@@ -91,6 +91,9 @@ function App() {
     if (screen === 'help') {
       setCurrentScreen('help');
     }
+    if (screen === 'Login') {
+      setCurrentScreen('login');
+    }
   };
 
   const handleUserProfileBack = () => {

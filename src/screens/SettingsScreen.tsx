@@ -37,8 +37,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onNavigate }) =
 
   const handleLogout = () => {
     console.log('Logout pressed');
-    if (onBack) {
-      onBack();
+    if (onNavigate) {
+      onNavigate('Login');
     }
   };
 
@@ -71,6 +71,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onNavigate }) =
             title="LogOut →"
             onPress={handleLogout}
             showArrow={false}
+            textStyle={styles.logoutText}
             style={styles.logoutItem}
           />
         </Card>
@@ -102,6 +103,9 @@ const styles = StyleSheet.create({
   },
   logoutItem: {
     borderBottomWidth: 0,
+  },
+  logoutText: {
+    color: '#FF0000',
   },
 });
 

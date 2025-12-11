@@ -1,11 +1,12 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ViewStyle } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, ViewStyle, TextStyle } from 'react-native';
 import { Colors } from '../styles/colors';
 
 interface ListItemProps {
   title: string;
   onPress: () => void;
   style?: ViewStyle;
+  textStyle?: TextStyle;
   showArrow?: boolean;
 }
 
@@ -13,6 +14,7 @@ const ListItem: React.FC<ListItemProps> = ({
   title, 
   onPress, 
   style,
+  textStyle,
   showArrow = true 
 }) => {
   return (
@@ -21,7 +23,7 @@ const ListItem: React.FC<ListItemProps> = ({
       onPress={onPress}
       activeOpacity={0.7}
     >
-      <Text style={styles.listItemText}>{title}</Text>
+      <Text style={[styles.listItemText, textStyle]}>{title}</Text>
       {showArrow && <Text style={styles.arrow}>›</Text>}
     </TouchableOpacity>
   );
