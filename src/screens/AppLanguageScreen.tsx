@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import { Colors } from '../styles/colors';
 import { useLanguage } from '../contexts/LanguageContext';
-import { Language } from '../utils/translations';
 import { ScreenHeader, TextInputField, Card } from '../components';
 
 interface AppLanguageScreenProps {
@@ -17,22 +16,17 @@ interface AppLanguageScreenProps {
 }
 
 const AppLanguageScreen: React.FC<AppLanguageScreenProps> = ({ onBack }) => {
-  const { language, setLanguage } = useLanguage();
+  const { language, changeLanguage } = useLanguage();
   const [selectedLanguage, setSelectedLanguage] = useState<string>(language);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Only show implemented languages
   const languages = [
-    { id: 1, name: 'English', nativeName: 'English' },
-    { id: 2, name: 'Hindi', nativeName: 'हिंदी' },
-    { id: 3, name: 'Gujarati', nativeName: 'ગુજરાતી' },
-    { id: 4, name: 'Marathi', nativeName: 'मराठी' },
-    { id: 5, name: 'Bengali', nativeName: 'বাংলা' },
-    { id: 6, name: 'Tamil', nativeName: 'தமிழ்' },
-    { id: 7, name: 'Telugu', nativeName: 'తెలుగు' },
-    { id: 8, name: 'Kannada', nativeName: 'ಕನ್ನಡ' },
-    { id: 9, name: 'Malayalam', nativeName: 'മലയാളം' },
-    { id: 10, name: 'Punjabi', nativeName: 'ਪੰਜਾਬੀ' },
-    { id: 11, name: 'Urdu', nativeName: 'اردو' },
+    { id: 1, code: 'en', name: 'English', nativeName: 'English' },
+    { id: 2, code: 'hi', name: 'Hindi', nativeName: 'हिंदी' },
+    // Add more as you implement them:
+    // { id: 3, code: 'gu', name: 'Gujarati', nativeName: 'ગુજરાતી' },
+    // { id: 4, code: 'mr', name: 'Marathi', nativeName: 'मराठी' },
   ];
 
   const filteredLanguages = languages.filter(lang =>
@@ -40,10 +34,10 @@ const AppLanguageScreen: React.FC<AppLanguageScreenProps> = ({ onBack }) => {
     lang.nativeName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleLanguageSelect = (languageName: string) => {
-    setSelectedLanguage(languageName);
-    setLanguage(languageName as Language);
-    console.log('Language selected:', languageName);
+  const handleLanguageSelect = async (languageCode: string) => {
+    setSelectedLanguage(languageCode);
+    await changeLanguage(languageCode as 'en' | 'hi');
+    console.log('Language selected:', languageCode);
   };
 
   return (
@@ -76,14 +70,14 @@ const AppLanguageScreen: React.FC<AppLanguageScreenProps> = ({ onBack }) => {
                   styles.languageItem,
                   index === filteredLanguages.length - 1 && styles.lastLanguageItem
                 ]}
-                onPress={() => handleLanguageSelect(language.name)}
+                onPress={() => handleLanguageSelect(language.code)}
                 activeOpacity={0.7}
               >
                 <View style={styles.languageInfo}>
                   <Text style={styles.languageName}>{language.name}</Text>
                   <Text style={styles.nativeName}>{language.nativeName}</Text>
                 </View>
-                {selectedLanguage === language.name && (
+                {selectedLanguage === language.code && (
                   <Text style={styles.checkmark}>✓</Text>
                 )}
               </TouchableOpacity>

@@ -1,21 +1,53 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Language, Translations, translations } from '../utils/translations';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import '../i18n'; // Initialize i18next
+
+type Language = 'en' | 'hi';
 
 interface LanguageContextType {
   language: Language;
-  setLanguage: (language: Language) => void;
-  t: Translations;
+  changeLanguage: (lang: Language) => Promise<void>;
+  t: (key: string) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useState<Language>('English');
+const LANGUAGE_STORAGE_KEY = '@app_language';
 
-  const t = translations[language];
+export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const { t, i18n } = useTranslation();
+  const [language, setLanguage] = useState<Language>('en');
+
+  // Load saved language on mount
+  useEffect(() => {
+    loadSavedLanguage();
+  }, []);
+
+  const loadSavedLanguage = async () => {
+    try {
+      const savedLanguage = await AsyncStorage.getItem(LANGUAGE_STORAGE_KEY);
+      if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'hi')) {
+        setLanguage(savedLanguage);
+        i18n.changeLanguage(savedLanguage);
+      }
+    } catch (error) {
+      console.error('Error loading saved language:', error);
+    }
+  };
+
+  const changeLanguage = async (lang: Language) => {
+    try {
+      await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+      setLanguage(lang);
+      await i18n.changeLanguage(lang);
+    } catch (error) {
+      console.error('Error changing language:', error);
+    }
+  };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={{ language, changeLanguage, t }}>
       {children}
     </LanguageContext.Provider>
   );

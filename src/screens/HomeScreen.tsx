@@ -194,7 +194,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
       {/* Header */}
       <View style={styles.header}>
         <View>
-          <Text style={styles.greeting}>{t.greeting}, {userName}</Text>
+          <Text style={styles.greeting}>{t('home.greeting')}, {userName}</Text>
         </View>
         <TouchableOpacity
           style={styles.menuButton}
@@ -216,7 +216,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
               }
             }}
           >
-            <Text style={styles.dropdownText}>{t.orders}</Text>
+            <Text style={styles.dropdownText}>{t('orders.title')}</Text>
           </TouchableOpacity>
           <View style={styles.dropdownDivider} />
           <TouchableOpacity
@@ -228,14 +228,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
               }
             }}
           >
-            <Text style={styles.dropdownText}>{t.schedule}</Text>
+            <Text style={styles.dropdownText}>{t('schedule.schedule')}</Text>
           </TouchableOpacity>
           <View style={styles.dropdownDivider} />
           <TouchableOpacity
             style={styles.dropdownItem}
             onPress={handleSettingsPress}
           >
-            <Text style={styles.dropdownText}>{t.setting}</Text>
+            <Text style={styles.dropdownText}>{t('settings.setting')}</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -257,7 +257,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
             onPress={handleDayTabClick}
           >
             <Text style={[styles.tabText, viewMode === 'day' && styles.tabTextActive]}>
-              {t.day}
+              {t('home.day')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -265,7 +265,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
             onPress={() => setViewMode('week')}
           >
             <Text style={[styles.tabText, viewMode === 'week' && styles.tabTextActive]}>
-              {t.week}
+              {t('home.week')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -273,7 +273,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
             onPress={() => setViewMode('month')}
           >
             <Text style={[styles.tabText, viewMode === 'month' && styles.tabTextActive]}>
-              {t.month}
+              {t('home.month')}
             </Text>
           </TouchableOpacity>
         </View>

@@ -19,13 +19,13 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onNavigate }) =
   const { t } = useLanguage();
   
   const settingsOptions = [
-    { id: 1, title: t.userProfile, key: 'userProfile' },
-    { id: 2, title: "Image's & Video's", key: 'images' },
-    { id: 3, title: t.location, key: 'location' },
-    { id: 4, title: t.appLanguage, key: 'appLanguage' },
-    { id: 5, title: t.inviteFriend, key: 'inviteFriend' },
-    { id: 6, title: t.tutorialVideos, key: 'tutorialVideos' },
-    { id: 7, title: t.help, key: 'help' },
+    { id: 1, title: t('settings.userProfile'), key: 'userProfile' },
+    { id: 2, title: t('settings.imagesVideos'), key: 'images' },
+    { id: 3, title: t('settings.location'), key: 'location' },
+    { id: 4, title: t('settings.appLanguage'), key: 'appLanguage' },
+    { id: 5, title: t('settings.inviteFriend'), key: 'inviteFriend' },
+    { id: 6, title: t('settings.tutorialVideos'), key: 'tutorialVideos' },
+    { id: 7, title: t('settings.help'), key: 'help' },
   ];
 
   const handleOptionPress = (key: string) => {
@@ -52,7 +52,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onNavigate }) =
       >
         {/* Header */}
         <View style={styles.header}>
-          <ScreenHeader title={t.settings} onBack={onBack} />
+          <ScreenHeader title={t('settings.settings')} onBack={onBack} />
         </View>
 
         {/* Settings Options */}
@@ -68,7 +68,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onNavigate }) =
 
           {/* Logout Option */}
           <ListItem
-            title="LogOut →"
+            title={t('settings.logout')}
             onPress={handleLogout}
             showArrow={false}
             textStyle={styles.logoutText}

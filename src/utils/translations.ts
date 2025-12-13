@@ -19,11 +19,13 @@ export interface Translations {
   // Settings Screen
   settings: string;
   userProfile: string;
+  imagesVideos: string;
   location: string;
   appLanguage: string;
   inviteFriend: string;
   tutorialVideos: string;
   help: string;
+  logout: string;
   
   // Order Screens
   orderHistory: string;
@@ -57,6 +59,22 @@ export interface Translations {
   update: string;
   save: string;
   sendEmail: string;
+  
+  // Location Screen
+  getCurrentLocation: string;
+  setHomeLocation: string;
+  gettingAddress: string;
+  mapPlaceholder: string;
+  locationInfoText: string;
+  permissionDenied: string;
+  permissionDeniedMessage: string;
+  locationError: string;
+  locationErrorMessage: string;
+  noLocationSelected: string;
+  noLocationSelectedMessage: string;
+  homeLocationSet: string;
+  homeLocationSetMessage: string;
+  yourLocation: string;
   
   // FAQ
   faq1Question: string;
@@ -110,11 +128,13 @@ export const translations: Record<Language, Translations> = {
     setting: 'Setting',
     settings: 'Settings',
     userProfile: 'User Profile',
+    imagesVideos: "Image's & Video's",
     location: 'Location',
     appLanguage: 'App Language',
     inviteFriend: 'Invite Friend',
     tutorialVideos: 'Tutorial Videos',
     help: 'Help',
+    logout: 'LogOut →',
     orderHistory: 'Order History',
     activeOrder: 'Order',
     client: 'Client',
@@ -140,6 +160,20 @@ export const translations: Record<Language, Translations> = {
     update: 'Update',
     save: 'Save',
     sendEmail: 'Send Email',
+    getCurrentLocation: '📍 Get Current Location',
+    setHomeLocation: 'Set Home Location',
+    gettingAddress: 'Getting address...',
+    mapPlaceholder: 'Tap "Get Current Location" to view your position',
+    locationInfoText: 'Click "Get Current Location" to sync your GPS location, then click "Set Home Location" to save it.',
+    permissionDenied: 'Permission Denied',
+    permissionDeniedMessage: 'Location permission is required to get your current location.',
+    locationError: 'Location Error',
+    locationErrorMessage: 'Unable to get your location. Please make sure location services are enabled.',
+    noLocationSelected: 'No Location Selected',
+    noLocationSelectedMessage: 'Please get your current location first before setting it as home location.',
+    homeLocationSet: 'Home Location Set',
+    homeLocationSetMessage: 'Your home location has been set.',
+    yourLocation: 'Your Location',
     faq1Question: 'How To Withdraw Money ?',
     faq1Answer: 'To withdraw money:\n1. Go to your Profile\n2. Click on "Withdraw Funds"\n3. Enter the amount (minimum ₹100)\n4. Select your bank account\n5. Confirm the withdrawal\n\nMoney will be transferred within 24-48 hours.',
     faq2Question: 'How TO Get More Work ?',
@@ -185,11 +219,13 @@ export const translations: Record<Language, Translations> = {
     setting: 'सेटिंग',
     settings: 'सेटिंग्स',
     userProfile: 'उपयोगकर्ता प्रोफ़ाइल',
+    imagesVideos: 'छवियाँ और वीडियो',
     location: 'स्थान',
     appLanguage: 'ऐप भाषा',
     inviteFriend: 'मित्र को आमंत्रित करें',
     tutorialVideos: 'ट्यूटोरियल वीडियो',
     help: 'मदद',
+    logout: 'लॉगआउट →',
     orderHistory: 'ऑर्डर इतिहास',
     activeOrder: 'ऑर्डर',
     client: 'ग्राहक',
@@ -215,6 +251,20 @@ export const translations: Record<Language, Translations> = {
     update: 'अपडेट करें',
     save: 'सहेजें',
     sendEmail: 'ईमेल भेजें',
+    getCurrentLocation: '📍 वर्तमान स्थान प्राप्त करें',
+    setHomeLocation: 'होम स्थान सेट करें',
+    gettingAddress: 'पता प्राप्त कर रहे हैं...',
+    mapPlaceholder: 'अपनी स्थिति देखने के लिए "वर्तमान स्थान प्राप्त करें" पर टैप करें',
+    locationInfoText: 'अपना GPS स्थान सिंक करने के लिए "वर्तमान स्थान प्राप्त करें" पर क्लिक करें, फिर इसे सहेजने के लिए "होम स्थान सेट करें" पर क्लिक करें।',
+    permissionDenied: 'अनुमति अस्वीकृत',
+    permissionDeniedMessage: 'आपका वर्तमान स्थान प्राप्त करने के लिए स्थान अनुमति आवश्यक है।',
+    locationError: 'स्थान त्रुटि',
+    locationErrorMessage: 'आपका स्थान प्राप्त करने में असमर्थ। कृपया सुनिश्चित करें कि स्थान सेवाएं सक्षम हैं।',
+    noLocationSelected: 'कोई स्थान चयनित नहीं',
+    noLocationSelectedMessage: 'कृपया इसे होम स्थान के रूप में सेट करने से पहले अपना वर्तमान स्थान प्राप्त करें।',
+    homeLocationSet: 'होम स्थान सेट किया गया',
+    homeLocationSetMessage: 'आपका होम स्थान सेट कर दिया गया है।',
+    yourLocation: 'आपका स्थान',
     faq1Question: 'पैसे कैसे निकालें?',
     faq1Answer: 'पैसे निकालने के लिए:\n1. अपनी प्रोफाइल पर जाएं\n2. "धनराशि निकालें" पर क्लिक करें\n3. राशि दर्ज करें (न्यूनतम ₹100)\n4. अपना बैंक खाता चुनें\n5. निकासी की पुष्टि करें\n\nपैसा 24-48 घंटों में स्थानांतरित हो जाएगा।',
     faq2Question: 'अधिक काम कैसे प्राप्त करें?',
@@ -260,11 +310,13 @@ export const translations: Record<Language, Translations> = {
     setting: 'સેટિંગ',
     settings: 'સેટિંગ્સ',
     userProfile: 'વપરાશકર્તા પ્રોફાઇલ',
+    imagesVideos: 'છબીઓ અને વિડિઓઝ',
     location: 'સ્થાન',
     appLanguage: 'એપ ભાષા',
     inviteFriend: 'મિત્રને આમંત્રિત કરો',
     tutorialVideos: 'ટ્યુટોરિયલ વિડિઓઝ',
     help: 'મદદ',
+    logout: 'લૉગઆઉટ →',
     orderHistory: 'ઓર્ડર ઇતિહાસ',
     activeOrder: 'ઓર્ડર',
     client: 'ગ્રાહક',
@@ -290,6 +342,20 @@ export const translations: Record<Language, Translations> = {
     update: 'અપડેટ કરો',
     save: 'સાચવો',
     sendEmail: 'ઈમેલ મોકલો',
+    getCurrentLocation: '📍 વર્તમાન સ્થાન મેળવો',
+    setHomeLocation: 'હોમ સ્થાન સેટ કરો',
+    gettingAddress: 'સરનામું મેળવી રહ્યા છીએ...',
+    mapPlaceholder: 'તમારી સ્થિતિ જોવા માટે "વર્તમાન સ્થાન મેળવો" પર ટેપ કરો',
+    locationInfoText: 'તમારું GPS સ્થાન સિંક કરવા માટે "વર્તમાન સ્થાન મેળવો" પર ક્લિક કરો, પછી તેને સાચવવા માટે "હોમ સ્થાન સેટ કરો" પર ક્લિક કરો।',
+    permissionDenied: 'પરવાનગી નકારી',
+    permissionDeniedMessage: 'તમારું વર્તમાન સ્થાન મેળવવા માટે સ્થાન પરવાનગી જરૂરી છે।',
+    locationError: 'સ્થાન ભૂલ',
+    locationErrorMessage: 'તમારું સ્થાન મેળવવામાં અસમર્થ. કૃપા કરીને ખાતરી કરો કે સ્થાન સેવાઓ સક્ષમ છે।',
+    noLocationSelected: 'કોઈ સ્થાન પસંદ નથી',
+    noLocationSelectedMessage: 'કૃપા કરીને તેને હોમ સ્થાન તરીકે સેટ કરતા પહેલા તમારું વર્તમાન સ્થાન મેળવો।',
+    homeLocationSet: 'હોમ સ્થાન સેટ',
+    homeLocationSetMessage: 'તમારું હોમ સ્થાન સેટ કરવામાં આવ્યું છે।',
+    yourLocation: 'તમારું સ્થાન',
     faq1Question: 'How To Withdraw Money ?',
     faq1Answer: 'To withdraw money:\n1. Go to your Profile\n2. Click on "Withdraw Funds"\n3. Enter the amount (minimum ₹100)\n4. Select your bank account\n5. Confirm the withdrawal\n\nMoney will be transferred within 24-48 hours.',
     faq2Question: 'How TO Get More Work ?',
@@ -336,11 +402,13 @@ export const translations: Record<Language, Translations> = {
     setting: 'सेटिंग',
     settings: 'सेटिंग्ज',
     userProfile: 'वापरकर्ता प्रोफाइल',
+    imagesVideos: 'प्रतिमा आणि व्हिडिओ',
     location: 'स्थान',
     appLanguage: 'अॅप भाषा',
     inviteFriend: 'मित्राला आमंत्रित करा',
     tutorialVideos: 'ट्यूटोरियल व्हिडिओ',
     help: 'मदत',
+    logout: 'लॉगआउट →',
     orderHistory: 'ऑर्डर इतिहास',
     activeOrder: 'ऑर्डर',
     client: 'ग्राहक',
@@ -366,6 +434,20 @@ export const translations: Record<Language, Translations> = {
     update: 'अद्यतनित करा',
     save: 'जतन करा',
     sendEmail: 'ईमेल पाठवा',
+    getCurrentLocation: '📍 सध्याचे स्थान मिळवा',
+    setHomeLocation: 'होम स्थान सेट करा',
+    gettingAddress: 'पत्ता मिळवत आहे...',
+    mapPlaceholder: 'तुमची स्थिती पाहण्यासाठी "सध्याचे स्थान मिळवा" वर टॅप करा',
+    locationInfoText: 'तुमचे GPS स्थान सिंक करण्यासाठी "सध्याचे स्थान मिळवा" वर क्लिक करा, नंतर ते जतन करण्यासाठी "होम स्थान सेट करा" वर क्लिक करा।',
+    permissionDenied: 'परवानगी नाकारली',
+    permissionDeniedMessage: 'तुमचे सध्याचे स्थान मिळवण्यासाठी स्थान परवानगी आवश्यक आहे।',
+    locationError: 'स्थान त्रुटी',
+    locationErrorMessage: 'तुमचे स्थान मिळवण्यात अक्षम. कृपया खात्री करा की स्थान सेवा सक्षम आहेत।',
+    noLocationSelected: 'कोणतेही स्थान निवडलेले नाही',
+    noLocationSelectedMessage: 'कृपया ते होम स्थान म्हणून सेट करण्यापूर्वी तुमचे सध्याचे स्थान मिळवा।',
+    homeLocationSet: 'होम स्थान सेट',
+    homeLocationSetMessage: 'तुमचे होम स्थान सेट केले गेले आहे।',
+    yourLocation: 'तुमचे स्थान',
     faq1Question: 'How To Withdraw Money ?',
     faq1Answer: 'To withdraw money:\n1. Go to your Profile\n2. Click on "Withdraw Funds"\n3. Enter the amount (minimum ₹100)\n4. Select your bank account\n5. Confirm the withdrawal\n\nMoney will be transferred within 24-48 hours.',
     faq2Question: 'How TO Get More Work ?',

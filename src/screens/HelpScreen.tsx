@@ -24,70 +24,82 @@ const HelpScreen: React.FC<HelpScreenProps> = ({ onBack, onAIChatPress }) => {
   const faqItems = [
     {
       id: 1,
-      question: t.faq1Question,
-      answer: t.faq1Answer,
+      question: t('help.faq1Question'),
+      answer: t('help.faq1Answer'),
     },
     {
       id: 2,
-      question: t.faq2Question,
-      answer: t.faq2Answer,
+      question: t('help.faq2Question'),
+      answer: t('help.faq2Answer'),
     },
     {
       id: 3,
-      question: t.faq3Question,
-      answer: t.faq3Answer,
+      question: t('help.faq3Question'),
+      answer: t('help.faq3Answer'),
     },
     {
       id: 4,
-      question: t.faq4Question,
-      answer: t.faq4Answer,
+      question: t('help.faq4Question'),
+      answer: t('help.faq4Answer'),
     },
     {
       id: 5,
-      question: t.faq5Question,
-      answer: t.faq5Answer,
+      question: t('help.faq5Question'),
+      answer: t('help.faq5Answer'),
     },
     {
       id: 6,
-      question: t.faq6Question,
-      answer: t.faq6Answer,
+      question: t('help.faq6Question'),
+      answer: t('help.faq6Answer'),
     },
   ];
 
   const handleSendEmail = () => {
-    // Pre-filled email template
+    // TODO: Get user details from backend/context when available
+    // For now using placeholder data
     const userDetails = {
-      name: 'Praveg Amine',
-      profession: 'Professional Worker',
-      mobile: '+91 1234567890',
+      name: 'Prayag Ahire', // TODO: Get from user profile/context
+      mobile: '+91 1234567890', // TODO: Get from user profile/context
+      address: 'Mumbai, Maharashtra', // TODO: Get from user profile/context
     };
 
-    const subject = 'Help Request - ProWorker App';
-    const body = `Hi ProWorker Support Team,
+    const subject = 'Support Request - Worker App';
+    const body = `Dear ProWorker Support Team,
 
-I need help with the following:
+I need assistance with the following:
 
-User Details:
-- Name: ${userDetails.name}
-- Profession: ${userDetails.profession}
-- Mobile: ${userDetails.mobile}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+USER DETAILS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Name: ${userDetails.name}
+Contact: ${userDetails.mobile}
+Address: ${userDetails.address}
 
-My Query/Issue:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MY QUERY/ISSUE:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 [Please describe your issue or question here]
 
-Thank you!`;
 
-    const emailUrl = `mailto:support@proworker.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Thank you for your support!
+
+Best regards,
+${userDetails.name}`;
+
+    const emailUrl = `mailto:client.support@proworker.co?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
     Linking.canOpenURL(emailUrl)
       .then((supported) => {
         if (supported) {
           Linking.openURL(emailUrl);
         } else {
-          Alert.alert('Error', 'Unable to open email app');
+          Alert.alert('Error', 'Unable to open email app. Please make sure you have an email app installed.');
         }
       })
-      .catch(() => Alert.alert('Error', 'Unable to open email app'));
+      .catch(() => Alert.alert('Error', 'Unable to open email app. Please try again.'));
   };
 
   const handleFAQPress = (faqId: number) => {
@@ -106,13 +118,13 @@ Thank you!`;
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={onBack}>
-            <Text style={styles.backButtonText}>← {t.help}</Text>
+            <Text style={styles.backButtonText}>← {t('help.title')}</Text>
           </TouchableOpacity>
         </View>
 
         {/* Send Email Button */}
         <TouchableOpacity style={styles.sendEmailButton} onPress={handleSendEmail}>
-          <Text style={styles.sendEmailText}>{t.sendEmail}</Text>
+          <Text style={styles.sendEmailText}>{t('actions.sendEmail')}</Text>
         </TouchableOpacity>
 
         {/* FAQ List */}
