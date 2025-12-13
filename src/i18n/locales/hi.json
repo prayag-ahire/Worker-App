@@ -129,7 +129,8 @@
     "september": "सितंबर",
     "october": "अक्टूबर",
     "november": "नवंबर",
-    "december": "दिसंबर"
+    "december": "दिसंबर",
+    "week": "सप्ताह"
   },
   "actions": {
     "search": "खोजें",
@@ -139,5 +140,144 @@
     "update": "अपडेट करें",
     "sendEmail": "ईमेल भेजें",
     "previous": "पिछला"
+  },
+  "profile": {
+    "title": "उपयोगकर्ता प्रोफ़ाइल",
+    "edit": "संपादित करें",
+    "charges": "शुल्क",
+    "rating": "रेटिंग",
+    "distanceCharges": "दूरी शुल्क",
+    "on": "चालू",
+    "off": "बंद",
+    "description": "विवरण...",
+    "image": "छवि",
+    "video": "वीडियो",
+    "review": "समीक्षा",
+    "imagesPlaceholder": "छवियाँ यहां दिखाई देंगी",
+    "videosPlaceholder": "वीडियो यहां दिखाई देंगे",
+    "reviewsPlaceholder": "समीक्षाएं यहां दिखाई देंगी"
+  },
+  "inviteFriend": {
+    "title": "मित्र को आमंत्रित करें",
+    "shareCode": "अपना रेफरल कोड साझा करें",
+    "yourCode": "आपका कोड",
+    "copyCode": "कोड कॉपी करें",
+    "shareVia": "के माध्यम से साझा करें",
+    "benefits": "रेफरल लाभ",
+    "benefit1": "दोस्त साइन अप करने पर आपको ₹100 मिलते हैं",
+    "benefit2": "आपके दोस्त को ₹50 बोनस मिलता है",
+    "benefit3": "असीमित रेफरल की अनुमति",
+    "howItWorks": "यह कैसे काम करता है?",
+    "step1": "अपने दोस्तों के साथ अपना रेफरल कोड साझा करें",
+    "step2": "दोस्त आपके कोड का उपयोग करके साइन अप करता है",
+    "step3": "आप दोनों को पुरस्कार मिलते हैं!"
+  },
+  "tutorial": {
+    "title": "ट्यूटोरियल वीडियो",
+    "noVideos": "कोई ट्यूटोरियल वीडियो उपलब्ध नहीं",
+    "watchNow": "अभी देखें"
+  },
+  "editProfile": {
+    "title": "प्रोफ़ाइल संपादित करें",
+    "name": "नाम",
+    "email": "ईमेल",
+    "phone": "फोन",
+    "address": "पता",
+    "profession": "पेशा",
+    "experience": "अनुभव",
+    "skills": "कौशल",
+    "saveChanges": "परिवर्तन सहेजें",
+    "cancel": "रद्द करें"
+  },
+  "personalDetails": {
+    "title": "व्यक्तिगत विवरण",
+    "fullName": "पूरा नाम",
+    "dateOfBirth": "जन्म तिथि",
+    "gender": "लिंग",
+    "male": "पुरुष",
+    "female": "महिला",
+    "other": "अन्य",
+    "nationality": "राष्ट्रीयता",
+    "idProof": "पहचान प्रमाण",
+    "uploadDocument": "दस्तावेज़ अपलोड करें"
+  },
+  "activeOrder": {
+    "title": "सक्रिय ऑर्डर",
+    "orderNumber": "ऑर्डर #",
+    "customerName": "ग्राहक का नाम",
+    "serviceType": "सेवा प्रकार",
+    "scheduledDate": "निर्धारित तिथि",
+    "scheduledTime": "निर्धारित समय",
+    "address": "पता",
+    "phone": "फोन",
+    "status": "स्थिति",
+    "viewOnMap": "मानचित्र पर देखें",
+    "callCustomer": "ग्राहक को कॉल करें",
+    "startWork": "काम शुरू करें",
+    "completeWork": "काम पूरा करें",
+    "reschedule": "पुनर्निर्धारित करें",
+    "cancel": "ऑर्डर रद्द करें"
+  },
+  "orderDetails": {
+    "title": "ऑर्डर विवरण",
+    "orderInfo": "ऑर्डर जानकारी",
+    "customerInfo": "ग्राहक जानकारी",
+    "serviceDetails": "सेवा विवरण",
+    "paymentInfo": "भुगतान जानकारी",
+    "amount": "राशि",
+    "paymentMethod": "भुगतान विधि",
+    "paymentStatus": "भुगतान स्थिति",
+    "notes": "नोट्स"
+  },
+  "comment": {
+    "title": "टिप्पणी जोड़ें",
+    "enterComment": "अपनी टिप्पणी यहां दर्ज करें...",
+    "submit": "जमा करें",
+    "cancel": "रद्द करें",
+    "commentRequired": "टिप्पणी आवश्यक है"
+  },
+  "reschedule": {
+    "title": "पुनर्निर्धारित करें",
+    "selectDate": "तिथि चुनें",
+    "selectTime": "समय चुनें",
+    "reason": "पुनर्निर्धारण का कारण",
+    "confirm": "पुनर्निर्धारण की पुष्टि करें",
+    "cancel": "रद्द करें"
+  },
+  "timeSlots": {
+    "title": "समय स्लॉट चुनें",
+    "morning": "सुबह",
+    "afternoon": "दोपहर",
+    "evening": "शाम",
+    "night": "रात",
+    "selectSlot": "एक समय स्लॉट चुनें",
+    "noSlotsAvailable": "कोई स्लॉट उपलब्ध नहीं"
+  },
+  "weeklySchedule": {
+    "title": "साप्ताहिक अनुसूची",
+    "week": "सप्ताह",
+    "noWorkScheduled": "इस सप्ताह के लिए कोई काम निर्धारित नहीं",
+    "days": "दिन",
+    "startTime": "शुरू\nसमय",
+    "endTime": "समाप्त\nसमय"
+  },
+  "monthlySchedule": {
+    "title": "मासिक अनुसूची",
+    "month": "महीना",
+    "noWorkScheduled": "इस महीने के लिए कोई काम निर्धारित नहीं",
+    "editLeave": "छुट्टी संपादित करें",
+    "addLeave": "छुट्टी जोड़ें",
+    "date": "तिथि",
+    "enterReason": "छुट्टी का कारण दर्ज करें",
+    "update": "अपडेट करें",
+    "cancelLeave": "छुट्टी रद्द करें",
+    "close": "बंद करें"
+  },
+  "aiChat": {
+    "title": "AI सहायक",
+    "typeMessage": "अपना संदेश टाइप करें...",
+    "send": "भेजें",
+    "greeting": "नमस्ते! आज मैं आपकी कैसे मदद कर सकता हूं?",
+    "thinking": "सोच रहा हूं..."
   }
 }

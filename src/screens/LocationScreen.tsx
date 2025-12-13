@@ -195,7 +195,7 @@ const LocationScreen: React.FC<LocationScreenProps> = ({ onBack }) => {
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <ScreenHeader title="Location" onBack={onBack} />
+        <ScreenHeader title={t('location.title')} onBack={onBack} />
 
         {/* Map Container */}
         <View style={styles.mapContainer}>
@@ -212,7 +212,7 @@ const LocationScreen: React.FC<LocationScreenProps> = ({ onBack }) => {
             {markerPosition && (
               <Marker
                 coordinate={markerPosition}
-                title="Your Location"
+                title={t('location.yourLocation')}
                 description={location}
                 pinColor={Colors.accent}
               />
@@ -228,7 +228,7 @@ const LocationScreen: React.FC<LocationScreenProps> = ({ onBack }) => {
 
         {/* GPS Button */}
         <SecondaryButton
-          title="📍 Get Current Location"
+          title={t('location.getCurrentLocation')}
           onPress={handleGetCurrentLocation}
           style={styles.gpsButton}
           textStyle={styles.gpsButtonText}
@@ -236,14 +236,14 @@ const LocationScreen: React.FC<LocationScreenProps> = ({ onBack }) => {
 
         {/* Set Home Location Button */}
         <PrimaryButton
-          title="Set Home Location"
+          title={t('location.setHomeLocation')}
           onPress={handleSetHomeLocation}
           style={styles.setLocationButton}
         />
 
         {/* Info Text */}
         <Text style={styles.infoText}>
-          Click "Get Current Location" to sync your GPS location, then click "Set Home Location" to save it.
+          {t('location.infoText')}
         </Text>
       </ScrollView>
     </View>

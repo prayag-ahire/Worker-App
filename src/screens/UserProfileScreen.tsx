@@ -10,6 +10,7 @@ import {
   Switch,
 } from 'react-native';
 import { Colors } from '../styles/colors';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface UserProfileScreenProps {
   onBack?: () => void;
@@ -17,6 +18,7 @@ interface UserProfileScreenProps {
 }
 
 const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit }) => {
+  const { t } = useLanguage();
   const [name, setName] = useState('Praveg Amine');
   const [charges, setCharges] = useState('200/hr');
   const [rating] = useState(4); // 4 out of 6 stars
@@ -44,9 +46,9 @@ const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit })
           <TouchableOpacity style={styles.backButton} onPress={onBack}>
             <Text style={styles.backButtonText}>←</Text>
           </TouchableOpacity>
-          <Text style={styles.title}>User Profile</Text>
+          <Text style={styles.title}>{t('profile.title')}</Text>
           <TouchableOpacity style={styles.editButton} onPress={handleEdit}>
-            <Text style={styles.editButtonText}>Edit</Text>
+            <Text style={styles.editButtonText}>{t('profile.edit')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -64,13 +66,13 @@ const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit })
 
             {/* Charges */}
             <View style={styles.infoRow}>
-              <Text style={styles.label}>charges : </Text>
+              <Text style={styles.label}>{t('profile.charges')} : </Text>
               <Text style={styles.value}>{charges}</Text>
             </View>
 
             {/* Rating */}
             <View style={styles.ratingRow}>
-              <Text style={styles.label}>Rating </Text>
+              <Text style={styles.label}>{t('profile.rating')} </Text>
               <View style={styles.stars}>
                 {[1, 2, 3, 4, 5, 6].map((star) => (
                   <Text key={star} style={styles.star}>
@@ -82,7 +84,7 @@ const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit })
 
             {/* Distance Charges */}
             <View style={styles.distanceRow}>
-              <Text style={styles.distanceLabel}>Distance Charges</Text>
+              <Text style={styles.distanceLabel}>{t('profile.distanceCharges')}</Text>
               <View style={styles.switchContainer}>
                 <Switch
                   value={distanceCharges}
@@ -90,7 +92,7 @@ const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit })
                   trackColor={{ false: Colors.border, true: Colors.accent }}
                   thumbColor={Colors.white}
                 />
-                <Text style={styles.switchLabel}>{distanceCharges ? 'ON' : 'OFF'}</Text>
+                <Text style={styles.switchLabel}>{distanceCharges ? t('profile.on') : t('profile.off')}</Text>
               </View>
             </View>
           </View>
@@ -100,7 +102,7 @@ const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit })
         <View style={styles.descriptionContainer}>
           <TextInput
             style={styles.descriptionInput}
-            placeholder="Description..."
+            placeholder={t('profile.description')}
             placeholderTextColor={Colors.textLight}
             value={description}
             onChangeText={setDescription}
@@ -117,7 +119,7 @@ const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit })
             onPress={() => setActiveTab('image')}
           >
             <Text style={[styles.tabText, activeTab === 'image' && styles.tabTextActive]}>
-              image
+              {t('profile.image')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -125,7 +127,7 @@ const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit })
             onPress={() => setActiveTab('video')}
           >
             <Text style={[styles.tabText, activeTab === 'video' && styles.tabTextActive]}>
-              video
+              {t('profile.video')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -133,7 +135,7 @@ const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit })
             onPress={() => setActiveTab('review')}
           >
             <Text style={[styles.tabText, activeTab === 'review' && styles.tabTextActive]}>
-              review
+              {t('profile.review')}
             </Text>
           </TouchableOpacity>
         </View>
@@ -141,9 +143,9 @@ const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit })
         {/* Content Area */}
         <View style={styles.contentArea}>
           <Text style={styles.contentPlaceholder}>
-            {activeTab === 'image' && 'Images will appear here'}
-            {activeTab === 'video' && 'Videos will appear here'}
-            {activeTab === 'review' && 'Reviews will appear here'}
+            {activeTab === 'image' && t('profile.imagesPlaceholder')}
+            {activeTab === 'video' && t('profile.videosPlaceholder')}
+            {activeTab === 'review' && t('profile.reviewsPlaceholder')}
           </Text>
         </View>
       </ScrollView>

@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Colors } from '../styles/colors';
 import { ScreenHeader, Card } from '../components';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface OrderHistoryScreenProps {
   onBack?: () => void;
@@ -22,13 +23,15 @@ interface Order {
 }
 
 const OrderHistoryScreen: React.FC<OrderHistoryScreenProps> = ({ onBack, onOrderPress }) => {
+  const { t } = useLanguage();
+  
   const orders: Order[] = [
-    { id: '1245', clientName: 'Prayag Ahire', status: 'Completed' },
-    { id: '1246', clientName: 'Ganesh Ahire', status: 'Completed' },
-    { id: '1247', clientName: 'Ram Shirsagar', status: 'Completed' },
-    { id: '1248', clientName: 'Prayag Ahire', status: 'Completed' },
-    { id: '1249', clientName: 'Prayag Ahire', status: 'Completed' },
-    { id: '1250', clientName: 'Prayag Ahire', status: 'Completed' },
+    { id: '1245', clientName: 'Prayag Ahire', status: t('home.completed') },
+    { id: '1246', clientName: 'Ganesh Ahire', status: t('home.completed') },
+    { id: '1247', clientName: 'Ram Shirsagar', status: t('home.completed') },
+    { id: '1248', clientName: 'Prayag Ahire', status: t('home.completed') },
+    { id: '1249', clientName: 'Prayag Ahire', status: t('home.completed') },
+    { id: '1250', clientName: 'Prayag Ahire', status: t('home.completed') },
   ];
 
   return (
@@ -40,7 +43,7 @@ const OrderHistoryScreen: React.FC<OrderHistoryScreenProps> = ({ onBack, onOrder
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <ScreenHeader title="Orders" onBack={onBack} />
+        <ScreenHeader title={t('orders.title')} onBack={onBack} />
 
         {/* Orders List */}
         <Card style={styles.ordersCard}>

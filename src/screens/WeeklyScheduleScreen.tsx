@@ -9,6 +9,7 @@ import {
   Modal,
 } from 'react-native';
 import { Colors } from '../styles/colors';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface WeeklyScheduleScreenProps {
   onBack?: () => void;
@@ -21,14 +22,16 @@ interface DaySchedule {
 }
 
 const WeeklyScheduleScreen: React.FC<WeeklyScheduleScreenProps> = ({ onBack }) => {
+  const { t } = useLanguage();
+  
   const [schedule, setSchedule] = useState<DaySchedule[]>([
-    { day: 'Sunday', startTime: 'NON', endTime: 'NON' },
-    { day: 'Monday', startTime: '09:00', endTime: '18:00' },
-    { day: 'Tuesday', startTime: '09:00', endTime: '18:00' },
-    { day: 'Wednesday', startTime: '09:00', endTime: '18:00' },
-    { day: 'Thursday', startTime: '09:00', endTime: '18:00' },
-    { day: 'Friday', startTime: '09:00', endTime: '18:00' },
-    { day: 'Saturday', startTime: '09:00', endTime: '18:00' },
+    { day: t('calendar.sunday'), startTime: 'NON', endTime: 'NON' },
+    { day: t('calendar.monday'), startTime: '09:00', endTime: '18:00' },
+    { day: t('calendar.tuesday'), startTime: '09:00', endTime: '18:00' },
+    { day: t('calendar.wednesday'), startTime: '09:00', endTime: '18:00' },
+    { day: t('calendar.thursday'), startTime: '09:00', endTime: '18:00' },
+    { day: t('calendar.friday'), startTime: '09:00', endTime: '18:00' },
+    { day: t('calendar.saturday'), startTime: '09:00', endTime: '18:00' },
   ]);
 
   const [showTimePicker, setShowTimePicker] = useState(false);
@@ -108,15 +111,15 @@ const WeeklyScheduleScreen: React.FC<WeeklyScheduleScreenProps> = ({ onBack }) =
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={onBack}>
-            <Text style={styles.backButtonText}>← Weekly Schedule</Text>
+            <Text style={styles.backButtonText}>← {t('weeklySchedule.title')}</Text>
           </TouchableOpacity>
         </View>
 
         {/* Table Header */}
         <View style={styles.tableHeader}>
-          <Text style={[styles.headerCell, styles.dayColumn]}>Days</Text>
-          <Text style={[styles.headerCell, styles.timeColumn]}>Start{'\n'}Time</Text>
-          <Text style={[styles.headerCell, styles.timeColumn]}>End{'\n'}Time</Text>
+          <Text style={[styles.headerCell, styles.dayColumn]}>{t('weeklySchedule.days')}</Text>
+          <Text style={[styles.headerCell, styles.timeColumn]}>{t('weeklySchedule.startTime')}</Text>
+          <Text style={[styles.headerCell, styles.timeColumn]}>{t('weeklySchedule.endTime')}</Text>
         </View>
 
         {/* Schedule Rows */}
@@ -150,7 +153,7 @@ const WeeklyScheduleScreen: React.FC<WeeklyScheduleScreenProps> = ({ onBack }) =
 
         {/* Update Button */}
         <TouchableOpacity style={styles.updateButton} onPress={handleUpdate}>
-          <Text style={styles.updateButtonText}>Update</Text>
+          <Text style={styles.updateButtonText}>{t('actions.update')}</Text>
         </TouchableOpacity>
       </ScrollView>
 

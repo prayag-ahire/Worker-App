@@ -10,6 +10,7 @@ import {
   Modal,
 } from 'react-native';
 import { Colors } from '../styles/colors';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface MonthlyScheduleScreenProps {
   onBack?: () => void;
@@ -20,6 +21,7 @@ interface LeaveData {
 }
 
 const MonthlyScheduleScreen: React.FC<MonthlyScheduleScreenProps> = ({ onBack }) => {
+  const { t } = useLanguage();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [leaves, setLeaves] = useState<LeaveData>({
     '2025-10-12': 'Personal work',
@@ -31,8 +33,20 @@ const MonthlyScheduleScreen: React.FC<MonthlyScheduleScreenProps> = ({ onBack })
   const [leaveReason, setLeaveReason] = useState('');
 
   const formatMonth = () => {
-    const months = ['January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'];
+    const months = [
+      t('calendar.january'),
+      t('calendar.february'),
+      t('calendar.march'),
+      t('calendar.april'),
+      t('calendar.may'),
+      t('calendar.june'),
+      t('calendar.july'),
+      t('calendar.august'),
+      t('calendar.september'),
+      t('calendar.october'),
+      t('calendar.november'),
+      t('calendar.december')
+    ];
     const monthName = months[selectedDate.getMonth()];
     const year = selectedDate.getFullYear();
     return `${monthName.slice(0, 3)}, ${year}`;
@@ -137,7 +151,7 @@ const MonthlyScheduleScreen: React.FC<MonthlyScheduleScreenProps> = ({ onBack })
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={onBack}>
-            <Text style={styles.backButtonText}>← Monthly Schedule</Text>
+            <Text style={styles.backButtonText}>← {t('monthlySchedule.title')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -199,15 +213,15 @@ const MonthlyScheduleScreen: React.FC<MonthlyScheduleScreenProps> = ({ onBack })
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>
-              {leaves[getDateKey(selectedDay || 0)] ? 'Edit Leave' : 'Add Leave'}
+              {leaves[getDateKey(selectedDay || 0)] ? t('monthlySchedule.editLeave') : t('monthlySchedule.addLeave')}
             </Text>
             <Text style={styles.modalDate}>
-              Date: {selectedDay} {formatMonth()}
+              {t('monthlySchedule.date')}: {selectedDay} {formatMonth()}
             </Text>
 
             <TextInput
               style={styles.reasonInput}
-              placeholder="Enter reason for leave"
+              placeholder={t('monthlySchedule.enterReason')}
               placeholderTextColor={Colors.textLight}
               value={leaveReason}
               onChangeText={setLeaveReason}
@@ -220,7 +234,7 @@ const MonthlyScheduleScreen: React.FC<MonthlyScheduleScreenProps> = ({ onBack })
                 style={styles.updateButton}
                 onPress={handleUpdateLeave}
               >
-                <Text style={styles.updateButtonText}>Update</Text>
+                <Text style={styles.updateButtonText}>{t('monthlySchedule.update')}</Text>
               </TouchableOpacity>
 
               {leaves[getDateKey(selectedDay || 0)] && (
@@ -228,7 +242,7 @@ const MonthlyScheduleScreen: React.FC<MonthlyScheduleScreenProps> = ({ onBack })
                   style={styles.cancelButton}
                   onPress={handleCancelLeave}
                 >
-                  <Text style={styles.cancelButtonText}>Cancel Leave</Text>
+                  <Text style={styles.cancelButtonText}>{t('monthlySchedule.cancelLeave')}</Text>
                 </TouchableOpacity>
               )}
 
@@ -240,7 +254,7 @@ const MonthlyScheduleScreen: React.FC<MonthlyScheduleScreenProps> = ({ onBack })
                   setSelectedDay(null);
                 }}
               >
-                <Text style={styles.closeButtonText}>Close</Text>
+                <Text style={styles.closeButtonText}>{t('monthlySchedule.close')}</Text>
               </TouchableOpacity>
             </View>
           </View>

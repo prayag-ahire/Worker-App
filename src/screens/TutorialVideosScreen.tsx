@@ -9,12 +9,15 @@ import {
 } from 'react-native';
 import { Colors } from '../styles/colors';
 import { ScreenHeader, Card } from '../components';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface TutorialVideosScreenProps {
   onBack?: () => void;
 }
 
 const TutorialVideosScreen: React.FC<TutorialVideosScreenProps> = ({ onBack }) => {
+  const { t } = useLanguage();
+  
   const videos = [
     { id: 1, title: 'Getting Started', duration: '5:30', thumbnail: '🎬' },
     { id: 2, title: 'Managing Orders', duration: '8:15', thumbnail: '📋' },
@@ -36,7 +39,7 @@ const TutorialVideosScreen: React.FC<TutorialVideosScreenProps> = ({ onBack }) =
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <ScreenHeader title="Tutorial Video" onBack={onBack} />
+        <ScreenHeader title={t('tutorial.title')} onBack={onBack} />
 
         {/* Videos List */}
         {videos.map((video) => (

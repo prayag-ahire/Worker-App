@@ -11,12 +11,14 @@ import {
 } from 'react-native';
 import { Colors } from '../styles/colors';
 import { ScreenHeader, PrimaryButton, Card } from '../components';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface InviteFriendScreenProps {
   onBack?: () => void;
 }
 
 const InviteFriendScreen: React.FC<InviteFriendScreenProps> = ({ onBack }) => {
+  const { t } = useLanguage();
   const [referralCode] = useState('PROWORK' + Math.floor(Math.random() * 10000));
 
   const handleCopyCode = () => {
@@ -39,67 +41,67 @@ const InviteFriendScreen: React.FC<InviteFriendScreenProps> = ({ onBack }) => {
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <ScreenHeader title="Invite A Friend" onBack={onBack} />
+        <ScreenHeader title={t('inviteFriend.title')} onBack={onBack} />
 
         {/* Illustration */}
         <Card style={styles.illustrationCard}>
           <Text style={styles.illustrationEmoji}>👥</Text>
-          <Text style={styles.illustrationText}>Invite friends & earn rewards!</Text>
+          <Text style={styles.illustrationText}>{t('inviteFriend.shareCode')}</Text>
         </Card>
 
         {/* Benefits Section */}
         <View style={styles.benefitsContainer}>
           <View style={styles.benefitItem}>
             <Text style={styles.benefitIcon}>🎁</Text>
-            <Text style={styles.benefitText}>You get ₹100 when friend signs up</Text>
+            <Text style={styles.benefitText}>{t('inviteFriend.benefit1')}</Text>
           </View>
           <View style={styles.benefitItem}>
             <Text style={styles.benefitIcon}>💰</Text>
-            <Text style={styles.benefitText}>Your friend gets ₹50 bonus</Text>
+            <Text style={styles.benefitText}>{t('inviteFriend.benefit2')}</Text>
           </View>
         </View>
 
         {/* Referral Code Section */}
         <View style={styles.codeContainer}>
-          <Text style={styles.codeLabel}>Your Referral Code</Text>
+          <Text style={styles.codeLabel}>{t('inviteFriend.yourCode')}</Text>
           <View style={styles.codeBox}>
             <Text style={styles.codeText}>{referralCode}</Text>
             <TouchableOpacity style={styles.copyButton} onPress={handleCopyCode}>
-              <Text style={styles.copyButtonText}>Copy</Text>
+              <Text style={styles.copyButtonText}>{t('inviteFriend.copyCode')}</Text>
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Share Button */}
         <PrimaryButton
-          title="Invite A Friend"
+          title={t('inviteFriend.title')}
           onPress={handleShare}
           style={styles.shareButton}
         />
 
         {/* How it Works */}
         <View style={styles.howItWorksContainer}>
-          <Text style={styles.howItWorksTitle}>How it works?</Text>
+          <Text style={styles.howItWorksTitle}>{t('inviteFriend.howItWorks')}</Text>
           
           <View style={styles.stepItem}>
             <View style={styles.stepNumber}>
               <Text style={styles.stepNumberText}>1</Text>
             </View>
-            <Text style={styles.stepText}>Share your referral code with friends</Text>
+            <Text style={styles.stepText}>{t('inviteFriend.step1')}</Text>
           </View>
 
           <View style={styles.stepItem}>
             <View style={styles.stepNumber}>
               <Text style={styles.stepNumberText}>2</Text>
             </View>
-            <Text style={styles.stepText}>Friend signs up using your code</Text>
+            <Text style={styles.stepText}>{t('inviteFriend.step2')}</Text>
           </View>
 
           <View style={styles.stepItem}>
             <View style={styles.stepNumber}>
               <Text style={styles.stepNumberText}>3</Text>
             </View>
-            <Text style={styles.stepText}>Both of you get rewards!</Text>
+            <Text style={styles.stepText}>{t('inviteFriend.step3')}</Text>
           </View>
         </View>
       </ScrollView>

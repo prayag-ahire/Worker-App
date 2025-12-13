@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Colors } from '../styles/colors';
 import { ScreenHeader, Card } from '../components';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface ScheduleMainScreenProps {
   onBack?: () => void;
@@ -16,9 +17,11 @@ interface ScheduleMainScreenProps {
 }
 
 const ScheduleMainScreen: React.FC<ScheduleMainScreenProps> = ({ onBack, onNavigate }) => {
+  const { t } = useLanguage();
+  
   const scheduleOptions = [
-    { id: 1, title: 'Weekly Schedule', icon: '📅', key: 'weekly' },
-    { id: 2, title: 'Monthly Schedule', icon: '🗓️', key: 'monthly' },
+    { id: 1, title: t('schedule.weeklySchedule'), icon: '📅', key: 'weekly' },
+    { id: 2, title: t('schedule.monthlySchedule'), icon: '🗓️', key: 'monthly' },
   ];
 
   return (
@@ -30,7 +33,7 @@ const ScheduleMainScreen: React.FC<ScheduleMainScreenProps> = ({ onBack, onNavig
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <ScreenHeader title="Schedule" onBack={onBack} />
+        <ScreenHeader title={t('schedule.title')} onBack={onBack} />
 
         {/* Schedule Options */}
         <Card style={styles.optionsCard}>

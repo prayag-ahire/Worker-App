@@ -40,13 +40,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
 
   // Sample data - Week view
   const weekWork = [
-    { day: 'Sunday', count: '0' },
-    { day: 'Monday', count: '7' },
-    { day: 'Tuesday', count: '2' },
-    { day: 'Wednesday', count: '4' },
-    { day: 'Thursday', count: '8' },
-    { day: 'Friday', count: '5' },
-    { day: 'Saturday', count: '0' },
+    { day: t('calendar.sunday'), count: '0' },
+    { day: t('calendar.monday'), count: '7' },
+    { day: t('calendar.tuesday'), count: '2' },
+    { day: t('calendar.wednesday'), count: '4' },
+    { day: t('calendar.thursday'), count: '8' },
+    { day: t('calendar.friday'), count: '5' },
+    { day: t('calendar.saturday'), count: '0' },
   ];
 
   // Sample data - Month view (calendar grid)
@@ -96,7 +96,15 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
 
   const formatDate = () => {
     const day = selectedDate.getDate();
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const days = [
+      t('calendar.sunday'),
+      t('calendar.monday'),
+      t('calendar.tuesday'),
+      t('calendar.wednesday'),
+      t('calendar.thursday'),
+      t('calendar.friday'),
+      t('calendar.saturday')
+    ];
     const dayName = days[selectedDate.getDay()];
     return `${day}, ${dayName}`;
   };
@@ -110,15 +118,39 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
 
   const formatWeek = () => {
     const weekNum = getWeekNumber(selectedDate);
-    const months = ['January', 'February', 'March', 'April', 'May', 'June', 
-                    'July', 'August', 'September', 'October', 'November', 'December'];
+    const months = [
+      t('calendar.january'),
+      t('calendar.february'),
+      t('calendar.march'),
+      t('calendar.april'),
+      t('calendar.may'),
+      t('calendar.june'),
+      t('calendar.july'),
+      t('calendar.august'),
+      t('calendar.september'),
+      t('calendar.october'),
+      t('calendar.november'),
+      t('calendar.december')
+    ];
     const monthName = months[selectedDate.getMonth()];
-    return `Week ${weekNum}, ${monthName}`;
+    return `${t('calendar.week')} ${weekNum}, ${monthName}`;
   };
 
   const formatMonth = () => {
-    const months = ['January', 'February', 'March', 'April', 'May', 'June', 
-                    'July', 'August', 'September', 'October', 'November', 'December'];
+    const months = [
+      t('calendar.january'),
+      t('calendar.february'),
+      t('calendar.march'),
+      t('calendar.april'),
+      t('calendar.may'),
+      t('calendar.june'),
+      t('calendar.july'),
+      t('calendar.august'),
+      t('calendar.september'),
+      t('calendar.october'),
+      t('calendar.november'),
+      t('calendar.december')
+    ];
     const monthName = months[selectedDate.getMonth()];
     const year = selectedDate.getFullYear();
     return `${monthName} ${year}`;

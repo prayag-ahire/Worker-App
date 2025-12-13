@@ -129,7 +129,8 @@
     "september": "September",
     "october": "October",
     "november": "November",
-    "december": "December"
+    "december": "December",
+    "week": "Week"
   },
   "actions": {
     "search": "Search",
@@ -139,5 +140,144 @@
     "update": "Update",
     "sendEmail": "Send Email",
     "previous": "previous"
+  },
+  "profile": {
+    "title": "User Profile",
+    "edit": "Edit",
+    "charges": "charges",
+    "rating": "Rating",
+    "distanceCharges": "Distance Charges",
+    "on": "ON",
+    "off": "OFF",
+    "description": "Description...",
+    "image": "image",
+    "video": "video",
+    "review": "review",
+    "imagesPlaceholder": "Images will appear here",
+    "videosPlaceholder": "Videos will appear here",
+    "reviewsPlaceholder": "Reviews will appear here"
+  },
+  "inviteFriend": {
+    "title": "Invite A Friend",
+    "shareCode": "Share Your Referral Code",
+    "yourCode": "Your Code",
+    "copyCode": "Copy Code",
+    "shareVia": "Share Via",
+    "benefits": "Referral Benefits",
+    "benefit1": "You earn ₹100 when friend signs up",
+    "benefit2": "Your friend gets ₹50 bonus",
+    "benefit3": "Unlimited referrals allowed",
+    "howItWorks": "How it works?",
+    "step1": "Share your referral code with friends",
+    "step2": "Friend signs up using your code",
+    "step3": "Both of you get rewards!"
+  },
+  "tutorial": {
+    "title": "Tutorial Videos",
+    "noVideos": "No tutorial videos available",
+    "watchNow": "Watch Now"
+  },
+  "editProfile": {
+    "title": "Edit Profile",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "profession": "Profession",
+    "experience": "Experience",
+    "skills": "Skills",
+    "saveChanges": "Save Changes",
+    "cancel": "Cancel"
+  },
+  "personalDetails": {
+    "title": "Personal Details",
+    "fullName": "Full Name",
+    "dateOfBirth": "Date of Birth",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "other": "Other",
+    "nationality": "Nationality",
+    "idProof": "ID Proof",
+    "uploadDocument": "Upload Document"
+  },
+  "activeOrder": {
+    "title": "Active Order",
+    "orderNumber": "Order #",
+    "customerName": "Customer Name",
+    "serviceType": "Service Type",
+    "scheduledDate": "Scheduled Date",
+    "scheduledTime": "Scheduled Time",
+    "address": "Address",
+    "phone": "Phone",
+    "status": "Status",
+    "viewOnMap": "View on Map",
+    "callCustomer": "Call Customer",
+    "startWork": "Start Work",
+    "completeWork": "Complete Work",
+    "reschedule": "Reschedule",
+    "cancel": "Cancel Order"
+  },
+  "orderDetails": {
+    "title": "Order Details",
+    "orderInfo": "Order Information",
+    "customerInfo": "Customer Information",
+    "serviceDetails": "Service Details",
+    "paymentInfo": "Payment Information",
+    "amount": "Amount",
+    "paymentMethod": "Payment Method",
+    "paymentStatus": "Payment Status",
+    "notes": "Notes"
+  },
+  "comment": {
+    "title": "Add Comment",
+    "enterComment": "Enter your comment here...",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "commentRequired": "Comment is required"
+  },
+  "reschedule": {
+    "title": "Reschedule",
+    "selectDate": "Select Date",
+    "selectTime": "Select Time",
+    "reason": "Reason for Rescheduling",
+    "confirm": "Confirm Reschedule",
+    "cancel": "Cancel"
+  },
+  "timeSlots": {
+    "title": "Select Time Slot",
+    "morning": "Morning",
+    "afternoon": "Afternoon",
+    "evening": "Evening",
+    "night": "Night",
+    "selectSlot": "Select a time slot",
+    "noSlotsAvailable": "No slots available"
+  },
+  "weeklySchedule": {
+    "title": "Weekly Schedule",
+    "week": "Week",
+    "noWorkScheduled": "No work scheduled for this week",
+    "days": "Days",
+    "startTime": "Start\nTime",
+    "endTime": "End\nTime"
+  },
+  "monthlySchedule": {
+    "title": "Monthly Schedule",
+    "month": "Month",
+    "noWorkScheduled": "No work scheduled for this month",
+    "editLeave": "Edit Leave",
+    "addLeave": "Add Leave",
+    "date": "Date",
+    "enterReason": "Enter reason for leave",
+    "update": "Update",
+    "cancelLeave": "Cancel Leave",
+    "close": "Close"
+  },
+  "aiChat": {
+    "title": "AI Assistant",
+    "typeMessage": "Type your message...",
+    "send": "Send",
+    "greeting": "Hello! How can I help you today?",
+    "thinking": "Thinking..."
   }
 }
