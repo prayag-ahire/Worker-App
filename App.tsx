@@ -246,6 +246,10 @@ function App() {
     setSelectedTimeSlots([]);
   };
 
+  const handleHomePress = () => {
+    setCurrentScreen('home');
+  };
+
   return (
     <LanguageProvider>
       <SafeAreaProvider>
@@ -274,12 +278,16 @@ function App() {
             onSchedulePress={handleSchedulePress}
             onOrdersPress={handleOrdersPress}
             onWorkItemPress={handleWorkItemPress}
+            onHomePress={handleHomePress}
           />
         )}
         {currentScreen === 'settings' && (
           <SettingsScreen
             onBack={handleSettingsBack}
             onNavigate={handleSettingsNavigate}
+            onHomePress={handleHomePress}
+            onOrdersPress={handleOrdersPress}
+            onSchedulePress={handleSchedulePress}
           />
         )}
         {currentScreen === 'userProfile' && (
@@ -318,7 +326,9 @@ function App() {
         {currentScreen === 'scheduleMain' && (
           <ScheduleMainScreen
             onBack={handleScheduleMainBack}
-            onNavigate={handleScheduleNavigate}
+            onHomePress={handleHomePress}
+            onOrdersPress={handleOrdersPress}
+            onSettingsPress={handleSettingsPress}
           />
         )}
         {currentScreen === 'weeklySchedule' && (
@@ -331,6 +341,9 @@ function App() {
           <OrderHistoryScreen
             onBack={handleOrderHistoryBack}
             onOrderPress={handleOrderPress}
+            onHomePress={handleHomePress}
+            onSchedulePress={handleSchedulePress}
+            onSettingsPress={handleSettingsPress}
           />
         )}
         {currentScreen === 'orderDetails' && (

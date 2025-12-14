@@ -8,12 +8,16 @@ import {
   ScrollView,
 } from 'react-native';
 import { Colors } from '../styles/colors';
-import { ScreenHeader, Card } from '../components';
+import { Card } from '../components';
+import BottomNavigation from '../components/BottomNavigation';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface OrderHistoryScreenProps {
   onBack?: () => void;
   onOrderPress?: (orderId: string) => void;
+  onHomePress?: () => void;
+  onSchedulePress?: () => void;
+  onSettingsPress?: () => void;
 }
 
 interface Order {
@@ -22,7 +26,7 @@ interface Order {
   status: string;
 }
 
-const OrderHistoryScreen: React.FC<OrderHistoryScreenProps> = ({ onBack, onOrderPress }) => {
+const OrderHistoryScreen: React.FC<OrderHistoryScreenProps> = ({ onBack, onOrderPress, onHomePress, onSchedulePress, onSettingsPress }) => {
   const { t } = useLanguage();
   
   const orders: Order[] = [
@@ -38,13 +42,15 @@ const OrderHistoryScreen: React.FC<OrderHistoryScreenProps> = ({ onBack, onOrder
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={Colors.accent} translucent={true} />
 
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>{t('orders.title')}</Text>
+      </View>
+
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
-        <ScreenHeader title={t('orders.title')} onBack={onBack} variant="blue" />
-
         {/* Orders List */}
         <Card style={styles.ordersCard}>
           {orders.map((order, index) => (
@@ -66,6 +72,14 @@ const OrderHistoryScreen: React.FC<OrderHistoryScreenProps> = ({ onBack, onOrder
           ))}
         </Card>
       </ScrollView>
+
+      <BottomNavigation
+        activeTab="orders"
+        onHomePress={onHomePress}
+        onOrdersPress={onBack}
+        onSchedulePress={onSchedulePress}
+        onProfilePress={onSettingsPress}
+      />
     </View>
   );
 };
@@ -74,6 +88,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.white,
+  },
+  header: {
+    paddingHorizontal: 24,
+    paddingTop: 60,
+    paddingBottom: 20,
+    backgroundColor: Colors.accent,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    shadowColor: Colors.accent,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: Colors.white,
+    letterSpacing: -0.3,
   },
   scrollContent: {
     flexGrow: 1,

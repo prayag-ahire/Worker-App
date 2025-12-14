@@ -8,14 +8,18 @@ import {
 } from 'react-native';
 import { Colors } from '../styles/colors';
 import { useLanguage } from '../contexts/LanguageContext';
-import { ScreenHeader, ListItem, Card } from '../components';
+import { ListItem, Card } from '../components';
+import BottomNavigation from '../components/BottomNavigation';
 
 interface SettingsScreenProps {
   onBack?: () => void;
   onNavigate?: (screen: string) => void;
+  onHomePress?: () => void;
+  onOrdersPress?: () => void;
+  onSchedulePress?: () => void;
 }
 
-const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onNavigate }) => {
+const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onNavigate, onHomePress, onOrdersPress, onSchedulePress }) => {
   const { t } = useLanguage();
   
   const settingsOptions = [
@@ -46,19 +50,15 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onNavigate }) =
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={Colors.accent} translucent={true} />
 
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>{t('settings.settings')}</Text>
+      </View>
+
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <ScreenHeader 
-            title={t('settings.settings')} 
-            onBack={onBack}
-            variant="blue"
-          />
-        </View>
-
         {/* Settings Options */}
         <Card style={styles.settingsCard}>
           {settingsOptions.map((option, index) => (
@@ -80,6 +80,14 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onNavigate }) =
           />
         </Card>
       </ScrollView>
+
+      <BottomNavigation
+        activeTab="profile"
+        onHomePress={onHomePress}
+        onOrdersPress={onOrdersPress}
+        onSchedulePress={onSchedulePress}
+        onProfilePress={onBack}
+      />
     </View>
   );
 };
@@ -87,15 +95,32 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onNavigate }) =
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.white, // Clean white background
+    backgroundColor: Colors.white,
+  },
+  header: {
+    paddingHorizontal: 24,
+    paddingTop: 60,
+    paddingBottom: 20,
+    backgroundColor: Colors.accent,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    shadowColor: Colors.accent,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: Colors.white,
+    letterSpacing: -0.3,
   },
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: 24,
-    paddingVertical: 20,
-  },
-  header: {
-    marginBottom: 16,
+    paddingTop: 20,
+    paddingBottom: 20,
   },
   settingsCard: {
     padding: 0,

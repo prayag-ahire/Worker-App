@@ -28,7 +28,7 @@ const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit })
   const [activeTab, setActiveTab] = useState<'image' | 'video' | 'review'>('image');
 
   const handleEdit = () => {
-    console.log('Edit pressed');
+    // TODO: Navigate to edit profile screen
     if (onEdit) {
       onEdit();
     }

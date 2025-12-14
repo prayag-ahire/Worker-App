@@ -93,7 +93,6 @@ const WeeklyScheduleScreen: React.FC<WeeklyScheduleScreenProps> = ({ onBack }) =
   };
 
   const handleUpdate = () => {
-    console.log('Schedule updated:', schedule);
     // TODO: Save schedule to backend/storage
     // Show success message or navigate back
     if (onBack) {
@@ -230,7 +229,7 @@ const styles = StyleSheet.create({
     marginBottom: -1,
   },
   cell: {
-    paddingVertical: 12,
+    paddingVertical: 18, // Increased from 12 for more spacing
     paddingHorizontal: 8,
     justifyContent: 'center',
     alignItems: 'center',

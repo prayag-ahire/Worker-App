@@ -8,15 +8,19 @@ import {
   ScrollView,
 } from 'react-native';
 import { Colors } from '../styles/colors';
-import { ScreenHeader, Card } from '../components';
+import { Card } from '../components';
 import { useLanguage } from '../contexts/LanguageContext';
+import BottomNavigation from '../components/BottomNavigation';
 
 interface ScheduleMainScreenProps {
   onBack?: () => void;
   onNavigate?: (screen: string) => void;
+  onHomePress?: () => void;
+  onOrdersPress?: () => void;
+  onSettingsPress?: () => void;
 }
 
-const ScheduleMainScreen: React.FC<ScheduleMainScreenProps> = ({ onBack, onNavigate }) => {
+const ScheduleMainScreen: React.FC<ScheduleMainScreenProps> = ({ onBack, onNavigate, onHomePress, onOrdersPress, onSettingsPress }) => {
   const { t } = useLanguage();
   
   const scheduleOptions = [
@@ -28,13 +32,15 @@ const ScheduleMainScreen: React.FC<ScheduleMainScreenProps> = ({ onBack, onNavig
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={Colors.accent} translucent={true} />
 
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>{t('schedule.title')}</Text>
+      </View>
+
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
-        <ScreenHeader title={t('schedule.title')} onBack={onBack} variant="blue" />
-
         {/* Schedule Options */}
         <Card style={styles.optionsCard}>
           {scheduleOptions.map((option, index) => (
@@ -54,6 +60,14 @@ const ScheduleMainScreen: React.FC<ScheduleMainScreenProps> = ({ onBack, onNavig
           ))}
         </Card>
       </ScrollView>
+
+      <BottomNavigation
+        activeTab="schedule"
+        onHomePress={onHomePress}
+        onOrdersPress={onOrdersPress}
+        onSchedulePress={onBack}
+        onProfilePress={onSettingsPress}
+      />
     </View>
   );
 };
@@ -62,6 +76,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.white,
+  },
+  header: {
+    paddingHorizontal: 24,
+    paddingTop: 60,
+    paddingBottom: 20,
+    backgroundColor: Colors.accent,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    shadowColor: Colors.accent,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: Colors.white,
+    letterSpacing: -0.3,
   },
   scrollContent: {
     flexGrow: 1,

@@ -9,12 +9,14 @@ import {
 } from 'react-native';
 import { Colors } from '../styles/colors';
 import { useLanguage } from '../contexts/LanguageContext';
+import BottomNavigation from '../components/BottomNavigation';
 
 interface HomeScreenProps {
   onSettingsPress?: () => void;
   onSchedulePress?: () => void;
   onOrdersPress?: () => void;
   onWorkItemPress?: (workId: string, status: string) => void;
+  onHomePress?: () => void;
 }
 
 type ViewMode = 'day' | 'week' | 'month';
@@ -26,12 +28,12 @@ interface WorkItem {
   status: 'Pending' | 'Confirmed' | 'Completed';
 }
 
-const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePress, onOrdersPress, onWorkItemPress }) => {
+const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePress, onOrdersPress, onWorkItemPress, onHomePress }) => {
   const { t } = useLanguage();
   const userName = 'Prayag Ahire'; // TODO: Get from user profile
-  const [showMenu, setShowMenu] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('day');
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [activeTab, setActiveTab] = useState<'home' | 'orders' | 'schedule' | 'profile'>('home');
 
   // Sample data - Day view
   const todayWork: WorkItem[] = [
@@ -64,7 +66,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
   };
 
   const handleSettingsPress = () => {
-    setShowMenu(false);
     if (onSettingsPress) {
       onSettingsPress();
     }
@@ -223,70 +224,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
     <View style={styles.container}>
       <StatusBar 
         barStyle="light-content" 
-        backgroundColor={showMenu ? 'rgba(0, 0, 0, 0.3)' : Colors.accent} 
+        backgroundColor={Colors.accent} 
         translucent={true} 
       />
 
       {/* Header */}
       <View style={styles.header}>
-        <View>
-          <Text style={styles.greeting}>{t('home.greeting')}, {userName}</Text>
-        </View>
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={() => setShowMenu(!showMenu)}
-        >
-          <Text style={styles.menuDots}>☰</Text>
-        </TouchableOpacity>
+        <Text style={styles.greeting}>{t('home.greeting')}, {userName}</Text>
       </View>
-
-      {/* Dropdown Menu */}
-      {showMenu && (
-        <View style={styles.dropdown}>
-          <TouchableOpacity
-            style={styles.dropdownItem}
-            onPress={() => {
-              setShowMenu(false);
-              if (onOrdersPress) {
-                onOrdersPress();
-              }
-            }}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.dropdownText}>{t('orders.title')}</Text>
-          </TouchableOpacity>
-          <View style={styles.dropdownDivider} />
-          <TouchableOpacity
-            style={styles.dropdownItem}
-            onPress={() => {
-              setShowMenu(false);
-              if (onSchedulePress) {
-                onSchedulePress();
-              }
-            }}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.dropdownText}>{t('schedule.schedule')}</Text>
-          </TouchableOpacity>
-          <View style={styles.dropdownDivider} />
-          <TouchableOpacity
-            style={styles.dropdownItem}
-            onPress={handleSettingsPress}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.dropdownText}>{t('settings.setting')}</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
-      {/* Overlay to close menu */}
-      {showMenu && (
-        <TouchableOpacity
-          style={styles.overlay}
-          activeOpacity={1}
-          onPress={() => setShowMenu(false)}
-        />
-      )}
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* View Mode Tabs */}
@@ -418,6 +363,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
           </View>
         )}
       </ScrollView>
+
+      <BottomNavigation
+        activeTab="home"
+        onHomePress={onHomePress}
+        onOrdersPress={onOrdersPress}
+        onSchedulePress={onSchedulePress}
+        onProfilePress={onSettingsPress}
+      />
     </View>
   );
 };
@@ -425,17 +378,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.backgroundPrimary, // Clean white background (70%)
+    backgroundColor: Colors.backgroundPrimary,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     paddingHorizontal: 24,
-    paddingTop: 60, // Increased for translucent StatusBar
+    paddingTop: 60,
     paddingBottom: 20,
-    backgroundColor: Colors.accent, // Sky blue background
-    borderBottomLeftRadius: 24, // Rounded bottom corners
+    backgroundColor: Colors.accent,
+    borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
     shadowColor: Colors.accent,
     shadowOffset: { width: 0, height: 3 },
@@ -447,69 +397,14 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: 20,
     fontWeight: '700',
-    color: Colors.white, // White text
+    color: Colors.white,
     letterSpacing: -0.3,
-  },
-  menuButton: {
-    width: 44,
-    height: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 22,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)', // Semi-transparent white
-  },
-  menuDots: {
-    fontSize: 24,
-    color: Colors.white, // White menu icon
-    fontWeight: '700',
-  },
-  dropdown: {
-    position: 'absolute',
-    top: 100,
-    right: 24,
-    backgroundColor: Colors.white,
-    borderRadius: 16,
-    paddingVertical: 8,
-    paddingHorizontal: 4,
-    shadowColor: Colors.shadowDark,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
-    elevation: 10,
-    zIndex: 100,
-    minWidth: 200,
-  },
-  dropdownItem: {
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    marginHorizontal: 4,
-  },
-  dropdownText: {
-    fontSize: 16,
-    color: Colors.textPrimary,
-    fontWeight: '600',
-    letterSpacing: -0.2,
-  },
-  dropdownDivider: {
-    height: 1,
-    backgroundColor: Colors.borderLight,
-    marginVertical: 6,
-    marginHorizontal: 8,
-  },
-  overlay: {
-    position: 'absolute',
-    top: -50, // Extended to cover StatusBar area
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    zIndex: 50,
   },
   content: {
     flex: 1,
     paddingHorizontal: 24,
     paddingTop: 20,
+    paddingBottom: 20,
   },
   tabsContainer: {
     flexDirection: 'row',
@@ -586,16 +481,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: Colors.white,
-    borderRadius: 14,
-    padding: 20,
-    marginBottom: 14,
-    shadowColor: Colors.accent,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.12,
-    shadowRadius: 10,
+    borderRadius: 16, // More rounded for modern look
+    padding: 24, // Increased padding
+    marginBottom: 16, // More spacing between cards
+    marginHorizontal: 4, // Slight horizontal margin for shadow visibility
+    // Modern shadow effect
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
     elevation: 4,
-    borderLeftWidth: 5,
-    borderLeftColor: Colors.accent, // Sky blue accent border (20%)
+    // Removed border for cleaner look
   },
   workInfo: {
     flex: 1,
@@ -614,12 +510,12 @@ const styles = StyleSheet.create({
   },
   workStatus: {
     fontSize: 13,
-    color: Colors.accent, // Sky blue status (20%)
+    color: Colors.accent,
     fontWeight: '700',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    backgroundColor: Colors.backgroundAccent, // Light blue background (10%)
-    borderRadius: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    backgroundColor: Colors.backgroundAccent,
+    borderRadius: 12, // More rounded
   },
   weekList: {
     marginBottom: 20,
@@ -629,14 +525,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: Colors.white,
-    borderRadius: 12,
-    padding: 18,
-    marginBottom: 10,
-    shadowColor: Colors.shadowDark,
+    borderRadius: 16, // More rounded
+    padding: 20,
+    marginBottom: 12,
+    marginHorizontal: 4, // Slight horizontal margin for shadow visibility
+    // Modern shadow effect
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
+    shadowRadius: 12,
+    elevation: 4,
   },
   weekDay: {
     fontSize: 16,
@@ -688,12 +586,22 @@ const styles = StyleSheet.create({
   monthDay: {
     flex: 1,
     aspectRatio: 1,
-    backgroundColor: Colors.backgroundSecondary,
-    borderRadius: 8,
+    backgroundColor: Colors.white, // Changed to white for better shadow visibility
+    borderRadius: 12, // More rounded for modern look
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 2,
+    marginHorizontal: 3, // Slightly more margin for shadow visibility
+    marginVertical: 2,
     position: 'relative',
+    // Modern shadow effect
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2, // Android shadow
   },
   monthDayNumber: {
     fontSize: 14,
@@ -715,6 +623,61 @@ const styles = StyleSheet.create({
   workCountText: {
     fontSize: 10,
     color: Colors.white,
+    fontWeight: '700',
+  },
+  bottomNav: {
+    flexDirection: 'row',
+    backgroundColor: Colors.white,
+    paddingTop: 8,
+    paddingBottom: 8,
+    paddingHorizontal: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 8,
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: '#f0f0f0',
+  },
+  navItem: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 2,
+  },
+  iconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 2,
+  },
+  iconContainerActive: {
+    backgroundColor: Colors.accent,
+  },
+  navIcon: {
+    fontSize: 22,
+    color: Colors.textSecondary,
+    fontWeight: '400',
+  },
+  navIconActive: {
+    fontSize: 22,
+    color: Colors.white,
+    fontWeight: '400',
+  },
+  navLabel: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    letterSpacing: -0.1,
+  },
+  navLabelActive: {
+    color: Colors.accent,
     fontWeight: '700',
   },
 });
