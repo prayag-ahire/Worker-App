@@ -148,9 +148,9 @@ const OrderDetailsScreen: React.FC<OrderDetailsScreenProps> = ({
         </View>
 
         {/* Back Button */}
-        <TouchableOpacity style={styles.backButton} onPress={onBack}>
+        {/* <TouchableOpacity style={styles.backButton} onPress={onBack}>
           <Text style={styles.backButtonText}>← Back to Orders</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </ScrollView>
 
       {/* Help Modal */}

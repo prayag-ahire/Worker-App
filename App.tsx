@@ -326,6 +326,7 @@ function App() {
         {currentScreen === 'scheduleMain' && (
           <ScheduleMainScreen
             onBack={handleScheduleMainBack}
+            onNavigate={handleScheduleNavigate}
             onHomePress={handleHomePress}
             onOrdersPress={handleOrdersPress}
             onSettingsPress={handleSettingsPress}

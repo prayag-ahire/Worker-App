@@ -8,7 +8,6 @@ import {
   ScrollView,
 } from 'react-native';
 import { Colors } from '../styles/colors';
-import { Card } from '../components';
 import BottomNavigation from '../components/BottomNavigation';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -52,25 +51,31 @@ const OrderHistoryScreen: React.FC<OrderHistoryScreenProps> = ({ onBack, onOrder
         showsVerticalScrollIndicator={false}
       >
         {/* Orders List */}
-        <Card style={styles.ordersCard}>
+        <View style={styles.ordersList}>
           {orders.map((order, index) => (
             <TouchableOpacity
               key={order.id}
-              style={[
-                styles.orderCard,
-                index === orders.length - 1 && styles.lastOrderCard
-              ]}
+              style={styles.orderCard}
               onPress={() => onOrderPress && onOrderPress(order.id)}
               activeOpacity={0.7}
             >
-              <View style={styles.orderIcon} />
+              <View style={styles.orderIcon}>
+                <View style={styles.documentIcon}>
+                  <View style={styles.documentLines} />
+                  <View style={styles.documentLines} />
+                  <View style={styles.documentLines} />
+                </View>
+              </View>
               <View style={styles.orderInfo}>
                 <Text style={styles.clientName}>{order.clientName}</Text>
                 <Text style={styles.orderStatus}>{order.status}</Text>
               </View>
+              <View style={styles.arrowContainer}>
+                <Text style={styles.arrow}>›</Text>
+              </View>
             </TouchableOpacity>
           ))}
-        </Card>
+        </View>
       </ScrollView>
 
       <BottomNavigation
@@ -87,7 +92,7 @@ const OrderHistoryScreen: React.FC<OrderHistoryScreenProps> = ({ onBack, onOrder
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundPrimary,
   },
   header: {
     paddingHorizontal: 24,
@@ -111,45 +116,78 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: 24,
-    paddingVertical: 20,
+    paddingTop: 20,
+    paddingBottom: 20,
   },
-  ordersCard: {
-    padding: 0,
-    overflow: 'hidden',
+  ordersList: {
+    gap: 16,
   },
   orderCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
     backgroundColor: Colors.white,
-  },
-  lastOrderCard: {
-    borderBottomWidth: 0,
+    borderRadius: 16,
+    padding: 20,
+    marginHorizontal: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
   },
   orderIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    borderWidth: 2,
-    borderColor: Colors.border,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: Colors.backgroundAccent,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginRight: 16,
-    backgroundColor: Colors.white,
+  },
+  documentIcon: {
+    width: 20,
+    height: 24,
+    borderWidth: 2,
+    borderColor: Colors.accent,
+    borderRadius: 3,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 4,
+  },
+  documentLines: {
+    width: 12,
+    height: 2,
+    backgroundColor: Colors.accent,
+    marginVertical: 1.5,
+    borderRadius: 1,
   },
   orderInfo: {
     flex: 1,
   },
   clientName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.textDark,
+    fontSize: 18,
+    fontWeight: '700',
+    color: Colors.textPrimary,
     marginBottom: 4,
+    letterSpacing: -0.3,
   },
   orderStatus: {
     fontSize: 14,
-    color: Colors.textMedium,
+    color: Colors.textSecondary,
+    fontWeight: '500',
+  },
+  arrowContainer: {
+    width: 32,
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.backgroundAccent,
+    borderRadius: 16,
+  },
+  arrow: {
+    fontSize: 24,
+    color: Colors.accent,
+    fontWeight: '600',
   },
 });
 

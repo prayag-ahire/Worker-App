@@ -197,6 +197,9 @@ const styles = StyleSheet.create({
   houseBodyActive: {
     backgroundColor: Colors.white,
   },
+  houseActive: {
+    backgroundColor: Colors.accent, // Add appropriate styling for active state
+  },
   // Orders/List icon
   listIcon: {
     width: 18,

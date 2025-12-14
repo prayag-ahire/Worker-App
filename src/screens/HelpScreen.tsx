@@ -55,52 +55,82 @@ const HelpScreen: React.FC<HelpScreenProps> = ({ onBack, onAIChatPress }) => {
     },
   ];
 
-  const handleSendEmail = () => {
+  const handleSendEmail = async () => {
     // TODO: Get user details from backend/context when available
-    // For now using placeholder data
     const userDetails = {
-      name: 'Prayag Ahire', // TODO: Get from user profile/context
-      mobile: '+91 1234567890', // TODO: Get from user profile/context
-      address: 'Mumbai, Maharashtra', // TODO: Get from user profile/context
+      name: 'Prayag Ahire',
+      mobile: '+91 1234567890',
+      address: 'Mumbai, Maharashtra',
     };
 
-    const subject = 'Support Request - Worker App';
+    const recipient = 'client.support@proworker.co';
+    const subject = '⚠️ SUPPORT REQUEST - Worker App';
     const body = `Dear ProWorker Support Team,
 
-I need assistance with the following:
+I am reaching out to request assistance with the ProWorker Worker application.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-USER DETAILS:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Name: ${userDetails.name}
-Contact: ${userDetails.mobile}
-Address: ${userDetails.address}
+═══════════════════════════════════════════════════════
+📋 CUSTOMER INFORMATION
+═══════════════════════════════════════════════════════
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-MY QUERY/ISSUE:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[Please describe your issue or question here]
+Full Name: ${userDetails.name}
+Contact Number: ${userDetails.mobile}
+Location/Address: ${userDetails.address}
+App Version: 1.0.0
+
+═══════════════════════════════════════════════════════
+❗ MY QUERY/ISSUE - PLEASE DESCRIBE BELOW ❗
+═══════════════════════════════════════════════════════
+
+[PLEASE DESCRIBE YOUR ISSUE OR QUESTION HERE IN DETAIL]
+
+What happened:
 
 
+What you expected:
 
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Thank you for your support!
+When did this occur:
 
-Best regards,
-${userDetails.name}`;
 
-    const emailUrl = `mailto:client.support@proworker.co?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+═══════════════════════════════════════════════════════
 
-    Linking.canOpenURL(emailUrl)
-      .then((supported) => {
-        if (supported) {
-          Linking.openURL(emailUrl);
-        } else {
-          Alert.alert('Error', 'Unable to open email app. Please make sure you have an email app installed.');
-        }
-      })
-      .catch(() => Alert.alert('Error', 'Unable to open email app. Please try again.'));
+Thank you for taking the time to assist me. I look forward to your response.
+
+Best Regards,
+${userDetails.name}
+${userDetails.mobile}
+
+---
+ProWorker Support Team
+📧 Email: client.support@proworker.co
+⏰ Hours: Monday - Friday, 9:00 AM - 6:00 PM IST`;
+
+    // Simplified mailto URL
+    const mailtoUrl = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+    try {
+      const canOpen = await Linking.canOpenURL(mailtoUrl);
+      
+      if (canOpen) {
+        await Linking.openURL(mailtoUrl);
+        console.log('Email app opened successfully');
+      } else {
+        console.log('Cannot open mailto URL');
+        Alert.alert(
+          'No Email App Found',
+          'Please install Gmail or another email app to send emails.',
+          [{ text: 'OK' }]
+        );
+      }
+    } catch (error) {
+      console.error('Email error:', error);
+      Alert.alert(
+        'Unable to Open Email',
+        'There was an error opening your email app. Please check your email settings.',
+        [{ text: 'OK' }]
+      );
+    }
   };
 
   const handleFAQPress = (faqId: number) => {

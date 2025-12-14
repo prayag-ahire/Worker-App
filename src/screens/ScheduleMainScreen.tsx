@@ -8,13 +8,12 @@ import {
   ScrollView,
 } from 'react-native';
 import { Colors } from '../styles/colors';
-import { Card } from '../components';
 import { useLanguage } from '../contexts/LanguageContext';
 import BottomNavigation from '../components/BottomNavigation';
 
 interface ScheduleMainScreenProps {
   onBack?: () => void;
-  onNavigate?: (screen: string) => void;
+  onNavigate?: (screen: 'weekly' | 'monthly') => void;
   onHomePress?: () => void;
   onOrdersPress?: () => void;
   onSettingsPress?: () => void;
@@ -24,8 +23,8 @@ const ScheduleMainScreen: React.FC<ScheduleMainScreenProps> = ({ onBack, onNavig
   const { t } = useLanguage();
   
   const scheduleOptions = [
-    { id: 1, title: t('schedule.weeklySchedule'), icon: '📅', key: 'weekly' },
-    { id: 2, title: t('schedule.monthlySchedule'), icon: '🗓️', key: 'monthly' },
+    { id: 1, title: t('schedule.weeklySchedule'), key: 'weekly' as const },
+    { id: 2, title: t('schedule.monthlySchedule'), key: 'monthly' as const },
   ];
 
   return (
@@ -42,23 +41,33 @@ const ScheduleMainScreen: React.FC<ScheduleMainScreenProps> = ({ onBack, onNavig
         showsVerticalScrollIndicator={false}
       >
         {/* Schedule Options */}
-        <Card style={styles.optionsCard}>
+        <View style={styles.optionsList}>
           {scheduleOptions.map((option, index) => (
             <TouchableOpacity
               key={option.id}
-              style={[
-                styles.optionItem,
-                index === scheduleOptions.length - 1 && styles.lastOption
-              ]}
+              style={styles.optionCard}
               onPress={() => onNavigate && onNavigate(option.key)}
               activeOpacity={0.7}
             >
-              <Text style={styles.optionIcon}>{option.icon}</Text>
-              <Text style={styles.optionText}>{option.title}</Text>
-              <Text style={styles.arrow}>›</Text>
+              <View style={styles.optionIcon}>
+                <View style={styles.calendarIcon}>
+                  <View style={styles.calendarTop} />
+                  <View style={styles.calendarBody}>
+                    <View style={styles.calendarDot} />
+                    <View style={styles.calendarDot} />
+                    <View style={styles.calendarDot} />
+                  </View>
+                </View>
+              </View>
+              <View style={styles.optionInfo}>
+                <Text style={styles.optionText}>{option.title}</Text>
+              </View>
+              <View style={styles.arrowContainer}>
+                <Text style={styles.arrow}>›</Text>
+              </View>
             </TouchableOpacity>
           ))}
-        </Card>
+        </View>
       </ScrollView>
 
       <BottomNavigation
@@ -75,7 +84,7 @@ const ScheduleMainScreen: React.FC<ScheduleMainScreenProps> = ({ onBack, onNavig
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundPrimary,
   },
   header: {
     paddingHorizontal: 24,
@@ -99,38 +108,85 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: 24,
-    paddingVertical: 20,
+    paddingTop: 20,
+    paddingBottom: 20,
   },
-  optionsCard: {
-    padding: 0,
-    overflow: 'hidden',
+  optionsList: {
+    gap: 16,
   },
-  optionItem: {
+  optionCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 20,
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
     backgroundColor: Colors.white,
-  },
-  lastOption: {
-    borderBottomWidth: 0,
+    borderRadius: 16,
+    padding: 20,
+    marginHorizontal: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
   },
   optionIcon: {
-    fontSize: 24,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: Colors.backgroundAccent,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginRight: 16,
   },
-  optionText: {
+  calendarIcon: {
+    width: 22,
+    height: 22,
+  },
+  calendarTop: {
+    width: 22,
+    height: 4,
+    backgroundColor: Colors.accent,
+    borderTopLeftRadius: 2,
+    borderTopRightRadius: 2,
+  },
+  calendarBody: {
+    width: 22,
+    height: 18,
+    borderWidth: 2,
+    borderColor: Colors.accent,
+    borderTopWidth: 0,
+    borderBottomLeftRadius: 2,
+    borderBottomRightRadius: 2,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingHorizontal: 3,
+  },
+  calendarDot: {
+    width: 3,
+    height: 3,
+    backgroundColor: Colors.accent,
+    borderRadius: 1.5,
+  },
+  optionInfo: {
     flex: 1,
-    fontSize: 16,
-    fontWeight: '500',
-    color: Colors.textDark,
+  },
+  optionText: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: Colors.textPrimary,
+    letterSpacing: -0.3,
+  },
+  arrowContainer: {
+    width: 32,
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.backgroundAccent,
+    borderRadius: 16,
   },
   arrow: {
     fontSize: 24,
-    color: Colors.textLight,
-    fontWeight: '300',
+    color: Colors.accent,
+    fontWeight: '600',
   },
 });
 
