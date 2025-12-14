@@ -221,7 +221,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={Colors.accent} translucent={true} />
+      <StatusBar 
+        barStyle="light-content" 
+        backgroundColor={showMenu ? 'rgba(0, 0, 0, 0.3)' : Colors.accent} 
+        translucent={true} 
+      />
 
       {/* Header */}
       <View style={styles.header}>
@@ -495,7 +499,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     position: 'absolute',
-    top: 0,
+    top: -50, // Extended to cover StatusBar area
     left: 0,
     right: 0,
     bottom: 0,

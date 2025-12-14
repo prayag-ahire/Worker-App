@@ -131,7 +131,7 @@ const AIChatScreen: React.FC<AIChatScreenProps> = ({ onBack }) => {
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={onBack}>
+        <TouchableOpacity style={styles.backButton} onPress={onBack} activeOpacity={0.7}>
           <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
         <View style={styles.headerInfo}>
@@ -191,10 +191,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 24,
-    paddingVertical: 20,
-    paddingTop: 50, // Reduced padding for translucent StatusBar
+    paddingVertical: 6, // Balanced padding for proper vertical centering
+    paddingTop: 45, // Increased to center content in visible blue area
     backgroundColor: Colors.accent, // Blue background
-    borderRadius: 24, // All corners rounded
+    borderBottomLeftRadius: 24, // Only bottom corners rounded
+    borderBottomRightRadius: 24,
     shadowColor: Colors.accent,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.2,
