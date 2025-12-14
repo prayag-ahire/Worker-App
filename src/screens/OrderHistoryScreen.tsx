@@ -36,14 +36,14 @@ const OrderHistoryScreen: React.FC<OrderHistoryScreenProps> = ({ onBack, onOrder
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
+      <StatusBar barStyle="light-content" backgroundColor={Colors.accent} translucent={true} />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <ScreenHeader title={t('orders.title')} onBack={onBack} />
+        <ScreenHeader title={t('orders.title')} onBack={onBack} variant="blue" />
 
         {/* Orders List */}
         <Card style={styles.ordersCard}>

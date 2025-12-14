@@ -34,14 +34,14 @@ const InviteFriendScreen: React.FC<InviteFriendScreenProps> = ({ onBack }) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
+      <StatusBar barStyle="light-content" backgroundColor={Colors.accent} translucent={true} />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <ScreenHeader title={t('inviteFriend.title')} onBack={onBack} />
+        <ScreenHeader title={t('inviteFriend.title')} onBack={onBack} variant="blue" />
 
         {/* Illustration */}
         <Card style={styles.illustrationCard}>

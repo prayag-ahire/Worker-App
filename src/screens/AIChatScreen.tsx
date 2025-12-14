@@ -190,32 +190,39 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-    backgroundColor: Colors.white,
+    paddingHorizontal: 24,
+    paddingVertical: 20,
+    paddingTop: 50, // Reduced padding for translucent StatusBar
+    backgroundColor: Colors.accent, // Blue background
+    borderRadius: 24, // All corners rounded
+    shadowColor: Colors.accent,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   backButton: {
     padding: 8,
     marginRight: 8,
   },
   backButtonText: {
-    fontSize: 24,
-    color: Colors.accent,
-    fontWeight: '600',
+    fontSize: 28,
+    color: Colors.white, // White arrow
+    fontWeight: '700',
+    marginTop: -3,
   },
   headerInfo: {
     flex: 1,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: '700',
-    color: Colors.textDark,
+    color: Colors.white, // White text
+    letterSpacing: -0.3,
   },
   headerSubtitle: {
     fontSize: 12,
-    color: Colors.accent,
+    color: 'rgba(255, 255, 255, 0.8)', // White with transparency
     marginTop: 2,
   },
   aiIcon: {

@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { Colors } from '../styles/colors';
 import { useLanguage } from '../contexts/LanguageContext';
+import { ScreenHeader } from '../components';
 
 interface HelpScreenProps {
   onBack?: () => void;
@@ -109,18 +110,14 @@ ${userDetails.name}`;
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
+      <StatusBar barStyle="light-content" backgroundColor={Colors.accent} translucent={true} />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={onBack}>
-            <Text style={styles.backButtonText}>← {t('help.title')}</Text>
-          </TouchableOpacity>
-        </View>
+        <ScreenHeader title={t('help.title')} onBack={onBack} variant="blue" />
 
         {/* Send Email Button */}
         <TouchableOpacity style={styles.sendEmailButton} onPress={handleSendEmail}>
@@ -173,20 +170,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: 24,
     paddingVertical: 20,
-    paddingBottom: 100, // Space for floating AI button
-  },
-  header: {
-    marginBottom: 24,
-    marginTop: 20,
-  },
-  backButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  backButtonText: {
-    fontSize: 18,
-    color: Colors.textDark,
-    fontWeight: '600',
   },
   sendEmailButton: {
     borderWidth: 1,
@@ -199,7 +182,7 @@ const styles = StyleSheet.create({
   },
   sendEmailText: {
     fontSize: 16,
-    color: Colors.textDark,
+    color: Colors.textPrimary,
     fontWeight: '500',
   },
   faqContainer: {
@@ -224,24 +207,24 @@ const styles = StyleSheet.create({
   faqText: {
     flex: 1,
     fontSize: 15,
-    color: Colors.textDark,
+    color: Colors.textPrimary,
     fontWeight: '500',
   },
   faqArrow: {
     fontSize: 14,
-    color: Colors.textMedium,
+    color: Colors.textSecondary,
     marginLeft: 12,
   },
   answerContainer: {
     paddingVertical: 12,
     paddingHorizontal: 20,
-    backgroundColor: Colors.backgroundSoft,
+    backgroundColor: Colors.backgroundAccent,
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
   },
   answerText: {
     fontSize: 14,
-    color: Colors.textDark,
+    color: Colors.textPrimary,
     lineHeight: 20,
   },
   aiChatButton: {

@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { Colors } from '../styles/colors';
 import { useLanguage } from '../contexts/LanguageContext';
+import { ScreenHeader } from '../components';
 
 interface MonthlyScheduleScreenProps {
   onBack?: () => void;
@@ -142,18 +143,14 @@ const MonthlyScheduleScreen: React.FC<MonthlyScheduleScreenProps> = ({ onBack })
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
+      <StatusBar barStyle="light-content" backgroundColor={Colors.accent} translucent={true} />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={onBack}>
-            <Text style={styles.backButtonText}>← {t('monthlySchedule.title')}</Text>
-          </TouchableOpacity>
-        </View>
+        <ScreenHeader title={t('monthlySchedule.title')} onBack={onBack} variant="blue" />
 
         {/* Month Navigation */}
         <View style={styles.monthNavigation}>
@@ -273,19 +270,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: 24,
     paddingVertical: 20,
-  },
-  header: {
-    marginBottom: 24,
-    marginTop: 20,
-  },
-  backButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  backButtonText: {
-    fontSize: 18,
-    color: Colors.textDark,
-    fontWeight: '600',
   },
   monthNavigation: {
     flexDirection: 'row',

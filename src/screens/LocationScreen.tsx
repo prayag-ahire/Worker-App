@@ -188,14 +188,14 @@ const LocationScreen: React.FC<LocationScreenProps> = ({ onBack }) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
+      <StatusBar barStyle="light-content" backgroundColor={Colors.accent} translucent={true} />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <ScreenHeader title={t('location.title')} onBack={onBack} />
+        <ScreenHeader title={t('location.title')} onBack={onBack} variant="blue" />
 
         {/* Map Container */}
         <View style={styles.mapContainer}>

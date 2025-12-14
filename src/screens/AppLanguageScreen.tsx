@@ -42,14 +42,14 @@ const AppLanguageScreen: React.FC<AppLanguageScreenProps> = ({ onBack }) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
+      <StatusBar barStyle="light-content" backgroundColor={Colors.accent} translucent={true} />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <ScreenHeader title="App Language" onBack={onBack} />
+        <ScreenHeader title="App Language" onBack={onBack} variant="blue" />
 
         {/* Language List Container */}
         <Card style={styles.languageCard}>

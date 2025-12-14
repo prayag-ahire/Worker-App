@@ -26,14 +26,14 @@ const ScheduleMainScreen: React.FC<ScheduleMainScreenProps> = ({ onBack, onNavig
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
+      <StatusBar barStyle="light-content" backgroundColor={Colors.accent} translucent={true} />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <ScreenHeader title={t('schedule.title')} onBack={onBack} />
+        <ScreenHeader title={t('schedule.title')} onBack={onBack} variant="blue" />
 
         {/* Schedule Options */}
         <Card style={styles.optionsCard}>

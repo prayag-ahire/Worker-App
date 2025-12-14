@@ -44,7 +44,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onNavigate }) =
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
+      <StatusBar barStyle="light-content" backgroundColor={Colors.accent} translucent={true} />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -52,7 +52,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onNavigate }) =
       >
         {/* Header */}
         <View style={styles.header}>
-          <ScreenHeader title={t('settings.settings')} onBack={onBack} />
+          <ScreenHeader 
+            title={t('settings.settings')} 
+            onBack={onBack}
+            variant="blue"
+          />
         </View>
 
         {/* Settings Options */}
@@ -83,7 +87,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onNavigate }) =
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.white, // Clean white background
   },
   scrollContent: {
     flexGrow: 1,
@@ -91,11 +95,15 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   header: {
-    marginBottom: 8,
+    marginBottom: 16,
   },
   settingsCard: {
     padding: 0,
     overflow: 'hidden',
+    backgroundColor: Colors.white,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
   },
   lastItem: {
     borderBottomWidth: 1,

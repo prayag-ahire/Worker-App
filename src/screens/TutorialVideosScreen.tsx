@@ -32,14 +32,14 @@ const TutorialVideosScreen: React.FC<TutorialVideosScreenProps> = ({ onBack }) =
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
+      <StatusBar barStyle="light-content" backgroundColor={Colors.accent} translucent={true} />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <ScreenHeader title={t('tutorial.title')} onBack={onBack} />
+        <ScreenHeader title={t('tutorial.title')} onBack={onBack} variant="blue" />
 
         {/* Videos List */}
         {videos.map((video) => (

@@ -221,7 +221,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
+      <StatusBar barStyle="light-content" backgroundColor={Colors.accent} translucent={true} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -247,6 +247,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
                 onOrdersPress();
               }
             }}
+            activeOpacity={0.7}
           >
             <Text style={styles.dropdownText}>{t('orders.title')}</Text>
           </TouchableOpacity>
@@ -259,6 +260,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
                 onSchedulePress();
               }
             }}
+            activeOpacity={0.7}
           >
             <Text style={styles.dropdownText}>{t('schedule.schedule')}</Text>
           </TouchableOpacity>
@@ -266,6 +268,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
           <TouchableOpacity
             style={styles.dropdownItem}
             onPress={handleSettingsPress}
+            activeOpacity={0.7}
           >
             <Text style={styles.dropdownText}>{t('settings.setting')}</Text>
           </TouchableOpacity>
@@ -287,6 +290,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
           <TouchableOpacity
             style={[styles.tab, viewMode === 'day' && styles.tabActive]}
             onPress={handleDayTabClick}
+            activeOpacity={0.7}
           >
             <Text style={[styles.tabText, viewMode === 'day' && styles.tabTextActive]}>
               {t('home.day')}
@@ -295,6 +299,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
           <TouchableOpacity
             style={[styles.tab, viewMode === 'week' && styles.tabActive]}
             onPress={() => setViewMode('week')}
+            activeOpacity={0.7}
           >
             <Text style={[styles.tabText, viewMode === 'week' && styles.tabTextActive]}>
               {t('home.week')}
@@ -303,6 +308,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
           <TouchableOpacity
             style={[styles.tab, viewMode === 'month' && styles.tabActive]}
             onPress={() => setViewMode('month')}
+            activeOpacity={0.7}
           >
             <Text style={[styles.tabText, viewMode === 'month' && styles.tabTextActive]}>
               {t('home.month')}
@@ -312,7 +318,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
 
         {/* Date Navigation */}
         <View style={styles.dateNavigation}>
-          <TouchableOpacity style={styles.navButton} onPress={handlePrevious}>
+          <TouchableOpacity 
+            style={styles.navButton} 
+            onPress={handlePrevious}
+            activeOpacity={0.6}
+          >
             <Text style={styles.navButtonText}>←</Text>
           </TouchableOpacity>
           <Text style={styles.dateText}>
@@ -320,7 +330,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
             {viewMode === 'week' && formatWeek()}
             {viewMode === 'month' && formatMonth()}
           </Text>
-          <TouchableOpacity style={styles.navButton} onPress={handleNext}>
+          <TouchableOpacity 
+            style={styles.navButton} 
+            onPress={handleNext}
+            activeOpacity={0.6}
+          >
             <Text style={styles.navButtonText}>→</Text>
           </TouchableOpacity>
         </View>
@@ -407,57 +421,77 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundPrimary, // Clean white background (70%)
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 24,
-    paddingTop: 50,
-    paddingBottom: 16,
+    paddingTop: 60, // Increased for translucent StatusBar
+    paddingBottom: 20,
+    backgroundColor: Colors.accent, // Sky blue background
+    borderBottomLeftRadius: 24, // Rounded bottom corners
+    borderBottomRightRadius: 24,
+    shadowColor: Colors.accent,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
     zIndex: 10,
   },
   greeting: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.textDark,
+    fontSize: 20,
+    fontWeight: '700',
+    color: Colors.white, // White text
+    letterSpacing: -0.3,
   },
   menuButton: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 22,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)', // Semi-transparent white
   },
   menuDots: {
     fontSize: 24,
-    color: Colors.textDark,
+    color: Colors.white, // White menu icon
+    fontWeight: '700',
   },
   dropdown: {
     position: 'absolute',
     top: 100,
     right: 24,
     backgroundColor: Colors.white,
-    borderRadius: 8,
-    padding: 8,
-    borderWidth: 1,
-    borderColor: Colors.border,
+    borderRadius: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+    shadowColor: Colors.shadowDark,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 16,
+    elevation: 10,
     zIndex: 100,
-    minWidth: 120,
+    minWidth: 200,
   },
   dropdownItem: {
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    marginHorizontal: 4,
   },
   dropdownText: {
-    fontSize: 15,
-    color: Colors.textDark,
-    fontWeight: '500',
+    fontSize: 16,
+    color: Colors.textPrimary,
+    fontWeight: '600',
+    letterSpacing: -0.2,
   },
   dropdownDivider: {
     height: 1,
-    backgroundColor: Colors.border,
-    marginVertical: 4,
+    backgroundColor: Colors.borderLight,
+    marginVertical: 6,
+    marginHorizontal: 8,
   },
   overlay: {
     position: 'absolute',
@@ -465,59 +499,80 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
     zIndex: 50,
   },
   content: {
     flex: 1,
     paddingHorizontal: 24,
+    paddingTop: 20,
   },
   tabsContainer: {
     flexDirection: 'row',
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 8,
-    overflow: 'hidden',
-    marginBottom: 20,
+    backgroundColor: Colors.backgroundSecondary,
+    borderRadius: 12,
+    padding: 4,
+    marginBottom: 24,
   },
   tab: {
     flex: 1,
-    paddingVertical: 12,
+    paddingVertical: 10,
     alignItems: 'center',
-    backgroundColor: Colors.white,
-    borderRightWidth: 1,
-    borderRightColor: Colors.border,
+    borderRadius: 8,
+    backgroundColor: 'transparent',
   },
   tabActive: {
-    backgroundColor: Colors.backgroundSoft,
+    backgroundColor: Colors.white, // White active tab
+    shadowColor: Colors.shadowDark,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   tabText: {
     fontSize: 15,
-    color: Colors.textMedium,
-    fontWeight: '500',
+    color: Colors.textSecondary,
+    fontWeight: '600',
   },
   tabTextActive: {
-    color: Colors.textDark,
-    fontWeight: '600',
+    color: Colors.accent, // Sky blue for active text (20%)
+    fontWeight: '700',
   },
   dateNavigation: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 20,
-    paddingVertical: 12,
+    marginBottom: 24,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    backgroundColor: Colors.backgroundAccent, // Light blue background (10%)
+    borderRadius: 12,
   },
   navButton: {
-    padding: 8,
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 22,
+    backgroundColor: Colors.white,
+    shadowColor: Colors.shadowDark,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    elevation: 3,
   },
   navButtonText: {
-    fontSize: 20,
-    color: Colors.textDark,
-    fontWeight: '600',
+    fontSize: 24,
+    color: Colors.accent, // Sky blue arrows (20%)
+    fontWeight: '700',
+    textAlign: 'center',
+    marginTop: -2, // Adjust for vertical centering
   },
   dateText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.textDark,
+    fontSize: 17,
+    fontWeight: '700',
+    color: Colors.textPrimary,
+    letterSpacing: -0.2,
   },
   workList: {
     marginBottom: 20,
@@ -526,29 +581,41 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 12,
+    backgroundColor: Colors.white,
+    borderRadius: 14,
+    padding: 20,
+    marginBottom: 14,
+    shadowColor: Colors.accent,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    elevation: 4,
+    borderLeftWidth: 5,
+    borderLeftColor: Colors.accent, // Sky blue accent border (20%)
   },
   workInfo: {
     flex: 1,
   },
   clientName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.textDark,
-    marginBottom: 4,
+    fontSize: 18,
+    fontWeight: '700',
+    color: Colors.textPrimary,
+    marginBottom: 6,
+    letterSpacing: -0.3,
   },
   workTime: {
     fontSize: 14,
-    color: Colors.textMedium,
+    color: Colors.textSecondary,
+    fontWeight: '500',
   },
   workStatus: {
-    fontSize: 14,
-    color: Colors.textMedium,
-    fontWeight: '500',
+    fontSize: 13,
+    color: Colors.accent, // Sky blue status (20%)
+    fontWeight: '700',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    backgroundColor: Colors.backgroundAccent, // Light blue background (10%)
+    borderRadius: 10,
   },
   weekList: {
     marginBottom: 20,
@@ -557,35 +624,58 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 8,
-    padding: 16,
+    backgroundColor: Colors.white,
+    borderRadius: 12,
+    padding: 18,
     marginBottom: 10,
+    shadowColor: Colors.shadowDark,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
   weekDay: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: Colors.textDark,
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.textPrimary,
   },
   weekCount: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: Colors.textDark,
+    fontSize: 18,
+    fontWeight: '700',
+    color: Colors.accent, // Sky blue count (20%)
+    minWidth: 32,
+    height: 32,
+    textAlign: 'center',
+    lineHeight: 32,
+    backgroundColor: Colors.backgroundAccent, // Light blue background (10%)
+    borderRadius: 16,
+    paddingHorizontal: 8,
   },
   monthContainer: {
     marginBottom: 20,
+    backgroundColor: Colors.white,
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: Colors.shadowDark,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
   monthHeader: {
     flexDirection: 'row',
-    marginBottom: 10,
+    marginBottom: 12,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.borderLight,
   },
   monthHeaderText: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.textMedium,
+    fontSize: 13,
+    fontWeight: '700',
+    color: Colors.textSecondary,
+    letterSpacing: 0.5,
   },
   monthWeek: {
     flexDirection: 'row',
@@ -594,9 +684,8 @@ const styles = StyleSheet.create({
   monthDay: {
     flex: 1,
     aspectRatio: 1,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 6,
+    backgroundColor: Colors.backgroundSecondary,
+    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
     marginHorizontal: 2,
@@ -604,20 +693,20 @@ const styles = StyleSheet.create({
   },
   monthDayNumber: {
     fontSize: 14,
-    fontWeight: '500',
-    color: Colors.textDark,
+    fontWeight: '600',
+    color: Colors.textPrimary,
   },
   workCountBadge: {
     position: 'absolute',
-    top: 2,
-    right: 2,
-    backgroundColor: Colors.accent,
-    borderRadius: 8,
-    minWidth: 16,
-    height: 16,
+    top: 4,
+    right: 4,
+    backgroundColor: Colors.accent, // Sky blue badge (20%)
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 4,
+    paddingHorizontal: 5,
   },
   workCountText: {
     fontSize: 10,

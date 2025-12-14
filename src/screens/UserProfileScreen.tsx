@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { Colors } from '../styles/colors';
 import { useLanguage } from '../contexts/LanguageContext';
+import { ScreenHeader } from '../components';
 
 interface UserProfileScreenProps {
   onBack?: () => void;
@@ -35,18 +36,15 @@ const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit })
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
+      <StatusBar barStyle="light-content" backgroundColor={Colors.accent} translucent={true} />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={onBack}>
-            <Text style={styles.backButtonText}>←</Text>
-          </TouchableOpacity>
-          <Text style={styles.title}>{t('profile.title')}</Text>
+        {/* Header with Edit Button */}
+        <View style={styles.headerContainer}>
+          <ScreenHeader title={t('profile.title')} onBack={onBack} variant="blue" />
           <TouchableOpacity style={styles.editButton} onPress={handleEdit}>
             <Text style={styles.editButtonText}>{t('profile.edit')}</Text>
           </TouchableOpacity>
@@ -163,40 +161,28 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 20,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 24,
-    marginTop: 20,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  backButtonText: {
-    fontSize: 28,
-    color: Colors.accent,
-    fontWeight: '600',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: Colors.textDark,
+  headerContainer: {
+    position: 'relative',
+    marginBottom: 16,
   },
   editButton: {
+    position: 'absolute',
+    top: 46, // Vertically centered with title text
+    right: 0,
     paddingVertical: 6,
-    paddingHorizontal: 16,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 6,
+    paddingHorizontal: 14,
+    backgroundColor: Colors.white,
+    borderRadius: 8,
+    shadowColor: Colors.shadowDark,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   editButtonText: {
     fontSize: 14,
-    color: Colors.textDark,
-    fontWeight: '500',
+    color: Colors.accent,
+    fontWeight: '700',
   },
   profileSection: {
     flexDirection: 'row',

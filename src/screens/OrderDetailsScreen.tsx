@@ -11,6 +11,7 @@ import {
   Linking,
 } from 'react-native';
 import { Colors } from '../styles/colors';
+import { ScreenHeader } from '../components';
 
 interface OrderDetailsScreenProps {
   onBack?: () => void;
@@ -83,16 +84,14 @@ const OrderDetailsScreen: React.FC<OrderDetailsScreenProps> = ({
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
+      <StatusBar barStyle="light-content" backgroundColor={Colors.accent} translucent={true} />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>#{orderId} Order</Text>
-        </View>
+        <ScreenHeader title={`#${orderId} Order`} onBack={onBack} variant="blue" />
 
         {/* Order Card */}
         <View style={styles.orderCard}>
@@ -249,15 +248,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: 24,
     paddingVertical: 20,
-  },
-  header: {
-    marginBottom: 24,
-    marginTop: 20,
-  },
-  headerTitle: {
-    fontSize: 20,
-    color: Colors.textDark,
-    fontWeight: '700',
   },
   orderCard: {
     borderWidth: 1,

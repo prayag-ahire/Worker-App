@@ -40,7 +40,7 @@ const CommentScreen: React.FC<CommentScreenProps> = ({
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
+      <StatusBar barStyle="light-content" backgroundColor={Colors.accent} translucent={true} />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -48,7 +48,7 @@ const CommentScreen: React.FC<CommentScreenProps> = ({
         keyboardShouldPersistTaps="handled"
       >
         {/* Header */}
-        <ScreenHeader title={title} onBack={onBack} />
+        <ScreenHeader title={title} onBack={onBack} variant="blue" />
 
         {/* Comment Input */}
         <View style={styles.inputContainer}>
