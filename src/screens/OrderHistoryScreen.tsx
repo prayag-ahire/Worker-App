@@ -81,7 +81,7 @@ const OrderHistoryScreen: React.FC<OrderHistoryScreenProps> = ({ onBack, onOrder
       <BottomNavigation
         activeTab="orders"
         onHomePress={onHomePress}
-        onOrdersPress={onBack}
+        onOrdersPress={undefined}
         onSchedulePress={onSchedulePress}
         onProfilePress={onSettingsPress}
       />

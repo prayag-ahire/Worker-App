@@ -47,7 +47,7 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ onBack, onSave })
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={onBack}>
-            <Text style={styles.backButtonText}>← Edit Profile</Text>
+            <Text style={styles.backButtonText}>‹ Edit Profile</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
             <Text style={styles.saveButtonText}>Save</Text>
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backButtonText: {
-    fontSize: 18,
+    fontSize: 20,
     color: Colors.textDark,
     fontWeight: '600',
   },

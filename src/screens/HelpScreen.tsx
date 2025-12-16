@@ -270,11 +270,11 @@ const styles = StyleSheet.create({
     shadowColor: Colors.accent,
     shadowOffset: {
       width: 0,
-      height: 4,
+      height: 6,
     },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 12,
   },
   aiChatText: {
     fontSize: 18,

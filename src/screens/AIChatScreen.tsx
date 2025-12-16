@@ -132,7 +132,7 @@ const AIChatScreen: React.FC<AIChatScreenProps> = ({ onBack }) => {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={onBack} activeOpacity={0.7}>
-          <Text style={styles.backButtonText}>←</Text>
+          <Text style={styles.backButtonText}>‹</Text>
         </TouchableOpacity>
         <View style={styles.headerInfo}>
           <Text style={styles.headerTitle}>AI Assistant</Text>
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   backButtonText: {
-    fontSize: 28,
+    fontSize: 32,
     color: Colors.white, // White arrow
     fontWeight: '700',
     marginTop: -3,

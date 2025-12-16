@@ -38,58 +38,70 @@ const WeeklyScheduleScreen: React.FC<WeeklyScheduleScreenProps> = ({ onBack }) =
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [selectedDayIndex, setSelectedDayIndex] = useState<number | null>(null);
   const [selectedTimeType, setSelectedTimeType] = useState<'start' | 'end'>('start');
+  const [selectedHour, setSelectedHour] = useState(9);
+  const [selectedMinute, setSelectedMinute] = useState(0);
 
-  // Generate time slots from 00:00 to 23:00 in 1-hour intervals
-  const generateTimeSlots = () => {
-    const slots = ['NON'];
-    for (let hour = 0; hour < 24; hour++) {
-      const hourStr = hour.toString().padStart(2, '0');
-      slots.push(`${hourStr}:00`);
-    }
-    return slots;
-  };
-
-  const timeSlots = generateTimeSlots();
+  const hours = Array.from({ length: 24 }, (_, i) => i);
+  const minutes = [0, 15, 30, 45];
 
   const handleTimeSlotPress = (dayIndex: number, timeType: 'start' | 'end') => {
     setSelectedDayIndex(dayIndex);
     setSelectedTimeType(timeType);
+    
+    // Set initial time based on current value
+    const currentTime = timeType === 'start' 
+      ? schedule[dayIndex].startTime 
+      : schedule[dayIndex].endTime;
+    
+    if (currentTime.toUpperCase() !== 'NON') {
+      const [hours, minutes] = currentTime.split(':').map(Number);
+      setSelectedHour(hours);
+      setSelectedMinute(minutes);
+    } else {
+      setSelectedHour(9);
+      setSelectedMinute(0);
+    }
+    
     setShowTimePicker(true);
   };
 
-  const handleTimeSelect = (time: string) => {
+  const handleTimeConfirm = () => {
     if (selectedDayIndex === null) return;
 
+    const timeString = `${selectedHour.toString().padStart(2, '0')}:${selectedMinute.toString().padStart(2, '0')}`;
     const newSchedule = [...schedule];
     
     if (selectedTimeType === 'start') {
-      newSchedule[selectedDayIndex].startTime = time;
-      // If start time is NON, set end time to NON automatically
-      if (time.toUpperCase() === 'NON') {
-        newSchedule[selectedDayIndex].endTime = 'NON';
-      } else {
-        // Validate: if start time is after end time, reset start to NON
-        const endTime = newSchedule[selectedDayIndex].endTime;
-        if (endTime !== 'NON' && time > endTime) {
-          newSchedule[selectedDayIndex].startTime = 'NON';
-          newSchedule[selectedDayIndex].endTime = 'NON';
-        }
+      newSchedule[selectedDayIndex].startTime = timeString;
+      // If setting start time, ensure end time is valid
+      const endTime = newSchedule[selectedDayIndex].endTime;
+      if (endTime !== 'NON' && timeString > endTime) {
+        newSchedule[selectedDayIndex].endTime = timeString;
       }
     } else {
       // Only allow end time change if start time is not NON
       if (newSchedule[selectedDayIndex].startTime.toUpperCase() !== 'NON') {
         const startTime = newSchedule[selectedDayIndex].startTime;
-        // Validate: if end time is before start time, reset start to NON
-        if (time !== 'NON' && time < startTime) {
-          newSchedule[selectedDayIndex].startTime = 'NON';
-          newSchedule[selectedDayIndex].endTime = 'NON';
+        if (timeString < startTime) {
+          newSchedule[selectedDayIndex].endTime = startTime;
         } else {
-          newSchedule[selectedDayIndex].endTime = time;
+          newSchedule[selectedDayIndex].endTime = timeString;
         }
       }
     }
+    
     setSchedule(newSchedule);
     setShowTimePicker(false);
+  };
+
+  const handleNonWorkingDay = () => {
+    if (selectedDayIndex !== null) {
+      const newSchedule = [...schedule];
+      newSchedule[selectedDayIndex].startTime = 'NON';
+      newSchedule[selectedDayIndex].endTime = 'NON';
+      setSchedule(newSchedule);
+      setShowTimePicker(false);
+    }
   };
 
   const handleUpdate = () => {
@@ -153,7 +165,7 @@ const WeeklyScheduleScreen: React.FC<WeeklyScheduleScreenProps> = ({ onBack }) =
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Time Picker Modal */}
+      {/* Custom Time Picker Modal */}
       <Modal
         visible={showTimePicker}
         transparent
@@ -171,18 +183,66 @@ const WeeklyScheduleScreen: React.FC<WeeklyScheduleScreenProps> = ({ onBack }) =
               </TouchableOpacity>
             </View>
 
-            <ScrollView style={styles.timeSlotsList} showsVerticalScrollIndicator={true}>
-              {timeSlots.map((time, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={styles.timeSlotItem}
-                  onPress={() => handleTimeSelect(time)}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.timeSlotText}>{time}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
+            {/* Time Picker Wheels */}
+            <View style={styles.pickerContainer}>
+              {/* Hour Picker */}
+              <View style={styles.pickerColumn}>
+                <Text style={styles.pickerLabel}>Hour</Text>
+                <ScrollView style={styles.pickerScroll} showsVerticalScrollIndicator={false}>
+                  {hours.map((hour) => (
+                    <TouchableOpacity
+                      key={hour}
+                      style={[
+                        styles.pickerItem,
+                        selectedHour === hour && styles.pickerItemSelected
+                      ]}
+                      onPress={() => setSelectedHour(hour)}
+                    >
+                      <Text style={[
+                        styles.pickerItemText,
+                        selectedHour === hour && styles.pickerItemTextSelected
+                      ]}>
+                        {hour.toString().padStart(2, '0')}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+
+              {/* Minute Picker */}
+              <View style={styles.pickerColumn}>
+                <Text style={styles.pickerLabel}>Minute</Text>
+                <ScrollView style={styles.pickerScroll} showsVerticalScrollIndicator={false}>
+                  {minutes.map((minute) => (
+                    <TouchableOpacity
+                      key={minute}
+                      style={[
+                        styles.pickerItem,
+                        selectedMinute === minute && styles.pickerItemSelected
+                      ]}
+                      onPress={() => setSelectedMinute(minute)}
+                    >
+                      <Text style={[
+                        styles.pickerItemText,
+                        selectedMinute === minute && styles.pickerItemTextSelected
+                      ]}>
+                        {minute.toString().padStart(2, '0')}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            </View>
+
+            {/* Action Buttons */}
+            <View style={styles.pickerActions}>
+              <TouchableOpacity style={styles.nonWorkingButton} onPress={handleNonWorkingDay}>
+                <Text style={styles.nonWorkingButtonText}>Set as Non-Working</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.confirmButton} onPress={handleTimeConfirm}>
+                <Text style={styles.confirmButtonText}>Confirm</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </Modal>
@@ -256,7 +316,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    maxHeight: '70%',
     paddingBottom: 20,
   },
   timePickerHeader: {
@@ -270,7 +329,7 @@ const styles = StyleSheet.create({
   },
   timePickerTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '700',
     color: Colors.textDark,
   },
   closeButton: {
@@ -278,20 +337,76 @@ const styles = StyleSheet.create({
     color: Colors.textDark,
     fontWeight: '600',
   },
-  timeSlotsList: {
-    maxHeight: 400,
-  },
-  timeSlotItem: {
-    paddingVertical: 16,
+  pickerContainer: {
+    flexDirection: 'row',
     paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
+    paddingVertical: 20,
+    gap: 20,
   },
-  timeSlotText: {
-    fontSize: 16,
+  pickerColumn: {
+    flex: 1,
+  },
+  pickerLabel: {
+    fontSize: 14,
+    fontWeight: '600',
     color: Colors.textDark,
     textAlign: 'center',
+    marginBottom: 12,
+  },
+  pickerScroll: {
+    maxHeight: 200,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 8,
+  },
+  pickerItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.borderLight,
+    alignItems: 'center',
+  },
+  pickerItemSelected: {
+    backgroundColor: Colors.backgroundAccent,
+  },
+  pickerItemText: {
+    fontSize: 18,
+    color: Colors.textDark,
     fontWeight: '500',
+  },
+  pickerItemTextSelected: {
+    color: Colors.accent,
+    fontWeight: '700',
+  },
+  pickerActions: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    gap: 12,
+  },
+  nonWorkingButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  nonWorkingButtonText: {
+    fontSize: 14,
+    color: Colors.textDark,
+    fontWeight: '600',
+  },
+  confirmButton: {
+    flex: 1,
+    paddingVertical: 14,
+    backgroundColor: Colors.accent,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  confirmButtonText: {
+    fontSize: 16,
+    color: Colors.white,
+    fontWeight: '700',
   },
   updateButton: {
     backgroundColor: Colors.accent,

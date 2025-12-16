@@ -10,6 +10,7 @@ import {
   TextInput,
 } from 'react-native';
 import { Colors } from '../styles/colors';
+import { ScreenHeader } from '../components';
 
 interface ActiveOrderScreenProps {
   onBack?: () => void;
@@ -74,29 +75,60 @@ const ActiveOrderScreen: React.FC<ActiveOrderScreenProps> = ({
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
+      <StatusBar barStyle="light-content" backgroundColor={Colors.accent} translucent={true} />
 
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.orderIdHeader}>#{orderId} Order</Text>
-      </View>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header */}
+        <ScreenHeader title={`#${orderId} Order`} onBack={onBack} variant="blue" />
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Order Card */}
         <View style={styles.orderCard}>
-          <TouchableOpacity style={styles.closeButton} onPress={onBack}>
-            <Text style={styles.closeButtonText}>✕</Text>
-          </TouchableOpacity>
-
-          <View style={styles.orderInfo}>
-            <Text style={styles.infoRow}>Client : {orderDetails.clientName}</Text>
-            <Text style={styles.infoRow}>Status : {orderDetails.status}</Text>
-            <Text style={styles.infoRow}>Address : {orderDetails.address}</Text>
-            <TouchableOpacity style={styles.mapButton}>
-              <Text style={styles.mapButtonText}>Open MAP</Text>
-            </TouchableOpacity>
-            <Text style={styles.infoRow}>Phone : {orderDetails.phone}</Text>
+          {/* Client Info Section */}
+          <View style={styles.clientSection}>
+            <View style={styles.clientIcon} />
+            <View style={styles.clientInfo}>
+              <Text style={styles.clientName}>{orderDetails.clientName}</Text>
+              <Text style={styles.orderStatus}>{orderDetails.status}</Text>
+            </View>
           </View>
+
+          {/* Order Details */}
+          <View style={styles.detailsSection}>
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Service:</Text>
+              <Text style={styles.detailValue}>{orderDetails.service}</Text>
+            </View>
+
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Date:</Text>
+              <Text style={styles.detailValue}>{orderDetails.date}</Text>
+            </View>
+
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Time:</Text>
+              <Text style={styles.detailValue}>{orderDetails.time}</Text>
+            </View>
+
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Phone:</Text>
+              <Text style={styles.detailValue}>{orderDetails.phone}</Text>
+            </View>
+
+            <View style={[styles.detailRow, styles.lastDetailRow]}>
+              <Text style={styles.detailLabel}>Address:</Text>
+              <Text style={[styles.detailValue, styles.addressText]}>
+                {orderDetails.address}
+              </Text>
+            </View>
+          </View>
+
+          {/* Map Button */}
+          <TouchableOpacity style={styles.mapButton}>
+            <Text style={styles.mapButtonText}>Open MAP</Text>
+          </TouchableOpacity>
 
           {orderStatus === 'Pending' && (
             <>
@@ -198,76 +230,94 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.white,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  scrollContent: {
+    flexGrow: 1,
     paddingHorizontal: 24,
-    paddingTop: 50,
-    paddingBottom: 16,
-  },
-  orderIdHeader: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: Colors.textDark,
-  },
-  menuButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  menuDots: {
-    fontSize: 24,
-    color: Colors.textDark,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 24,
+    paddingVertical: 20,
   },
   orderCard: {
     borderWidth: 1,
     borderColor: Colors.border,
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 20,
-    marginTop: 20,
-    position: 'relative',
+    marginBottom: 24,
+    backgroundColor: Colors.white,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
   },
-  closeButton: {
-    position: 'absolute',
-    top: 12,
-    right: 12,
-    width: 30,
-    height: 30,
-    justifyContent: 'center',
+  clientSection: {
+    flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 20,
+    paddingBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
   },
-  closeButtonText: {
-    fontSize: 24,
-    color: Colors.textDark,
-  },
-  orderInfo: {
-    marginTop: 20,
-  },
-  infoRow: {
-    fontSize: 14,
-    color: Colors.textDark,
-    marginBottom: 8,
-    lineHeight: 20,
-  },
-  mapButton: {
-    borderWidth: 1,
+  clientIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    borderWidth: 2,
     borderColor: Colors.border,
-    borderRadius: 6,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    alignSelf: 'flex-start',
-    marginVertical: 8,
+    marginRight: 16,
+    backgroundColor: Colors.backgroundSoft,
   },
-  mapButtonText: {
+  clientInfo: {
+    flex: 1,
+  },
+  clientName: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: Colors.textDark,
+    marginBottom: 4,
+    letterSpacing: -0.3,
+  },
+  orderStatus: {
     fontSize: 14,
+    color: Colors.textMedium,
+    fontWeight: '500',
+  },
+  detailsSection: {
+    marginBottom: 16,
+  },
+  detailRow: {
+    flexDirection: 'row',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  lastDetailRow: {
+    borderBottomWidth: 0,
+  },
+  detailLabel: {
+    fontSize: 15,
+    color: Colors.textMedium,
+    fontWeight: '500',
+    width: 100,
+  },
+  detailValue: {
+    flex: 1,
+    fontSize: 15,
     color: Colors.textDark,
     fontWeight: '500',
+  },
+  addressText: {
+    lineHeight: 22,
+  },
+  mapButton: {
+    backgroundColor: Colors.accent,
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  mapButtonText: {
+    fontSize: 15,
+    color: Colors.white,
+    fontWeight: '600',
   },
   otpButton: {
     borderWidth: 1,
@@ -275,17 +325,17 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
-    marginTop: 16,
+    marginBottom: 16,
+    backgroundColor: Colors.white,
   },
   otpButtonText: {
     fontSize: 15,
     color: Colors.textDark,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   actionButtons: {
     flexDirection: 'row',
     gap: 12,
-    marginTop: 16,
   },
   actionBtn: {
     flex: 1,
@@ -294,23 +344,25 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
+    backgroundColor: Colors.white,
   },
   actionBtnText: {
     fontSize: 15,
     color: Colors.textDark,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 20,
   },
   otpModal: {
     backgroundColor: Colors.white,
-    borderRadius: 12,
-    padding: 24,
-    width: '85%',
+    borderRadius: 16,
+    padding: 32,
+    width: '90%',
     maxWidth: 400,
     position: 'relative',
   },
@@ -322,83 +374,103 @@ const styles = StyleSheet.create({
     height: 30,
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 10,
+  },
+  closeButtonText: {
+    fontSize: 24,
+    color: Colors.textDark,
+    fontWeight: '600',
   },
   otpTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '700',
     color: Colors.textDark,
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: 32,
     marginTop: 20,
+    lineHeight: 28,
   },
   otpInputs: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 24,
+    marginBottom: 32,
+    gap: 8,
   },
   otpInput: {
-    width: 50,
-    height: 50,
-    borderWidth: 1,
+    flex: 1,
+    height: 56,
+    borderWidth: 2,
     borderColor: Colors.border,
-    borderRadius: 8,
+    borderRadius: 12,
     fontSize: 24,
     textAlign: 'center',
     color: Colors.textDark,
+    fontWeight: '600',
+    backgroundColor: Colors.white,
   },
   verifyButton: {
     backgroundColor: Colors.accent,
-    borderRadius: 8,
-    paddingVertical: 12,
+    borderRadius: 12,
+    paddingVertical: 16,
     alignItems: 'center',
+    shadowColor: Colors.accent,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   verifyButtonText: {
     fontSize: 16,
     color: Colors.white,
-    fontWeight: '600',
+    fontWeight: '700',
+    letterSpacing: 0.5,
   },
   alertModal: {
     backgroundColor: Colors.white,
-    borderRadius: 12,
-    padding: 24,
-    width: '85%',
+    borderRadius: 16,
+    padding: 32,
+    width: '90%',
     maxWidth: 400,
     alignItems: 'center',
     position: 'relative',
   },
   alertIcon: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    borderWidth: 2,
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    borderWidth: 3,
     borderColor: Colors.textDark,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 24,
+    marginTop: 10,
   },
   alertIconText: {
-    fontSize: 32,
+    fontSize: 40,
     color: Colors.textDark,
     fontWeight: '700',
   },
   alertText: {
-    fontSize: 16,
+    fontSize: 18,
     color: Colors.textDark,
     textAlign: 'center',
-    marginBottom: 24,
-    lineHeight: 24,
+    marginBottom: 32,
+    lineHeight: 26,
+    fontWeight: '500',
   },
   confirmButton: {
     borderWidth: 1,
     borderColor: Colors.border,
     borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 32,
+    paddingVertical: 14,
+    paddingHorizontal: 40,
+    minWidth: 180,
+    alignItems: 'center',
   },
   confirmButtonText: {
-    fontSize: 15,
+    fontSize: 16,
     color: Colors.textDark,
-    fontWeight: '500',
+    fontWeight: '600',
   },
 });
 

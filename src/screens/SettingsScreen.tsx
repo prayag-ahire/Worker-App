@@ -86,7 +86,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onNavigate, onH
         onHomePress={onHomePress}
         onOrdersPress={onOrdersPress}
         onSchedulePress={onSchedulePress}
-        onProfilePress={onBack}
+        onProfilePress={undefined}
       />
     </View>
   );

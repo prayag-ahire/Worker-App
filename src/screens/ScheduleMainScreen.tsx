@@ -74,7 +74,7 @@ const ScheduleMainScreen: React.FC<ScheduleMainScreenProps> = ({ onBack, onNavig
         activeTab="schedule"
         onHomePress={onHomePress}
         onOrdersPress={onOrdersPress}
-        onSchedulePress={onBack}
+        onSchedulePress={undefined}
         onProfilePress={onSettingsPress}
       />
     </View>

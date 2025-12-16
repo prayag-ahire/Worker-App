@@ -159,7 +159,10 @@ function App() {
   };
 
   const handleSettingsPress = () => {
-    setCurrentScreen('settings');
+    // Only navigate if not already on settings screen
+    if (currentScreen !== 'settings') {
+      setCurrentScreen('settings');
+    }
   };
 
   const handleSettingsBack = () => {
@@ -240,7 +243,10 @@ function App() {
   };
 
   const handleSchedulePress = () => {
-    setCurrentScreen('scheduleMain');
+    // Only navigate if not already on schedule screen
+    if (currentScreen !== 'scheduleMain') {
+      setCurrentScreen('scheduleMain');
+    }
   };
 
   const handleScheduleMainBack = () => {
@@ -264,7 +270,10 @@ function App() {
   };
 
   const handleOrdersPress = () => {
-    setCurrentScreen('orderHistory');
+    // Only navigate if not already on order history screen
+    if (currentScreen !== 'orderHistory') {
+      setCurrentScreen('orderHistory');
+    }
   };
 
   const handleOrderHistoryBack = () => {

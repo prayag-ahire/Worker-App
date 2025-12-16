@@ -32,7 +32,7 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({
           <Text style={[
             styles.backArrow,
             isBlueVariant && styles.backArrowWhite
-          ]}>←</Text>
+          ]}>‹</Text>
         )}
         <Text style={[
           styles.title,
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backArrow: {
-    fontSize: 28,
+    fontSize: 32,
     color: Colors.accent,
     fontWeight: '700',
     marginRight: 12,
