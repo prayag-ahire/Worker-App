@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, Modal, Text, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, Modal, Text, TouchableOpacity, BackHandler } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import SplashScreen from './src/screens/SplashScreen';
 import LoginScreen from './src/screens/LoginScreen';
@@ -40,6 +40,96 @@ function App() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmationType, setConfirmationType] = useState<'cancel' | 'reschedule'>('cancel');
 
+  // Handle hardware back button
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      // Exit app from these screens
+      if (currentScreen === 'splash' || currentScreen === 'login' || currentScreen === 'home') {
+        return false; // Let default behavior (exit app)
+      }
+
+      // Main sections - go to home
+      if (currentScreen === 'settings' || 
+          currentScreen === 'orderHistory' || 
+          currentScreen === 'scheduleMain') {
+        setCurrentScreen('home');
+        return true;
+      }
+
+      // Settings sub-screens - go to settings
+      if (currentScreen === 'userProfile' || 
+          currentScreen === 'location' || 
+          currentScreen === 'appLanguage' || 
+          currentScreen === 'inviteFriend' || 
+          currentScreen === 'tutorialVideos' || 
+          currentScreen === 'help') {
+        setCurrentScreen('settings');
+        return true;
+      }
+
+      // Edit profile - go to user profile
+      if (currentScreen === 'editProfile') {
+        setCurrentScreen('userProfile');
+        return true;
+      }
+
+      // AI Chat - go to help
+      if (currentScreen === 'aiChat') {
+        setCurrentScreen('help');
+        return true;
+      }
+
+      // Schedule sub-screens - go to schedule main
+      if (currentScreen === 'weeklySchedule' || currentScreen === 'monthlySchedule') {
+        setCurrentScreen('scheduleMain');
+        return true;
+      }
+
+      // Order details - go to order history
+      if (currentScreen === 'orderDetails') {
+        setCurrentScreen('orderHistory');
+        return true;
+      }
+
+      // Active order - go to home
+      if (currentScreen === 'activeOrder') {
+        setCurrentScreen('home');
+        return true;
+      }
+
+      // Reschedule flow - go back in order
+      if (currentScreen === 'timeSlots') {
+        setCurrentScreen('rescheduleCalendar');
+        return true;
+      }
+      if (currentScreen === 'rescheduleCalendar') {
+        setCurrentScreen('comment');
+        return true;
+      }
+      if (currentScreen === 'comment') {
+        setCurrentScreen('activeOrder');
+        return true;
+      }
+
+      // Signup flow - go to login
+      if (currentScreen === 'signup') {
+        setCurrentScreen('login');
+        return true;
+      }
+
+      // Onboarding/Personal details - can't go back
+      if (currentScreen === 'onboarding' || currentScreen === 'personalDetails') {
+        return true; // Prevent back
+      }
+
+      // Default - go to home
+      setCurrentScreen('home');
+      return true;
+    });
+
+    return () => backHandler.remove();
+  }, [currentScreen]);
+
   const handleSplashFinish = () => {
     setCurrentScreen('login');
   };
@@ -50,6 +140,10 @@ function App() {
 
   const handleSignUpPress = () => {
     setCurrentScreen('signup');
+  };
+
+  const handleLoginPress = () => {
+    setCurrentScreen('login');
   };
 
   const handleSignUpComplete = () => {
@@ -264,7 +358,10 @@ function App() {
           />
         )}
         {currentScreen === 'signup' && (
-          <SignUpScreen onSignUpComplete={handleSignUpComplete} />
+          <SignUpScreen 
+            onSignUpComplete={handleSignUpComplete}
+            onLoginPress={handleLoginPress}
+          />
         )}
         {currentScreen === 'onboarding' && (
           <OnboardingScreen onFinish={handleOnboardingFinish} />
