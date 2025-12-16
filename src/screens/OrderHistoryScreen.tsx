@@ -188,6 +188,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: Colors.accent,
     fontWeight: '600',
+    lineHeight: 24,
+    textAlign: 'center',
   },
 });
 

@@ -67,7 +67,7 @@ const InviteFriendScreen: React.FC<InviteFriendScreenProps> = ({ onBack }) => {
           <View style={styles.codeBox}>
             <Text style={styles.codeText}>{referralCode}</Text>
             <TouchableOpacity style={styles.copyButton} onPress={handleCopyCode}>
-              <Text style={styles.copyButtonText}>{t('inviteFriend.copyCode')}</Text>
+              <Text style={styles.copyText}>Copy</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -187,14 +187,19 @@ const styles = StyleSheet.create({
   },
   copyButton: {
     backgroundColor: Colors.accent,
-    paddingVertical: 8,
-    paddingHorizontal: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
     borderRadius: 8,
+    shadowColor: Colors.accent,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  copyButtonText: {
+  copyText: {
     fontSize: 14,
     color: Colors.white,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   shareButton: {
     marginBottom: 32,

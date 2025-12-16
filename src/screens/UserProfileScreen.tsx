@@ -24,7 +24,7 @@ const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit })
   const [charges, setCharges] = useState('200/hr');
   const [rating] = useState(4); // 4 out of 6 stars
   const [distanceCharges, setDistanceCharges] = useState(true);
-  const [description, setDescription] = useState('');
+  const description = 'Hi, I am a professional developer with 2 years of experience in plumbing and electrical work. I provide quality service at affordable rates.';
   const [activeTab, setActiveTab] = useState<'image' | 'video' | 'review'>('image');
 
   const handleEdit = () => {
@@ -50,101 +50,104 @@ const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit })
           </TouchableOpacity>
         </View>
 
-        {/* Profile Section */}
-        <View style={styles.profileSection}>
-          {/* Left: Profile Image */}
-          <View style={styles.profileImage}>
-            <Text style={styles.profileImageText}>📷</Text>
-          </View>
-
-          {/* Right: Details */}
-          <View style={styles.detailsSection}>
-            {/* Name */}
-            <Text style={styles.nameText}>{name}</Text>
-
-            {/* Charges */}
-            <View style={styles.infoRow}>
-              <Text style={styles.label}>{t('profile.charges')} : </Text>
-              <Text style={styles.value}>{charges}</Text>
+        {/* Profile Card - Combined */}
+        <View style={styles.profileCard}>
+          {/* Profile Header */}
+          <View style={styles.profileHeader}>
+            {/* Left: Profile Image */}
+            <View style={styles.profileImage}>
+              <Text style={styles.profileImageText}>📷</Text>
             </View>
 
-            {/* Rating */}
-            <View style={styles.ratingRow}>
-              <Text style={styles.label}>{t('profile.rating')} </Text>
-              <View style={styles.stars}>
-                {[1, 2, 3, 4, 5, 6].map((star) => (
-                  <Text key={star} style={styles.star}>
-                    {star <= rating ? '⭐' : '☆'}
-                  </Text>
-                ))}
+            {/* Right: Details */}
+            <View style={styles.detailsSection}>
+              {/* Name */}
+              <Text style={styles.nameText}>{name}</Text>
+
+              {/* Charges */}
+              <View style={styles.infoRow}>
+                <Text style={styles.label}>{t('profile.charges')} : </Text>
+                <Text style={styles.value}>{charges}</Text>
+              </View>
+
+              {/* Rating */}
+              <View style={styles.ratingRow}>
+                <Text style={styles.label}>{t('profile.rating')} </Text>
+                <View style={styles.stars}>
+                  {[1, 2, 3, 4, 5, 6].map((star) => (
+                    <Text key={star} style={styles.star}>
+                      {star <= rating ? '⭐' : '☆'}
+                    </Text>
+                  ))}
+                </View>
+              </View>
+
+              {/* Distance Charges */}
+              <View style={styles.distanceRow}>
+                <Text style={styles.distanceLabel}>{t('profile.distanceCharges')}</Text>
+                <View style={styles.switchContainer}>
+                  <Switch
+                    value={distanceCharges}
+                    onValueChange={setDistanceCharges}
+                    trackColor={{ false: Colors.border, true: Colors.accent }}
+                    thumbColor={Colors.white}
+                  />
+                  <Text style={styles.switchLabel}>{distanceCharges ? t('profile.on') : t('profile.off')}</Text>
+                </View>
               </View>
             </View>
+          </View>
 
-            {/* Distance Charges */}
-            <View style={styles.distanceRow}>
-              <Text style={styles.distanceLabel}>{t('profile.distanceCharges')}</Text>
-              <View style={styles.switchContainer}>
-                <Switch
-                  value={distanceCharges}
-                  onValueChange={setDistanceCharges}
-                  trackColor={{ false: Colors.border, true: Colors.accent }}
-                  thumbColor={Colors.white}
-                />
-                <Text style={styles.switchLabel}>{distanceCharges ? t('profile.on') : t('profile.off')}</Text>
-              </View>
-            </View>
+          {/* Divider */}
+          <View style={styles.divider} />
+
+          {/* Description */}
+          <View>
+            <Text style={styles.descriptionLabel}>{t('profile.description')}</Text>
+            <Text style={styles.descriptionText}>
+              {description || t('profile.noDescription')}
+            </Text>
           </View>
         </View>
 
-        {/* Description */}
-        <View style={styles.descriptionContainer}>
-          <TextInput
-            style={styles.descriptionInput}
-            placeholder={t('profile.description')}
-            placeholderTextColor={Colors.textLight}
-            value={description}
-            onChangeText={setDescription}
-            multiline
-            numberOfLines={4}
-            textAlignVertical="top"
-          />
-        </View>
+        {/* Media Card - Combined */}
+        <View style={styles.mediaCard}>
+          {/* Tabs */}
+          <View style={styles.tabsContainer}>
+            <TouchableOpacity
+              style={[styles.tab, activeTab === 'image' && styles.tabActive]}
+              onPress={() => setActiveTab('image')}
+            >
+              <Text style={[styles.tabText, activeTab === 'image' && styles.tabTextActive]}>
+                {t('profile.image')}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.tab, activeTab === 'video' && styles.tabActive]}
+              onPress={() => setActiveTab('video')}
+            >
+              <Text style={[styles.tabText, activeTab === 'video' && styles.tabTextActive]}>
+                {t('profile.video')}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.tab, activeTab === 'review' && styles.tabActive]}
+              onPress={() => setActiveTab('review')}
+            >
+              <Text style={[styles.tabText, activeTab === 'review' && styles.tabTextActive]}>
+                {t('profile.review')}
+              </Text>
+            </TouchableOpacity>
+          </View>
 
-        {/* Tabs */}
-        <View style={styles.tabsContainer}>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'image' && styles.tabActive]}
-            onPress={() => setActiveTab('image')}
-          >
-            <Text style={[styles.tabText, activeTab === 'image' && styles.tabTextActive]}>
-              {t('profile.image')}
+          {/* Content Area */}
+          <View style={styles.contentArea}>
+            <Text style={styles.contentPlaceholder}>
+              {activeTab === 'image' && t('profile.imagesPlaceholder')}
+              {activeTab === 'video' && t('profile.videosPlaceholder')}
+              {activeTab === 'review' && t('profile.reviewsPlaceholder')}
             </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'video' && styles.tabActive]}
-            onPress={() => setActiveTab('video')}
-          >
-            <Text style={[styles.tabText, activeTab === 'video' && styles.tabTextActive]}>
-              {t('profile.video')}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'review' && styles.tabActive]}
-            onPress={() => setActiveTab('review')}
-          >
-            <Text style={[styles.tabText, activeTab === 'review' && styles.tabTextActive]}>
-              {t('profile.review')}
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Content Area */}
-        <View style={styles.contentArea}>
-          <Text style={styles.contentPlaceholder}>
-            {activeTab === 'image' && t('profile.imagesPlaceholder')}
-            {activeTab === 'video' && t('profile.videosPlaceholder')}
-            {activeTab === 'review' && t('profile.reviewsPlaceholder')}
-          </Text>
+          </View>
         </View>
       </ScrollView>
     </View>
@@ -184,20 +187,32 @@ const styles = StyleSheet.create({
     color: Colors.accent,
     fontWeight: '700',
   },
-  profileSection: {
+  profileCard: {
+    backgroundColor: Colors.white,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+    marginHorizontal: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  profileHeader: {
     flexDirection: 'row',
     gap: 16,
-    marginBottom: 16,
+    marginBottom: 20,
   },
   profileImage: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: Colors.backgroundSoft,
+    backgroundColor: Colors.backgroundAccent,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: Colors.border,
+    borderWidth: 3,
+    borderColor: Colors.accent,
   },
   profileImageText: {
     fontSize: 32,
@@ -207,43 +222,47 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   nameText: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 18,
+    fontWeight: '700',
     color: Colors.textDark,
     marginBottom: 8,
+    letterSpacing: -0.3,
   },
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   label: {
     fontSize: 14,
-    color: Colors.textDark,
-    fontWeight: '400',
+    color: Colors.textMedium,
+    fontWeight: '500',
   },
   value: {
     fontSize: 14,
-    color: Colors.textDark,
-    fontWeight: '600',
+    color: Colors.accent,
+    fontWeight: '700',
   },
   ratingRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   stars: {
     flexDirection: 'row',
-    gap: 4,
+    gap: 2,
   },
   star: {
-    fontSize: 16,
+    fontSize: 14,
   },
   distanceRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginTop: 8,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: Colors.borderLight,
   },
   distanceLabel: {
     fontSize: 14,
@@ -256,63 +275,79 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   switchLabel: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
+    color: Colors.accent,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: Colors.borderLight,
+    marginBottom: 20,
+  },
+  descriptionLabel: {
+    fontSize: 16,
+    fontWeight: '700',
     color: Colors.textDark,
+    marginBottom: 12,
+    letterSpacing: -0.2,
   },
-  descriptionContainer: {
-    marginTop: 8,
-    marginBottom: 24,
-  },
-  descriptionInput: {
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 8,
-    padding: 12,
+  descriptionText: {
     fontSize: 14,
     color: Colors.textDark,
-    minHeight: 80,
+    lineHeight: 22,
+  },
+  mediaCard: {
+    backgroundColor: Colors.white,
+    borderRadius: 16,
+    padding: 20,
+    marginHorizontal: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
   },
   tabsContainer: {
     flexDirection: 'row',
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 8,
-    overflow: 'hidden',
-    marginBottom: 16,
+    backgroundColor: Colors.backgroundSecondary,
+    borderRadius: 12,
+    padding: 4,
+    marginBottom: 20,
   },
   tab: {
     flex: 1,
-    paddingVertical: 12,
+    paddingVertical: 10,
     alignItems: 'center',
-    backgroundColor: Colors.white,
-    borderRightWidth: 1,
-    borderRightColor: Colors.border,
+    borderRadius: 8,
+    backgroundColor: 'transparent',
   },
   tabActive: {
-    backgroundColor: Colors.backgroundSoft,
+    backgroundColor: Colors.white,
+    shadowColor: Colors.shadowDark,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   tabText: {
     fontSize: 14,
-    color: Colors.textMedium,
-    fontWeight: '500',
-  },
-  tabTextActive: {
-    color: Colors.textDark,
+    color: Colors.textSecondary,
     fontWeight: '600',
   },
+  tabTextActive: {
+    color: Colors.accent,
+    fontWeight: '700',
+  },
   contentArea: {
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 12,
     minHeight: 300,
-    padding: 24,
+    paddingVertical: 24,
     justifyContent: 'center',
     alignItems: 'center',
   },
   contentPlaceholder: {
     fontSize: 14,
     color: Colors.textLight,
+    fontWeight: '500',
   },
 });
 

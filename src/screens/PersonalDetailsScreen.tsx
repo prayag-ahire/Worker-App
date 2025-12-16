@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Alert,
 } from 'react-native';
 import { Colors } from '../styles/colors';
 
@@ -22,22 +23,53 @@ const PersonalDetailsScreen: React.FC<PersonalDetailsScreenProps> = ({ onComplet
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [gender, setGender] = useState<'male' | 'female' | null>(null);
-  const [focusedField, setFocusedField] = useState<string | null>(null);
 
+  // ---------- VALIDATION HELPERS ----------
+  const isValidEmail = (value: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+
+  const isValidPhone = (value: string) =>
+    /^[0-9]{10}$/.test(value);
+
+  const isValidAge = (value: string) => {
+    const num = Number(value);
+    return num >= 1 && num <= 120;
+  };
+
+  // ---------- SUBMIT ----------
   const handleCreateProfile = () => {
+    if (name.trim().length < 2) {
+      Alert.alert('Invalid Name', 'Name must be at least 2 characters long.');
+      return;
+    }
+
+    if (!age || !isValidAge(age)) {
+      Alert.alert('Invalid Age', 'Please enter a valid age between 1 and 120.');
+      return;
+    }
+
+    if (!email || !isValidEmail(email)) {
+      Alert.alert('Invalid Email', 'Please enter a valid email address.');
+      return;
+    }
+
+    if (!phone || !isValidPhone(phone)) {
+      Alert.alert('Invalid Phone', 'Phone number must be exactly 10 digits.');
+      return;
+    }
+
+    if (!gender) {
+      Alert.alert('Gender Required', 'Please select your gender.');
+      return;
+    }
+
     console.log({ name, age, email, phone, gender });
     onComplete?.();
   };
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={Colors.backgroundLight} />
-
-      {/* Background blobs */}
-      <View style={styles.gradientOverlay}>
-        <View style={[styles.blob, styles.blob1]} />
-        <View style={[styles.blob, styles.blob2]} />
-      </View>
+      <StatusBar barStyle="light-content" backgroundColor={Colors.accent} translucent />
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -45,37 +77,35 @@ const PersonalDetailsScreen: React.FC<PersonalDetailsScreenProps> = ({ onComplet
       >
         <ScrollView
           contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="always"
+          showsVerticalScrollIndicator={false}
         >
           {/* Header */}
           <View style={styles.header}>
             <Text style={styles.title}>Personal Details</Text>
+            <Text style={styles.subtitle}>Complete your profile to get started</Text>
+          </View>
 
+          {/* Profile Image */}
+          <View style={styles.profileImageContainer}>
             <View style={styles.profileImage}>
               <Text style={styles.profileImageText}>📷</Text>
             </View>
+            <Text style={styles.uploadText}>Tap to upload photo</Text>
           </View>
 
           {/* Form */}
-          <View style={styles.formContainer}>
+          <View style={styles.formCard}>
             {/* Name */}
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Name</Text>
-              <View
-                style={[
-                  styles.inputWrapper,
-                  focusedField === 'name' && styles.inputWrapperFocused,
-                ]}
-              >
+              <View style={styles.inputWrapper}>
                 <TextInput
                   style={styles.input}
                   placeholder="Enter your name"
                   placeholderTextColor={Colors.textLight}
                   value={name}
                   onChangeText={setName}
-                  onFocus={() => setFocusedField('name')}
-                  onBlur={() => setFocusedField(null)}
                 />
               </View>
             </View>
@@ -83,21 +113,14 @@ const PersonalDetailsScreen: React.FC<PersonalDetailsScreenProps> = ({ onComplet
             {/* Age */}
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Age</Text>
-              <View
-                style={[
-                  styles.inputWrapper,
-                  focusedField === 'age' && styles.inputWrapperFocused,
-                ]}
-              >
+              <View style={styles.inputWrapper}>
                 <TextInput
                   style={styles.input}
                   placeholder="Enter your age"
                   placeholderTextColor={Colors.textLight}
                   value={age}
                   keyboardType="number-pad"
-                  onChangeText={setAge}
-                  onFocus={() => setFocusedField('age')}
-                  onBlur={() => setFocusedField(null)}
+                  onChangeText={(t) => setAge(t.replace(/[^0-9]/g, ''))}
                 />
               </View>
             </View>
@@ -105,12 +128,7 @@ const PersonalDetailsScreen: React.FC<PersonalDetailsScreenProps> = ({ onComplet
             {/* Email */}
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Email</Text>
-              <View
-                style={[
-                  styles.inputWrapper,
-                  focusedField === 'email' && styles.inputWrapperFocused,
-                ]}
-              >
+              <View style={styles.inputWrapper}>
                 <TextInput
                   style={styles.input}
                   placeholder="example@gmail.com"
@@ -119,8 +137,6 @@ const PersonalDetailsScreen: React.FC<PersonalDetailsScreenProps> = ({ onComplet
                   keyboardType="email-address"
                   autoCapitalize="none"
                   onChangeText={setEmail}
-                  onFocus={() => setFocusedField('email')}
-                  onBlur={() => setFocusedField(null)}
                 />
               </View>
             </View>
@@ -128,21 +144,15 @@ const PersonalDetailsScreen: React.FC<PersonalDetailsScreenProps> = ({ onComplet
             {/* Phone */}
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Phone</Text>
-              <View
-                style={[
-                  styles.inputWrapper,
-                  focusedField === 'phone' && styles.inputWrapperFocused,
-                ]}
-              >
+              <View style={styles.inputWrapper}>
                 <TextInput
                   style={styles.input}
                   placeholder="1234567890"
                   placeholderTextColor={Colors.textLight}
                   value={phone}
-                  keyboardType="phone-pad"
-                  onChangeText={setPhone}
-                  onFocus={() => setFocusedField('phone')}
-                  onBlur={() => setFocusedField(null)}
+                  keyboardType="number-pad"
+                  maxLength={10}
+                  onChangeText={(t) => setPhone(t.replace(/[^0-9]/g, ''))}
                 />
               </View>
             </View>
@@ -159,6 +169,7 @@ const PersonalDetailsScreen: React.FC<PersonalDetailsScreenProps> = ({ onComplet
                       gender === g && styles.genderButtonActive,
                     ]}
                     onPress={() => setGender(g)}
+                    activeOpacity={0.8}
                   >
                     <View style={styles.radioOuter}>
                       {gender === g && <View style={styles.radioInner} />}
@@ -177,7 +188,11 @@ const PersonalDetailsScreen: React.FC<PersonalDetailsScreenProps> = ({ onComplet
             </View>
 
             {/* Button */}
-            <TouchableOpacity style={styles.createButton} onPress={handleCreateProfile}>
+            <TouchableOpacity
+              style={styles.createButton}
+              onPress={handleCreateProfile}
+              activeOpacity={0.9}
+            >
               <Text style={styles.createButtonText}>Create Profile</Text>
             </TouchableOpacity>
           </View>
@@ -189,68 +204,68 @@ const PersonalDetailsScreen: React.FC<PersonalDetailsScreenProps> = ({ onComplet
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.backgroundLight,
-  },
-  gradientOverlay: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-  },
-  blob: {
-    position: 'absolute',
-    borderRadius: 1000,
-    opacity: 0.15,
-  },
-  blob1: {
-    width: 300,
-    height: 300,
-    backgroundColor: Colors.primaryMedium,
-    top: -100,
-    right: -100,
-  },
-  blob2: {
-    width: 240,
-    height: 240,
-    backgroundColor: Colors.primaryLight,
-    bottom: -80,
-    left: -80,
+    backgroundColor: Colors.white,
   },
   scrollContent: {
     flexGrow: 1,
-    padding: 24,
-    justifyContent: 'center',
+    paddingBottom: 24,
   },
   header: {
-    alignItems: 'center',
-    marginBottom: 24,
+    paddingHorizontal: 24,
+    paddingTop: 50,
+    paddingBottom: 40,
+    backgroundColor: Colors.accent,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
   },
   title: {
     fontSize: 24,
     fontWeight: '700',
-    color: Colors.textDark,
+    color: Colors.white,
+    marginBottom: 6,
+  },
+  subtitle: {
+    fontSize: 13,
+    color: Colors.white,
+    opacity: 0.9,
+  },
+  profileImageContainer: {
+    alignItems: 'center',
+    marginTop: -35,
+    marginBottom: 16,
   },
   profileImage: {
-    marginTop: 16,
-    width: 70,
-    height: 70,
-    borderRadius: 35,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     backgroundColor: Colors.white,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 3,
-    borderColor: Colors.accent,
+    borderWidth: 4,
+    borderColor: Colors.white,
+    elevation: 6,
   },
   profileImageText: {
-    fontSize: 28,
+    fontSize: 32,
   },
-  formContainer: {
-    width: '100%',
+  uploadText: {
+    fontSize: 11,
+    color: Colors.textMedium,
+    marginTop: 6,
+    fontWeight: '500',
+  },
+  formCard: {
+    marginHorizontal: 24,
+    backgroundColor: Colors.white,
+    borderRadius: 16,
+    padding: 16,
+    elevation: 4,
   },
   inputGroup: {
-    marginBottom: 10,
+    marginBottom: 12,
   },
   label: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '600',
     marginBottom: 6,
     color: Colors.textDark,
@@ -259,19 +274,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     height: 44,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: Colors.border,
-    paddingHorizontal: 14,
-    backgroundColor: Colors.backgroundSoft,
-  },
-  inputWrapperFocused: {
-    borderColor: Colors.accent,
+    borderRadius: 12,
+    borderWidth: 2,           // ✅ constant
+    borderColor: Colors.borderLight,
+    paddingHorizontal: 16,
     backgroundColor: Colors.white,
   },
   input: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 15,
     color: Colors.textDark,
   },
   genderContainer: {
@@ -282,52 +293,54 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     padding: 10,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: Colors.border,
-    backgroundColor: Colors.backgroundSoft,
+    borderRadius: 12,
+    borderWidth: 2,          // ✅ constant
+    borderColor: Colors.borderLight,
+    backgroundColor: Colors.white,
   },
   genderButtonActive: {
     borderColor: Colors.accent,
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundAccent,
   },
   radioOuter: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
     borderWidth: 2,
-    borderColor: Colors.border,
-    marginRight: 6,
+    borderColor: Colors.borderLight,
+    marginRight: 8,
     justifyContent: 'center',
     alignItems: 'center',
   },
   radioInner: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
     backgroundColor: Colors.accent,
   },
   genderText: {
-    fontSize: 13,
+    fontSize: 14,
     color: Colors.textMedium,
+    fontWeight: '500',
   },
   genderTextActive: {
     color: Colors.accent,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   createButton: {
-    marginTop: 14,
-    borderRadius: 10,
+    marginTop: 16,
+    borderRadius: 12,
     backgroundColor: Colors.accent,
-    paddingVertical: 13,
+    paddingVertical: 14,
     alignItems: 'center',
+    elevation: 6,
   },
   createButtonText: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '700',
     color: Colors.white,
   },
 });
-
 export default PersonalDetailsScreen;

@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { Colors } from '../styles/colors';
 import { ScreenHeader } from '../components';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface OrderDetailsScreenProps {
   onBack?: () => void;
@@ -26,6 +27,7 @@ const OrderDetailsScreen: React.FC<OrderDetailsScreenProps> = ({
   onNavigateToAIChat,
   onNavigateToHelp 
 }) => {
+  const { t } = useLanguage();
   const [showHelpModal, setShowHelpModal] = useState(false);
 
   const orderDetails = {
@@ -93,7 +95,7 @@ const OrderDetailsScreen: React.FC<OrderDetailsScreenProps> = ({
         {/* Header */}
         <ScreenHeader title={`#${orderId} Order`} onBack={onBack} variant="blue" />
 
-        {/* Order Card */}
+        {/* Order Card - Combined */}
         <View style={styles.orderCard}>
           {/* Client Info */}
           <View style={styles.clientSection}>
@@ -107,40 +109,41 @@ const OrderDetailsScreen: React.FC<OrderDetailsScreenProps> = ({
           {/* Action Buttons */}
           <View style={styles.actionButtons}>
             <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
-              <Text style={styles.actionButtonText}>Share</Text>
+              <Text style={styles.actionButtonText}>{t('orderDetails.share')}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.actionButton} onPress={handleHelp}>
-              <Text style={styles.actionButtonText}>Help</Text>
+              <Text style={styles.actionButtonText}>{t('orderDetails.help')}</Text>
             </TouchableOpacity>
           </View>
-        </View>
 
-        {/* Order Details */}
-        <View style={styles.detailsSection}>
-          <Text style={styles.sectionTitle}>Order Details</Text>
+          {/* Divider */}
+          <View style={styles.divider} />
+
+          {/* Order Details */}
+          <Text style={styles.sectionTitle}>{t('orderDetails.title')}</Text>
           
           <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Service:</Text>
+            <Text style={styles.detailLabel}>{t('orderDetails.service')}:</Text>
             <Text style={styles.detailValue}>{orderDetails.service}</Text>
           </View>
 
           <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Date:</Text>
+            <Text style={styles.detailLabel}>{t('orderDetails.date')}:</Text>
             <Text style={styles.detailValue}>{orderDetails.date}</Text>
           </View>
 
           <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Time:</Text>
+            <Text style={styles.detailLabel}>{t('orderDetails.time')}:</Text>
             <Text style={styles.detailValue}>{orderDetails.time}</Text>
           </View>
 
           <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Amount:</Text>
+            <Text style={styles.detailLabel}>{t('orderDetails.amount')}:</Text>
             <Text style={styles.detailValue}>{orderDetails.amount}</Text>
           </View>
 
           <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Address:</Text>
+            <Text style={styles.detailLabel}>{t('orders.address')}:</Text>
             <Text style={[styles.detailValue, styles.addressText]}>
               {orderDetails.address}
             </Text>
@@ -163,14 +166,14 @@ const OrderDetailsScreen: React.FC<OrderDetailsScreenProps> = ({
         <View style={styles.modalOverlay}>
           <View style={styles.helpModal}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Need Help?</Text>
+              <Text style={styles.modalTitle}>{t('orderDetails.needHelp')}</Text>
               <TouchableOpacity onPress={() => setShowHelpModal(false)}>
                 <Text style={styles.closeButton}>✕</Text>
               </TouchableOpacity>
             </View>
 
             <Text style={styles.modalDescription}>
-              How can we assist you with this order?
+              {t('orderDetails.needHelp')}
             </Text>
 
             <View style={styles.helpOptions}>
@@ -183,9 +186,9 @@ const OrderDetailsScreen: React.FC<OrderDetailsScreenProps> = ({
                   <Text style={styles.helpIcon}>🤖</Text>
                 </View>
                 <View style={styles.helpOptionContent}>
-                  <Text style={styles.helpOptionTitle}>AI Chatbot</Text>
+                  <Text style={styles.helpOptionTitle}>{t('orderDetails.aiChatbot')}</Text>
                   <Text style={styles.helpOptionDescription}>
-                    Get instant answers to your queries
+                    {t('orderDetails.aiChatbotDesc')}
                   </Text>
                 </View>
                 <Text style={styles.helpArrow}>›</Text>
@@ -200,9 +203,9 @@ const OrderDetailsScreen: React.FC<OrderDetailsScreenProps> = ({
                   <Text style={styles.helpIcon}>❓</Text>
                 </View>
                 <View style={styles.helpOptionContent}>
-                  <Text style={styles.helpOptionTitle}>View FAQ</Text>
+                  <Text style={styles.helpOptionTitle}>{t('orderDetails.viewFAQ')}</Text>
                   <Text style={styles.helpOptionDescription}>
-                    Find answers to common questions
+                    {t('orderDetails.viewFAQDesc')}
                   </Text>
                 </View>
                 <Text style={styles.helpArrow}>›</Text>
@@ -217,9 +220,9 @@ const OrderDetailsScreen: React.FC<OrderDetailsScreenProps> = ({
                   <Text style={styles.helpIcon}>📧</Text>
                 </View>
                 <View style={styles.helpOptionContent}>
-                  <Text style={styles.helpOptionTitle}>Report an Issue</Text>
+                  <Text style={styles.helpOptionTitle}>{t('orderDetails.reportIssue')}</Text>
                   <Text style={styles.helpOptionDescription}>
-                    Send an email to report a problem
+                    {t('orderDetails.reportIssueDesc')}
                   </Text>
                 </View>
                 <Text style={styles.helpArrow}>›</Text>
@@ -230,7 +233,7 @@ const OrderDetailsScreen: React.FC<OrderDetailsScreenProps> = ({
               style={styles.cancelButton}
               onPress={() => setShowHelpModal(false)}
             >
-              <Text style={styles.cancelButtonText}>Cancel</Text>
+              <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -250,12 +253,19 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   orderCard: {
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 12,
-    padding: 20,
+    borderRadius: 16, // More rounded for modern look
+    padding: 24, // Increased padding
     marginBottom: 24,
+    marginHorizontal: 4, // Slight horizontal margin for shadow visibility
     backgroundColor: Colors.white,
+    overflow: 'hidden', // Ensures content respects rounded corners
+    // Modern shadow effect
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
+    // Removed border for cleaner look
   },
   clientSection: {
     flexDirection: 'row',
@@ -267,9 +277,9 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 30,
     borderWidth: 2,
-    borderColor: Colors.border,
+    borderColor: Colors.backgroundSoft,
     marginRight: 16,
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundSoft,
   },
   clientInfo: {
     flex: 1,
@@ -279,10 +289,12 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: Colors.textDark,
     marginBottom: 4,
+    letterSpacing: -0.3,
   },
   orderStatus: {
     fontSize: 14,
     color: Colors.textMedium,
+    fontWeight: '500',
   },
   actionButtons: {
     flexDirection: 'row',
@@ -290,37 +302,44 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     flex: 1,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 8,
-    paddingVertical: 12,
+    borderRadius: 12, // More rounded
+    paddingVertical: 14, // Increased padding
     alignItems: 'center',
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundAccent,
+    // Modern shadow effect
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   actionButtonText: {
     fontSize: 15,
-    color: Colors.textDark,
-    fontWeight: '600',
+    color: Colors.accent,
+    fontWeight: '700',
   },
-  detailsSection: {
-    marginBottom: 24,
+  divider: {
+    height: 1,
+    backgroundColor: Colors.borderLight,
+    marginVertical: 20,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
     color: Colors.textDark,
     marginBottom: 16,
+    letterSpacing: -0.3,
   },
   detailRow: {
     flexDirection: 'row',
-    paddingVertical: 12,
+    paddingVertical: 14, // Increased padding
     borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
+    borderBottomColor: Colors.borderLight,
   },
   detailLabel: {
     fontSize: 15,
     color: Colors.textMedium,
-    fontWeight: '500',
+    fontWeight: '600',
     width: 100,
   },
   detailValue: {
@@ -350,10 +369,16 @@ const styles = StyleSheet.create({
   },
   helpModal: {
     backgroundColor: Colors.white,
-    borderRadius: 16,
+    borderRadius: 20, // More rounded
     width: '100%',
     maxWidth: 400,
     padding: 24,
+    // Modern shadow effect
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 8,
   },
   modalHeader: {
     flexDirection: 'row',
@@ -365,6 +390,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     color: Colors.textDark,
+    letterSpacing: -0.3,
   },
   closeButton: {
     fontSize: 24,
@@ -384,33 +410,40 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 16,
-    paddingHorizontal: 12,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 12,
+    paddingHorizontal: 16, // Increased padding
+    borderRadius: 14, // More rounded
     marginBottom: 12,
     backgroundColor: Colors.white,
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
+    // Modern shadow effect
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
   },
   helpIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Colors.backgroundSoft,
+    width: 44, // Slightly larger
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: Colors.backgroundAccent,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 14,
   },
   helpIcon: {
-    fontSize: 20,
+    fontSize: 22, // Slightly larger
   },
   helpOptionContent: {
     flex: 1,
   },
   helpOptionTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
     color: Colors.textDark,
     marginBottom: 4,
+    letterSpacing: -0.2,
   },
   helpOptionDescription: {
     fontSize: 13,
@@ -426,8 +459,9 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 8,
+    borderColor: Colors.borderLight,
+    borderRadius: 12, // More rounded
+    backgroundColor: Colors.white,
   },
   cancelButtonText: {
     fontSize: 16,

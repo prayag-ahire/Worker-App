@@ -275,38 +275,65 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 20,
-    paddingVertical: 12,
+    marginBottom: 24,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    backgroundColor: Colors.backgroundAccent, // Light blue background
+    borderRadius: 12,
   },
   navButton: {
-    padding: 8,
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 22,
+    backgroundColor: Colors.white,
+    shadowColor: Colors.shadowDark,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    elevation: 3,
   },
   navButtonText: {
-    fontSize: 20,
-    color: Colors.textDark,
-    fontWeight: '600',
+    fontSize: 24,
+    color: Colors.accent, // Sky blue arrows
+    fontWeight: '700',
+    textAlign: 'center',
+    lineHeight: 24, // Match fontSize for better centering
+    includeFontPadding: false, // Remove extra padding on Android
+    textAlignVertical: 'center', // Center vertically on Android
   },
   monthText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.textDark,
+    fontSize: 17,
+    fontWeight: '700',
+    color: Colors.textPrimary,
+    letterSpacing: -0.2,
   },
   calendarContainer: {
-    borderWidth: 1,
-    borderColor: Colors.border,
+    marginBottom: 20,
+    backgroundColor: Colors.white,
     borderRadius: 12,
-    padding: 12,
+    padding: 16,
+    shadowColor: Colors.shadowDark,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
   weekHeader: {
     flexDirection: 'row',
-    marginBottom: 10,
+    marginBottom: 12,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.borderLight,
   },
   weekHeaderText: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.textMedium,
+    fontSize: 13,
+    fontWeight: '700',
+    color: Colors.textSecondary,
+    letterSpacing: 0.5,
   },
   week: {
     flexDirection: 'row',
@@ -315,25 +342,36 @@ const styles = StyleSheet.create({
   day: {
     flex: 1,
     aspectRatio: 1,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 6,
+    backgroundColor: Colors.white,
+    borderRadius: 12, // More rounded for modern look
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 2,
-    backgroundColor: Colors.white,
+    marginHorizontal: 3, // Slightly more margin for shadow visibility
+    marginVertical: 2,
+    position: 'relative',
+    overflow: 'hidden', // Ensures shadow respects rounded corners
+    // Modern shadow effect
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2, // Android shadow
   },
   leaveDay: {
-    backgroundColor: '#ffcccc',
-    borderColor: '#ff6666',
+    backgroundColor: '#ffebee', // Softer red background
+    borderWidth: 2,
+    borderColor: '#ef5350', // Modern red border
   },
   dayNumber: {
     fontSize: 14,
-    fontWeight: '500',
-    color: Colors.textDark,
+    fontWeight: '600',
+    color: Colors.textPrimary,
   },
   leaveDayNumber: {
-    color: '#cc0000',
+    color: '#d32f2f', // Darker red for better contrast
     fontWeight: '700',
   },
   modalOverlay: {
