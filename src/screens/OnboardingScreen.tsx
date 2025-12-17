@@ -10,39 +10,40 @@ import {
   Image,
 } from 'react-native';
 import { Colors } from '../styles/colors';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const { width } = Dimensions.get('window');
 
 interface OnboardingItem {
   id: string;
-  title: string;
-  description: string;
+  titleKey: string;
+  descriptionKey: string;
   image: any;
 }
 
 const onboardingData: OnboardingItem[] = [
   {
     id: '1',
-    title: 'Create Your Profile',
-    description: 'Create worker profile and let the world know existence of your skill',
+    titleKey: 'onboarding.slide1Title',
+    descriptionKey: 'onboarding.slide1Description',
     image: require('../assets/images/onboarding1.png'),
   },
   {
     id: '2',
-    title: 'Share Your Work',
-    description: 'Increase the value of your skill by sharing your work',
+    titleKey: 'onboarding.slide2Title',
+    descriptionKey: 'onboarding.slide2Description',
     image: require('../assets/images/onboarding2.png'),
   },
   {
     id: '3',
-    title: 'Get Discovered',
-    description: 'Let people to know your existence',
+    titleKey: 'onboarding.slide3Title',
+    descriptionKey: 'onboarding.slide3Description',
     image: require('../assets/images/onboarding3.png'),
   },
   {
     id: '4',
-    title: 'Expand Your Reach',
-    description: 'Increase the reach by registering your self here',
+    titleKey: 'onboarding.slide4Title',
+    descriptionKey: 'onboarding.slide4Description',
     image: require('../assets/images/onboarding4.png'),
   },
 ];
@@ -52,6 +53,7 @@ interface OnboardingScreenProps {
 }
 
 const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onFinish }) => {
+  const { t } = useLanguage();
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
 
@@ -79,8 +81,8 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onFinish }) => {
         <Image source={item.image} style={styles.image} resizeMode="contain" />
       </View>
       <View style={styles.textContainer}>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.description}>{item.description}</Text>
+        <Text style={styles.title}>{t(item.titleKey)}</Text>
+        <Text style={styles.description}>{t(item.descriptionKey)}</Text>
       </View>
     </View>
   );
@@ -106,7 +108,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onFinish }) => {
       {/* Skip Button */}
       {currentIndex < onboardingData.length - 1 && (
         <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
-          <Text style={styles.skipText}>Skip</Text>
+          <Text style={styles.skipText}>{t('onboarding.skip')}</Text>
         </TouchableOpacity>
       )}
 
@@ -133,7 +135,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onFinish }) => {
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
           <Text style={styles.nextButtonText}>
-            {currentIndex === onboardingData.length - 1 ? 'Get Started' : 'Next'}
+            {currentIndex === onboardingData.length - 1 ? t('onboarding.getStarted') : t('onboarding.next')}
           </Text>
         </TouchableOpacity>
       </View>

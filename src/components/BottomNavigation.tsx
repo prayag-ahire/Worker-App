@@ -70,7 +70,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
         <View style={[styles.iconContainer, activeTab === 'home' && styles.iconContainerActive]}>
           <HomeIcon active={activeTab === 'home'} />
         </View>
-        <Text style={[styles.navLabel, activeTab === 'home' && styles.navLabelActive]}>Home</Text>
+        <Text style={[styles.navLabel, activeTab === 'home' && styles.navLabelActive]}>{t('home.title')}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -103,7 +103,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
         <View style={[styles.iconContainer, activeTab === 'profile' && styles.iconContainerActive]}>
           <SettingsIcon active={activeTab === 'profile'} />
         </View>
-        <Text style={[styles.navLabel, activeTab === 'profile' && styles.navLabelActive]}>Settings</Text>
+        <Text style={[styles.navLabel, activeTab === 'profile' && styles.navLabelActive]}>{t('settings.setting')}</Text>
       </TouchableOpacity>
     </View>
   );

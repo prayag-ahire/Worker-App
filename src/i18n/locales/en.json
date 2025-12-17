@@ -13,6 +13,24 @@
     "error": "Error",
     "success": "Success"
   },
+  "splash": {
+    "appName": "ProWorker",
+    "tagline": "Make Your Skills Visible",
+    "subtitle": "Professional Work Management Platform"
+  },
+  "onboarding": {
+    "skip": "Skip",
+    "next": "Next",
+    "getStarted": "Get Started",
+    "slide1Title": "Create Your Profile",
+    "slide1Description": "Create worker profile and let the world know existence of your skill",
+    "slide2Title": "Share Your Work",
+    "slide2Description": "Increase the value of your skill by sharing your work",
+    "slide3Title": "Get Discovered",
+    "slide3Description": "Let people to know your existence",
+    "slide4Title": "Expand Your Reach",
+    "slide4Description": "Increase the reach by registering your self here"
+  },
   "home": {
     "title": "Home",
     "greeting": "Hello",
@@ -191,15 +209,30 @@
   },
   "personalDetails": {
     "title": "Personal Details",
-    "fullName": "Full Name",
-    "dateOfBirth": "Date of Birth",
+    "subtitle": "Complete your profile to get started",
+    "uploadPhoto": "Tap to upload photo",
+    "name": "Name",
+    "namePlaceholder": "Enter your name",
+    "age": "Age",
+    "agePlaceholder": "Enter your age",
+    "email": "Email",
+    "emailPlaceholder": "example@gmail.com",
+    "phone": "Phone",
+    "phonePlaceholder": "1234567890",
     "gender": "Gender",
     "male": "Male",
     "female": "Female",
-    "other": "Other",
-    "nationality": "Nationality",
-    "idProof": "ID Proof",
-    "uploadDocument": "Upload Document"
+    "createProfile": "Create Profile",
+    "invalidName": "Invalid Name",
+    "invalidNameMessage": "Name must be at least 2 characters long.",
+    "invalidAge": "Invalid Age",
+    "invalidAgeMessage": "Please enter a valid age between 18 and 120.",
+    "invalidEmail": "Invalid Email",
+    "invalidEmailMessage": "Please enter a valid email address.",
+    "invalidPhone": "Invalid Phone",
+    "invalidPhoneMessage": "Phone number must be exactly 10 digits.",
+    "genderRequired": "Gender Required",
+    "genderRequiredMessage": "Please select your gender."
   },
   "activeOrder": {
     "title": "Active Order",
@@ -220,6 +253,11 @@
   },
   "orderDetails": {
     "title": "Order Details",
+    "share": "Share",
+    "help": "Help",
+    "service": "Service",
+    "date": "Date",
+    "time": "Time",
     "orderInfo": "Order Information",
     "customerInfo": "Customer Information",
     "serviceDetails": "Service Details",
@@ -227,7 +265,14 @@
     "amount": "Amount",
     "paymentMethod": "Payment Method",
     "paymentStatus": "Payment Status",
-    "notes": "Notes"
+    "notes": "Notes",
+    "needHelp": "Need Help?",
+    "aiChatbot": "AI Chatbot",
+    "aiChatbotDesc": "Get instant answers to your queries",
+    "viewFAQ": "View FAQ",
+    "viewFAQDesc": "Find answers to common questions",
+    "reportIssue": "Report an Issue",
+    "reportIssueDesc": "Send an email to report a problem"
   },
   "comment": {
     "title": "Add Comment",

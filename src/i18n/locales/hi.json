@@ -13,6 +13,24 @@
     "error": "त्रुटि",
     "success": "सफलता"
   },
+  "splash": {
+    "appName": "ProWorker",
+    "tagline": "अपने कौशल को दृश्यमान बनाएं",
+    "subtitle": "पेशेवर कार्य प्रबंधन मंच"
+  },
+  "onboarding": {
+    "skip": "छोड़ें",
+    "next": "आगे",
+    "getStarted": "शुरू करें",
+    "slide1Title": "अपनी प्रोफाइल बनाएं",
+    "slide1Description": "कार्यकर्ता प्रोफाइल बनाएं और दुनिया को अपने कौशल के अस्तित्व के बारे में बताएं",
+    "slide2Title": "अपना काम साझा करें",
+    "slide2Description": "अपने काम को साझा करके अपने कौशल का मूल्य बढ़ाएं",
+    "slide3Title": "खोजे जाएं",
+    "slide3Description": "लोगों को अपने अस्तित्व के बारे में बताएं",
+    "slide4Title": "अपनी पहुंच बढ़ाएं",
+    "slide4Description": "यहां खुद को पंजीकृत करके पहुंच बढ़ाएं"
+  },
   "home": {
     "title": "होम",
     "greeting": "नमस्ते",
@@ -191,15 +209,30 @@
   },
   "personalDetails": {
     "title": "व्यक्तिगत विवरण",
-    "fullName": "पूरा नाम",
-    "dateOfBirth": "जन्म तिथि",
+    "subtitle": "शुरू करने के लिए अपनी प्रोफ़ाइल पूरी करें",
+    "uploadPhoto": "फोटो अपलोड करने के लिए टैप करें",
+    "name": "नाम",
+    "namePlaceholder": "अपना नाम दर्ज करें",
+    "age": "उम्र",
+    "agePlaceholder": "अपनी उम्र दर्ज करें",
+    "email": "ईमेल",
+    "emailPlaceholder": "example@gmail.com",
+    "phone": "फोन",
+    "phonePlaceholder": "1234567890",
     "gender": "लिंग",
     "male": "पुरुष",
     "female": "महिला",
-    "other": "अन्य",
-    "nationality": "राष्ट्रीयता",
-    "idProof": "पहचान प्रमाण",
-    "uploadDocument": "दस्तावेज़ अपलोड करें"
+    "createProfile": "प्रोफ़ाइल बनाएं",
+    "invalidName": "अमान्य नाम",
+    "invalidNameMessage": "नाम कम से कम 2 अक्षर लंबा होना चाहिए।",
+    "invalidAge": "अमान्य उम्र",
+    "invalidAgeMessage": "कृपया 18 से 120 के बीच एक मान्य उम्र दर्ज करें.",
+    "invalidEmail": "अमान्य ईमेल",
+    "invalidEmailMessage": "कृपया एक मान्य ईमेल पता दर्ज करें।",
+    "invalidPhone": "अमान्य फोन",
+    "invalidPhoneMessage": "फोन नंबर बिल्कुल 10 अंकों का होना चाहिए।",
+    "genderRequired": "लिंग आवश्यक",
+    "genderRequiredMessage": "कृपया अपना लिंग चुनें."
   },
   "activeOrder": {
     "title": "सक्रिय ऑर्डर",
@@ -220,6 +253,11 @@
   },
   "orderDetails": {
     "title": "ऑर्डर विवरण",
+    "share": "साझा करें",
+    "help": "मदद",
+    "service": "सेवा",
+    "date": "तिथि",
+    "time": "समय",
     "orderInfo": "ऑर्डर जानकारी",
     "customerInfo": "ग्राहक जानकारी",
     "serviceDetails": "सेवा विवरण",
@@ -227,7 +265,14 @@
     "amount": "राशि",
     "paymentMethod": "भुगतान विधि",
     "paymentStatus": "भुगतान स्थिति",
-    "notes": "नोट्स"
+    "notes": "नोट्स",
+    "needHelp": "मदद चाहिए?",
+    "aiChatbot": "AI चैटबॉट",
+    "aiChatbotDesc": "अपने प्रश्नों के तुरंत उत्तर प्राप्त करें",
+    "viewFAQ": "FAQ देखें",
+    "viewFAQDesc": "सामान्य प्रश्नों के उत्तर खोजें",
+    "reportIssue": "समस्या रिपोर्ट करें",
+    "reportIssueDesc": "समस्या रिपोर्ट करने के लिए ईमेल भेजें"
   },
   "comment": {
     "title": "टिप्पणी जोड़ें",

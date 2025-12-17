@@ -13,9 +13,10 @@ import { ScreenHeader, TextInputField, Card } from '../components';
 
 interface AppLanguageScreenProps {
   onBack?: () => void;
+  onComplete?: () => void;
 }
 
-const AppLanguageScreen: React.FC<AppLanguageScreenProps> = ({ onBack }) => {
+const AppLanguageScreen: React.FC<AppLanguageScreenProps> = ({ onBack, onComplete }) => {
   const { language, changeLanguage } = useLanguage();
   const [selectedLanguage, setSelectedLanguage] = useState<string>(language);
   const [searchQuery, setSearchQuery] = useState('');
@@ -49,7 +50,11 @@ const AppLanguageScreen: React.FC<AppLanguageScreenProps> = ({ onBack }) => {
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <ScreenHeader title="App Language" onBack={onBack} variant="blue" />
+        <ScreenHeader 
+          title="App Language" 
+          onBack={onComplete ? undefined : onBack} 
+          variant="blue" 
+        />
 
         {/* Language List Container */}
         <Card style={styles.languageCard}>
@@ -84,6 +89,17 @@ const AppLanguageScreen: React.FC<AppLanguageScreenProps> = ({ onBack }) => {
             ))}
           </View>
         </Card>
+
+        {/* Continue Button - Only show during signup flow */}
+        {onComplete && (
+          <TouchableOpacity 
+            style={styles.continueButton}
+            onPress={onComplete}
+            activeOpacity={0.9}
+          >
+            <Text style={styles.continueButtonText}>Continue</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
     </View>
   );
@@ -138,6 +154,25 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: Colors.accent,
     fontWeight: '700',
+  },
+  continueButton: {
+    marginTop: 24,
+    marginBottom: 16,
+    borderRadius: 14,
+    backgroundColor: Colors.accent,
+    paddingVertical: 16,
+    alignItems: 'center',
+    elevation: 8,
+    shadowColor: Colors.accent,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  continueButtonText: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: Colors.white,
+    letterSpacing: 0.5,
   },
 });
 

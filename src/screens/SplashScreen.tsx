@@ -8,6 +8,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { Colors } from '../styles/colors';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const { width, height } = Dimensions.get('window');
 
@@ -16,6 +17,7 @@ interface SplashScreenProps {
 }
 
 const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
+  const { t } = useLanguage();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.5)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
@@ -73,16 +75,16 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
         ]}
       >
         {/* Title */}
-        <Text style={styles.appTitle}>ProWorker</Text>
+        <Text style={styles.appTitle}>{t('splash.appName')}</Text>
         
         {/* Tagline */}
         <View style={styles.taglineContainer}>
-          <Text style={styles.tagline}>Make Your Skills Visible</Text>
+          <Text style={styles.tagline}>{t('splash.tagline')}</Text>
           <View style={styles.underline} />
         </View>
         
         {/* Subtitle */}
-        <Text style={styles.subtitle}>Professional Work Management Platform</Text>
+        <Text style={styles.subtitle}>{t('splash.subtitle')}</Text>
       </Animated.View>
     </View>
   );

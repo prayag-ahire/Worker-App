@@ -39,6 +39,7 @@ function App() {
   const [comment, setComment] = useState<string>('');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmationType, setConfirmationType] = useState<'cancel' | 'reschedule'>('cancel');
+  const [isSignupFlow, setIsSignupFlow] = useState(false);
 
   // Handle hardware back button
   useEffect(() => {
@@ -56,13 +57,13 @@ function App() {
         return true;
       }
 
-      // Settings sub-screens - go to settings
-      if (currentScreen === 'userProfile' || 
+      // Settings sub-screens - go to settings (but not during signup flow)
+      if ((currentScreen === 'userProfile' || 
           currentScreen === 'location' || 
-          currentScreen === 'appLanguage' || 
           currentScreen === 'inviteFriend' || 
           currentScreen === 'tutorialVideos' || 
-          currentScreen === 'help') {
+          currentScreen === 'help') ||
+          (currentScreen === 'appLanguage' && !isSignupFlow)) {
         setCurrentScreen('settings');
         return true;
       }
@@ -117,6 +118,12 @@ function App() {
         return true;
       }
 
+      // Language selection during signup flow - go back to signup
+      if (currentScreen === 'appLanguage' && isSignupFlow) {
+        setCurrentScreen('signup');
+        return true;
+      }
+
       // Onboarding/Personal details - can't go back
       if (currentScreen === 'onboarding' || currentScreen === 'personalDetails') {
         return true; // Prevent back
@@ -147,6 +154,11 @@ function App() {
   };
 
   const handleSignUpComplete = () => {
+    setIsSignupFlow(true);
+    setCurrentScreen('appLanguage');
+  };
+
+  const handleLanguageSelectionComplete = () => {
     setCurrentScreen('onboarding');
   };
 
@@ -155,6 +167,7 @@ function App() {
   };
 
   const handlePersonalDetailsComplete = () => {
+    setIsSignupFlow(false); // Reset signup flow flag
     setCurrentScreen('home');
   };
 
@@ -177,6 +190,7 @@ function App() {
       setCurrentScreen('location');
     }
     if (screen === 'appLanguage') {
+      setIsSignupFlow(false); // Accessing from settings
       setCurrentScreen('appLanguage');
     }
     if (screen === 'inviteFriend') {
@@ -215,7 +229,11 @@ function App() {
   };
 
   const handleAppLanguageBack = () => {
-    setCurrentScreen('settings');
+    if (isSignupFlow) {
+      setCurrentScreen('signup');
+    } else {
+      setCurrentScreen('settings');
+    }
   };
 
   const handleInviteFriendBack = () => {
@@ -412,7 +430,10 @@ function App() {
           <LocationScreen onBack={handleLocationBack} />
         )}
         {currentScreen === 'appLanguage' && (
-          <AppLanguageScreen onBack={handleAppLanguageBack} />
+          <AppLanguageScreen 
+            onBack={handleAppLanguageBack}
+            onComplete={isSignupFlow ? handleLanguageSelectionComplete : undefined}
+          />
         )}
         {currentScreen === 'inviteFriend' && (
           <InviteFriendScreen onBack={handleInviteFriendBack} />
