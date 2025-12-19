@@ -102,22 +102,22 @@ const LocationScreen: React.FC<LocationScreenProps> = ({ onBack }) => {
   const handleGetCurrentLocation = async () => {
     console.log('Get current location pressed');
     
-    // Request permission first
-    const hasPermission = await requestLocationPermission();
+      // Request permission first
+      const hasPermission = await requestLocationPermission();
     
-    if (!hasPermission) {
-      Alert.alert(
-        'Permission Denied',
+      if (!hasPermission) {
+        Alert.alert(
+          'Permission Denied',
         'Location permission is required to get your current location.',
-        [{ text: 'OK' }]
-      );
-      return;
-    }
+          [{ text: 'OK' }]
+        );
+        return;
+      }
 
-    // Get current position
-    Geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
+      // Get current position
+      Geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
         
         const newLocation: LocationCoords = {
           latitude,

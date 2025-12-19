@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -272,7 +272,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
             onPress={handlePrevious}
             activeOpacity={0.6}
           >
-            <Text style={styles.navButtonText}>←</Text>
+            <Text style={styles.navButtonText}>{'<'}</Text>
           </TouchableOpacity>
           <Text style={styles.dateText}>
             {viewMode === 'day' && formatDate()}
@@ -465,7 +465,7 @@ const styles = StyleSheet.create({
     color: Colors.accent, // Sky blue arrows (20%)
     fontWeight: '700',
     textAlign: 'center',
-    marginTop: -2, // Adjust for vertical centering
+    marginTop: -7, // Adjust for vertical centering
   },
   dateText: {
     fontSize: 17,

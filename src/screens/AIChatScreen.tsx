@@ -9,125 +9,234 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { Colors } from '../styles/colors';
+import { fetchWorkerData } from '../services/dataService';
+import { sendChatMessage, checkApiHealth } from '../services/apiClient';
+import { Message, WorkerContext } from '../services/types';
 
 interface AIChatScreenProps {
   onBack?: () => void;
 }
 
-interface Message {
-  id: string;
-  text: string;
-  isUser: boolean;
-  timestamp: Date;
-}
+// Hardcoded for demo, same as chatbot frontend
+const WORKER_ID = 1;
 
 const AIChatScreen: React.FC<AIChatScreenProps> = ({ onBack }) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: 'Hello! I\'m your ProWorker AI assistant. How can I help you today?',
-      isUser: false,
+      role: 'assistant',
+      content: "I am your personal AI assistant.\n\nI can assist you with your information like order, rating, review, schedule, etc.\n\nI will happy to help you 😊",
       timestamp: new Date(),
     },
   ]);
   const [inputText, setInputText] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [workerContext, setWorkerContext] = useState<WorkerContext | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [apiConnected, setApiConnected] = useState(false);
+  
   const scrollViewRef = useRef<ScrollView>(null);
 
-  // Auto-scroll to bottom when new message is added
+  // Auto-scroll to bottom when new message is added or loading state changes
   useEffect(() => {
-    scrollViewRef.current?.scrollToEnd({ animated: true });
-  }, [messages]);
+    setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }, 100);
+  }, [messages, isLoading]);
 
-  // Simulated AI responses based on keywords
-  const getAIResponse = (userMessage: string): string => {
-    const lowerMessage = userMessage.toLowerCase();
+  const initChat = async () => {
+    setLoadError(null);
+    setIsLoading(true);
+    try {
+      console.log('Fetching worker data for ID:', WORKER_ID);
+      const data = await fetchWorkerData(WORKER_ID);
+      if (data) {
+        setWorkerContext(data);
+      } else {
+        setLoadError('Unable to load profile. Please check if Worker ID ' + WORKER_ID + ' exists in Supabase.');
+      }
 
-    if (lowerMessage.includes('withdraw') || lowerMessage.includes('money')) {
-      return 'To withdraw money:\n1. Go to your Profile\n2. Click on "Withdraw"\n3. Enter amount\n4. Select your bank account\n5. Confirm withdrawal\n\nMinimum withdrawal is ₹100.';
+      const isHealthy = await checkApiHealth();
+      setApiConnected(isHealthy);
+      if (!isHealthy) {
+        console.warn('Backend API not connected - host machine port 3001 must be accessible');
+      }
+    } catch (error) {
+      console.error('Error initializing chat:', error);
+      setLoadError('Failed to initialize: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    } finally {
+      setIsLoading(false);
     }
-    if (lowerMessage.includes('work') || lowerMessage.includes('job')) {
-      return 'To get more work:\n1. Complete your profile 100%\n2. Add your skills and portfolio\n3. Set competitive rates\n4. Enable location services\n5. Keep your availability updated\n\nHigher ratings get more work!';
-    }
-    if (lowerMessage.includes('schedule') || lowerMessage.includes('non-working')) {
-      return 'To schedule non-working days:\n1. Go to Profile\n2. Click "Availability"\n3. Select dates you\'re unavailable\n4. Save changes\n\nClients won\'t see you on those days.';
-    }
-    if (lowerMessage.includes('bank') || lowerMessage.includes('account')) {
-      return 'To set primary bank account:\n1. Go to Settings\n2. Click "Bank Accounts"\n3. Add your bank details\n4. Click "Set as Primary"\n\nYou can add multiple accounts.';
-    }
-    if (lowerMessage.includes('referral') || lowerMessage.includes('invite') || lowerMessage.includes('friend')) {
-      return 'Referral benefits:\n• You get ₹100 when friend signs up\n• Your friend gets ₹50 bonus\n• Unlimited referrals!\n\nShare your code from Settings → Invite A Friend';
-    }
-    if (lowerMessage.includes('rating') || lowerMessage.includes('review')) {
-      return 'Ratings help you get more work!\n\n• Complete jobs on time\n• Maintain quality\n• Communicate well\n• Be professional\n\nHigher ratings = More visibility';
-    }
-    if (lowerMessage.includes('payment') || lowerMessage.includes('pay')) {
-      return 'Payment info:\n• Clients pay after work completion\n• Money credited within 24 hours\n• Withdraw anytime (min ₹100)\n• No hidden charges\n\nCheck "My Earnings" for details.';
-    }
-    if (lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
-      return 'Hello! How can I assist you with ProWorker today?';
-    }
-    if (lowerMessage.includes('thank')) {
-      return 'You\'re welcome! Feel free to ask if you need anything else. Happy working! 😊';
-    }
-
-    // Default response
-    return 'I can help you with:\n• Withdrawing money\n• Getting more work\n• Scheduling availability\n• Bank account setup\n• Referral program\n• Ratings & reviews\n• Payments\n\nWhat would you like to know?';
   };
 
-  const handleSend = () => {
-    if (inputText.trim() === '') return;
+  // Load Worker Data and Check API Health on Mount
+  useEffect(() => {
+    initChat();
+  }, []);
 
+  const handleSend = async () => {
+    if (inputText.trim() === '' || !workerContext || isLoading) return;
+
+    const userMessageContent = inputText.trim();
+    
     // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
-      text: inputText.trim(),
-      isUser: true,
+      role: 'user',
+      content: userMessageContent,
       timestamp: new Date(),
     };
 
     setMessages(prev => [...prev, userMessage]);
     setInputText('');
+    setIsLoading(true);
 
-    // Simulate AI response after a short delay
-    setTimeout(() => {
-      const aiResponse: Message = {
+    try {
+      if (!apiConnected) {
+        // Double check health if previously failed
+        const isHealthy = await checkApiHealth();
+        setApiConnected(isHealthy);
+        if (!isHealthy) {
+          throw new Error('AI Assistant is currently offline. Please try again later.');
+        }
+      }
+
+      const responseText = await sendChatMessage(userMessageContent, workerContext);
+      
+      const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: getAIResponse(inputText.trim()),
-        isUser: false,
+        role: 'assistant',
+        content: responseText,
         timestamp: new Date(),
       };
-      setMessages(prev => [...prev, aiResponse]);
-    }, 500);
+      
+      setMessages(prev => [...prev, aiMessage]);
+    } catch (error) {
+      console.error("Chat error", error);
+      const errorMsg: Message = {
+        id: (Date.now() + 2).toString(),
+        role: 'assistant',
+        content: error instanceof Error ? error.message : 'I\'m sorry, I couldn\'t process that. Please try again.',
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, errorMsg]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const renderMessage = (message: Message) => (
-    <View
-      key={message.id}
-      style={[
-        styles.messageBubble,
-        message.isUser ? styles.userBubble : styles.aiBubble,
-      ]}
-    >
-      <Text style={[
-        styles.messageText,
-        message.isUser ? styles.userText : styles.aiText,
-      ]}>
-        {message.text}
-      </Text>
-      <Text style={[
-        styles.timestamp,
-        message.isUser ? styles.userTimestamp : styles.aiTimestamp,
-      ]}>
-        {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-      </Text>
-    </View>
-  );
+  // Parse markdown-like formatting
+  const parseMarkdown = (text: string) => {
+    const lines = text.split('\n');
+    const elements: React.ReactElement[] = [];
+    
+    lines.forEach((line, index) => {
+      // Bold text: **text**
+      if (line.includes('**')) {
+        const parts = line.split('**');
+        const textElements: (string | React.ReactElement)[] = [];
+        parts.forEach((part, i) => {
+          if (i % 2 === 1) {
+            textElements.push(
+              <Text key={`bold-${index}-${i}`} style={styles.boldText}>{part}</Text>
+            );
+          } else if (part) {
+            textElements.push(part);
+          }
+        });
+        elements.push(
+          <Text key={`line-${index}`} style={styles.messageText}>
+            {textElements}
+          </Text>
+        );
+      }
+      // Bullet points: • or -
+      else if (line.trim().startsWith('•') || line.trim().startsWith('-')) {
+        elements.push(
+          <View key={`bullet-${index}`} style={styles.bulletContainer}>
+            <Text style={styles.bulletPoint}>•</Text>
+            <Text style={styles.bulletText}>{line.replace(/^[•\-]\s*/, '').trim()}</Text>
+          </View>
+        );
+      }
+      // Numbered lists: 1. 2. 3.
+      else if (/^\d+\.\s/.test(line.trim())) {
+        const match = line.match(/^(\d+)\.\s(.+)/);
+        if (match) {
+          elements.push(
+            <View key={`number-${index}`} style={styles.bulletContainer}>
+              <Text style={styles.numberText}>{match[1]}.</Text>
+              <Text style={styles.bulletText}>{match[2]}</Text>
+            </View>
+          );
+        }
+      }
+      // Regular text
+      else if (line.trim()) {
+        elements.push(
+          <Text key={`text-${index}`} style={styles.messageText}>{line}</Text>
+        );
+      }
+    });
+    
+    return elements;
+  };
+
+  const renderMessage = (message: Message) => {
+    const isUser = message.role === 'user';
+    return (
+      <View
+        key={message.id}
+        style={[
+          styles.messageBubble,
+          isUser ? styles.userBubble : styles.aiBubble,
+        ]}
+      >
+        <View style={styles.messageContent}>
+          {isUser ? (
+            <Text style={[styles.messageText, styles.userText]}>
+              {message.content}
+            </Text>
+          ) : (
+            <View>{parseMarkdown(message.content)}</View>
+          )}
+        </View>
+        <Text style={[
+          styles.timestamp,
+          isUser ? styles.userTimestamp : styles.aiTimestamp,
+        ]}>
+          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        </Text>
+      </View>
+    );
+  };
+
+  if (isLoading && !workerContext) {
+    return (
+      <View style={[styles.container, styles.centerContent]}>
+        <ActivityIndicator size="large" color={Colors.accent} />
+        <Text style={styles.loadingText}>Initializing AI Assistant...</Text>
+      </View>
+    );
+  }
+
+  if (loadError && !workerContext) {
+    return (
+      <View style={[styles.container, styles.centerContent]}>
+        <Text style={styles.errorText}>⚠️ {loadError}</Text>
+        <TouchableOpacity style={styles.retryButton} onPress={initChat}>
+          <Text style={styles.retryButtonText}>Retry</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
+      <StatusBar barStyle="light-content" backgroundColor={Colors.accent} translucent={true} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -136,7 +245,9 @@ const AIChatScreen: React.FC<AIChatScreenProps> = ({ onBack }) => {
         </TouchableOpacity>
         <View style={styles.headerInfo}>
           <Text style={styles.headerTitle}>AI Assistant</Text>
-          <Text style={styles.headerSubtitle}>Online</Text>
+          <Text style={styles.headerSubtitle}>
+            {apiConnected ? 'Online' : 'Offline'}
+          </Text>
         </View>
         <View style={styles.aiIcon}>
           <Text style={styles.aiIconText}>🤖</Text>
@@ -145,7 +256,7 @@ const AIChatScreen: React.FC<AIChatScreenProps> = ({ onBack }) => {
 
       {/* Messages */}
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.chatContainer}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
@@ -156,6 +267,11 @@ const AIChatScreen: React.FC<AIChatScreenProps> = ({ onBack }) => {
           showsVerticalScrollIndicator={false}
         >
           {messages.map(renderMessage)}
+          {isLoading && (
+            <View style={[styles.messageBubble, styles.aiBubble, styles.loadingBubble]}>
+              <ActivityIndicator size="small" color={Colors.accent} />
+            </View>
+          )}
         </ScrollView>
 
         {/* Input */}
@@ -168,11 +284,12 @@ const AIChatScreen: React.FC<AIChatScreenProps> = ({ onBack }) => {
             onChangeText={setInputText}
             multiline
             maxLength={500}
+            editable={!isLoading && !!workerContext}
           />
           <TouchableOpacity
-            style={[styles.sendButton, !inputText.trim() && styles.sendButtonDisabled]}
+            style={[styles.sendButton, (!inputText.trim() || isLoading || !workerContext) && styles.sendButtonDisabled]}
             onPress={handleSend}
-            disabled={!inputText.trim()}
+            disabled={!inputText.trim() || isLoading || !workerContext}
           >
             <Text style={styles.sendButtonText}>➤</Text>
           </TouchableOpacity>
@@ -187,12 +304,22 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.white,
   },
+  centerContent: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: Colors.textMedium,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 24,
-    paddingVertical: 6, // Balanced padding for proper vertical centering
-    paddingTop: 45, // Increased to center content in visible blue area
+    paddingVertical: 5,
+    paddingTop: 60, // Extra padding for translucent StatusBar
     backgroundColor: Colors.accent, // Blue background
     borderBottomLeftRadius: 24, // Only bottom corners rounded
     borderBottomRightRadius: 24,
@@ -252,6 +379,9 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 12,
   },
+  messageContent: {
+    // Container for message text - no flex to prevent expansion
+  },
   userBubble: {
     alignSelf: 'flex-end',
     backgroundColor: Colors.accent,
@@ -262,15 +392,52 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.backgroundSoft,
     borderBottomLeftRadius: 4,
   },
+  loadingBubble: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    minHeight: 40,
+    justifyContent: 'center',
+  },
   messageText: {
     fontSize: 15,
     lineHeight: 20,
+    color: Colors.textDark,
   },
   userText: {
     color: Colors.white,
   },
   aiText: {
     color: Colors.textDark,
+  },
+  boldText: {
+    fontWeight: '700',
+    color: Colors.textDark,
+  },
+  bulletContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginVertical: 2,
+  },
+  bulletPoint: {
+    fontSize: 15,
+    lineHeight: 20,
+    color: Colors.textDark,
+    marginRight: 8,
+    fontWeight: '700',
+  },
+  bulletText: {
+    flex: 1,
+    fontSize: 15,
+    lineHeight: 20,
+    color: Colors.textDark,
+  },
+  numberText: {
+    fontSize: 15,
+    lineHeight: 20,
+    color: Colors.textDark,
+    marginRight: 8,
+    fontWeight: '700',
+    minWidth: 24,
   },
   timestamp: {
     fontSize: 10,
@@ -320,6 +487,23 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontWeight: '700',
   },
+  errorText: {
+    color: 'red',
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  retryButton: {
+    backgroundColor: Colors.accent,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: Colors.white,
+    fontWeight: '700',
+  },
 });
 
 export default AIChatScreen;
+

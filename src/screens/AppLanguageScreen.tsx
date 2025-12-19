@@ -52,7 +52,8 @@ const AppLanguageScreen: React.FC<AppLanguageScreenProps> = ({ onBack, onComplet
         {/* Header */}
         <ScreenHeader 
           title="App Language" 
-          onBack={onComplete ? undefined : onBack} 
+          onBack={onBack} 
+          showBackButton={!onComplete}
           variant="blue" 
         />
 
