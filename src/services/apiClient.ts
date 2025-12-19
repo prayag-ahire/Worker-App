@@ -18,6 +18,10 @@ export interface ChatResponse {
   error?: string;
 }
 
+export interface ApiErrorResponse {
+  error?: string;
+}
+
 /**
  * Fetch with timeout
  */
@@ -69,11 +73,11 @@ export const sendChatMessage = async (
     );
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+      const errorData = await response.json().catch(() => ({})) as ApiErrorResponse;
       throw new Error(errorData.error || `API error: ${response.status}`);
     }
 
-    const data: ChatResponse = await response.json();
+    const data = await response.json() as ChatResponse;
 
     if (!data.success) {
       throw new Error(data.error || 'Failed to get response');
