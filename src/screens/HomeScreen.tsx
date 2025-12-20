@@ -272,7 +272,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
             onPress={handlePrevious}
             activeOpacity={0.6}
           >
-            <Text style={styles.navButtonText}>{'<'}</Text>
+            <Text style={styles.navButtonText}>‹</Text>
           </TouchableOpacity>
           <Text style={styles.dateText}>
             {viewMode === 'day' && formatDate()}
@@ -284,7 +284,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
             onPress={handleNext}
             activeOpacity={0.6}
           >
-            <Text style={styles.navButtonText}>→</Text>
+            <Text style={styles.navButtonText}>›</Text>
           </TouchableOpacity>
         </View>
 
@@ -448,24 +448,15 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   navButton: {
-    width: 44,
-    height: 44,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 22,
-    backgroundColor: Colors.white,
-    shadowColor: Colors.shadowDark,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.12,
-    shadowRadius: 4,
-    elevation: 3,
+    paddingHorizontal: 8,
   },
   navButtonText: {
-    fontSize: 24,
-    color: Colors.accent, // Sky blue arrows (20%)
+    fontSize: 40,
+    color: Colors.accent,
     fontWeight: '700',
     textAlign: 'center',
-    marginTop: -7, // Adjust for vertical centering
   },
   dateText: {
     fontSize: 17,
