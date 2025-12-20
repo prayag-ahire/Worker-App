@@ -41,12 +41,11 @@ const ScheduleIcon: React.FC<{ active: boolean }> = ({ active }) => (
 
 const SettingsIcon: React.FC<{ active: boolean }> = ({ active }) => (
   <View style={styles.iconWrapper}>
-    <View style={[styles.gearIcon]}>
-      <View style={[styles.gearCenter, active && styles.gearCenterActive]} />
-      <View style={[styles.gearTooth, styles.gearToothTop, active && styles.gearToothActive]} />
-      <View style={[styles.gearTooth, styles.gearToothRight, active && styles.gearToothActive]} />
-      <View style={[styles.gearTooth, styles.gearToothBottom, active && styles.gearToothActive]} />
-      <View style={[styles.gearTooth, styles.gearToothLeft, active && styles.gearToothActive]} />
+    <View style={styles.profileIcon}>
+      {/* Head circle */}
+      <View style={[styles.profileHead, active && styles.profileHeadActive]} />
+      {/* Shoulders */}
+      <View style={[styles.profileShoulders, active && styles.profileShouldersActive]} />
     </View>
   </View>
 );
@@ -239,53 +238,36 @@ const styles = StyleSheet.create({
   calendarTopActive: {
     backgroundColor: Colors.white,
   },
-  // Settings/Gear icon
-  gearIcon: {
+  // Settings icon - User Profile
+  profileIcon: {
     width: 20,
     height: 20,
     position: 'relative',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  gearCenter: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: Colors.textSecondary,
-    borderWidth: 2,
-    borderColor: Colors.textSecondary,
-    position: 'absolute',
-    zIndex: 2,
-  },
-  gearCenterActive: {
-    backgroundColor: Colors.white,
-    borderColor: Colors.white,
-  },
-  gearTooth: {
-    width: 4,
-    height: 6,
+  profileHead: {
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
     backgroundColor: Colors.textSecondary,
     position: 'absolute',
-    borderRadius: 1,
+    top: 2,
   },
-  gearToothActive: {
+  profileHeadActive: {
     backgroundColor: Colors.white,
   },
-  gearToothTop: {
-    top: 0,
-    left: 8,
+  profileShoulders: {
+    width: 14,
+    height: 8,
+    borderTopLeftRadius: 7,
+    borderTopRightRadius: 7,
+    backgroundColor: Colors.textSecondary,
+    position: 'absolute',
+    bottom: 2,
   },
-  gearToothRight: {
-    right: 0,
-    top: 7,
-  },
-  gearToothBottom: {
-    bottom: 0,
-    left: 8,
-  },
-  gearToothLeft: {
-    left: 0,
-    top: 7,
+  profileShouldersActive: {
+    backgroundColor: Colors.white,
   },
 });
 

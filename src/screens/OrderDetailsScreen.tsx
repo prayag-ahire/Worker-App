@@ -77,7 +77,7 @@ const OrderDetailsScreen: React.FC<OrderDetailsScreenProps> = ({
   const handleReportIssue = () => {
     setShowHelpModal(false);
     // Open email for reporting issue
-    const email = 'support@workerapp.com';
+    const email = 'support.worker@proworker.co';
     const subject = `Report Issue - Order #${orderDetails.id}`;
     const body = `Order Details:\nOrder ID: ${orderDetails.id}\nClient: ${orderDetails.clientName}\nService: ${orderDetails.service}\nDate: ${orderDetails.date}\nTime: ${orderDetails.time}\n\nIssue Description:\n[Please describe the issue here]`;
     
