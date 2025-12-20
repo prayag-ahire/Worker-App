@@ -155,11 +155,11 @@ const MonthlyScheduleScreen: React.FC<MonthlyScheduleScreenProps> = ({ onBack })
         {/* Month Navigation */}
         <View style={styles.monthNavigation}>
           <TouchableOpacity style={styles.navButton} onPress={handlePrevious}>
-            <Text style={styles.navButtonText}>←</Text>
+            <Text style={styles.navButtonText}>‹</Text>
           </TouchableOpacity>
           <Text style={styles.monthText}>{formatMonth()}</Text>
           <TouchableOpacity style={styles.navButton} onPress={handleNext}>
-            <Text style={styles.navButtonText}>→</Text>
+            <Text style={styles.navButtonText}>›</Text>
           </TouchableOpacity>
         </View>
 
@@ -282,26 +282,15 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   navButton: {
-    width: 44,
-    height: 44,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 22,
-    backgroundColor: Colors.white,
-    shadowColor: Colors.shadowDark,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.12,
-    shadowRadius: 4,
-    elevation: 3,
+    paddingHorizontal: 8,
   },
   navButtonText: {
-    fontSize: 24,
-    color: Colors.accent, // Sky blue arrows
+    fontSize: 40,
+    color: Colors.accent,
     fontWeight: '700',
     textAlign: 'center',
-    lineHeight: 24, // Match fontSize for better centering
-    includeFontPadding: false, // Remove extra padding on Android
-    textAlignVertical: 'center', // Center vertically on Android
   },
   monthText: {
     fontSize: 17,

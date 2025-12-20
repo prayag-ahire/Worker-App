@@ -161,7 +161,9 @@
   },
   "profile": {
     "title": "User Profile",
+    "editProfile": "Edit Profile",
     "edit": "Edit",
+    "visitCharge": "Visit Charge",
     "charges": "charges",
     "rating": "Rating",
     "distanceCharges": "Distance Charges",

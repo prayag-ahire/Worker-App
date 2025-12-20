@@ -161,7 +161,9 @@
   },
   "profile": {
     "title": "उपयोगकर्ता प्रोफ़ाइल",
+    "editProfile": "प्रोफ़ाइल संपादित करें",
     "edit": "संपादित करें",
+    "visitCharge": "विज़िट शुल्क",
     "charges": "शुल्क",
     "rating": "रेटिंग",
     "distanceCharges": "दूरी शुल्क",

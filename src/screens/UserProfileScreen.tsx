@@ -22,7 +22,7 @@ const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit })
   const { t } = useLanguage();
   const [name, setName] = useState('Praveg Amine');
   const [charges, setCharges] = useState('200/hr');
-  const [rating] = useState(4); // 4 out of 6 stars
+  const [rating] = useState(4); // 4 out of 5 stars
   const [distanceCharges, setDistanceCharges] = useState(true);
   const description = 'Hi, I am a professional developer with 2 years of experience in plumbing and electrical work. I provide quality service at affordable rates.';
   const [activeTab, setActiveTab] = useState<'image' | 'video' | 'review'>('image');
@@ -64,9 +64,9 @@ const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit })
               {/* Name */}
               <Text style={styles.nameText}>{name}</Text>
 
-              {/* Charges */}
+              {/* Visit Charge */}
               <View style={styles.infoRow}>
-                <Text style={styles.label}>{t('profile.charges')} : </Text>
+                <Text style={styles.label}>{t('profile.visitCharge')} : </Text>
                 <Text style={styles.value}>{charges}</Text>
               </View>
 
@@ -74,7 +74,7 @@ const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit })
               <View style={styles.ratingRow}>
                 <Text style={styles.label}>{t('profile.rating')} </Text>
                 <View style={styles.stars}>
-                  {[1, 2, 3, 4, 5, 6].map((star) => (
+                  {[1, 2, 3, 4, 5].map((star) => (
                     <Text key={star} style={styles.star}>
                       {star <= rating ? '⭐' : '☆'}
                     </Text>

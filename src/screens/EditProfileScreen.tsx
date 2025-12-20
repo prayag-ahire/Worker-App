@@ -9,6 +9,8 @@ import {
   ScrollView,
 } from 'react-native';
 import { Colors } from '../styles/colors';
+import { useLanguage } from '../contexts/LanguageContext';
+import { ScreenHeader } from '../components';
 
 interface EditProfileScreenProps {
   onBack?: () => void;
@@ -16,9 +18,11 @@ interface EditProfileScreenProps {
 }
 
 const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ onBack, onSave }) => {
+  const { t } = useLanguage();
   const [name, setName] = useState('Praveg Amine');
   const [charges, setCharges] = useState('200');
   const [description, setDescription] = useState('Hi, i am professional developer and i have 2 year\'s of experience');
+  const [distanceCharges, setDistanceCharges] = useState('50');
 
   const handleSave = () => {
     console.log('Save pressed');
@@ -46,11 +50,7 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ onBack, onSave })
       >
         {/* Header */}
         <View style={styles.headerContainer}>
-          <TouchableOpacity style={styles.backButton} onPress={onBack}>
-            <Text style={styles.backButtonText}>‹</Text>
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Edit Profile</Text>
-          <View style={styles.placeholder} />
+          <ScreenHeader title={t('profile.editProfile')} onBack={onBack} variant="blue" />
         </View>
 
         {/* Name */}
@@ -73,14 +73,27 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ onBack, onSave })
           </TouchableOpacity>
         </View>
 
-        {/* Charges */}
+        {/* Visit Charge */}
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Charges per Hour OR visit</Text>
+          <Text style={styles.label}>{t('profile.visitCharge')}</Text>
           <TextInput
             style={styles.input}
             value={charges}
             onChangeText={setCharges}
-            placeholder="Enter charges"
+            placeholder="Enter visit charge"
+            placeholderTextColor={Colors.textLight}
+            keyboardType="number-pad"
+          />
+        </View>
+
+        {/* Distance Charges */}
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>{t('profile.distanceCharges')}</Text>
+          <TextInput
+            style={styles.input}
+            value={distanceCharges}
+            onChangeText={setDistanceCharges}
+            placeholder="Enter distance charges"
             placeholderTextColor={Colors.textLight}
             keyboardType="number-pad"
           />
@@ -117,48 +130,15 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingBottom: 20,
+    paddingHorizontal: 24,
+    paddingVertical: 20,
   },
   headerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 24,
-    paddingTop: 60,
-    paddingBottom: 20,
-    backgroundColor: Colors.accent,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    shadowColor: Colors.accent,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
-    marginBottom: 24,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  backButtonText: {
-    fontSize: 32,
-    color: Colors.white,
-    fontWeight: '300',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: Colors.white,
-    letterSpacing: -0.3,
-  },
-  placeholder: {
-    width: 40,
+    position: 'relative',
+    marginBottom: 16,
   },
   inputGroup: {
     marginBottom: 20,
-    paddingHorizontal: 24,
   },
   label: {
     fontSize: 15,
@@ -223,7 +203,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 12,
     marginBottom: 24,
-    marginHorizontal: 24,
     shadowColor: Colors.accent,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,

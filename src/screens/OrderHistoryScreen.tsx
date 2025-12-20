@@ -177,18 +177,14 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   arrowContainer: {
-    width: 32,
-    height: 32,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: Colors.backgroundAccent,
-    borderRadius: 16,
+    paddingHorizontal: 8,
   },
   arrow: {
-    fontSize: 24,
+    fontSize: 40,
     color: Colors.accent,
-    fontWeight: '600',
-    lineHeight: 24,
+    fontWeight: '700',
     textAlign: 'center',
   },
 });
