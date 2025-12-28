@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,10 +8,14 @@ import {
   ScrollView,
   Alert,
   Clipboard,
+  ActivityIndicator,
 } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { Colors } from '../styles/colors';
 import { ScreenHeader, PrimaryButton, Card } from '../components';
 import { useLanguage } from '../contexts/LanguageContext';
+import { getReferralCode } from '../services/apiClient';
+import { getAuthToken } from '../utils/storage';
 
 interface InviteFriendScreenProps {
   onBack?: () => void;
@@ -19,11 +23,51 @@ interface InviteFriendScreenProps {
 
 const InviteFriendScreen: React.FC<InviteFriendScreenProps> = ({ onBack }) => {
   const { t } = useLanguage();
-  const [referralCode] = useState('PROWORK' + Math.floor(Math.random() * 10000));
+  const [referralCode, setReferralCode] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch referral code on mount
+  useEffect(() => {
+    const fetchReferralCode = async () => {
+      try {
+        const token = await getAuthToken();
+        if (!token) {
+          throw new Error('No authentication token found. Please login again.');
+        }
+
+        const response = await getReferralCode(token);
+        setReferralCode(response.ReferCode.toString());
+        console.log('Fetched referral code:', response.ReferCode);
+      } catch (error: any) {
+        console.error('Error fetching referral code:', error);
+        Toast.show({
+          type: 'error',
+          text1: 'Failed to Load',
+          text2: error.message || 'Could not fetch referral code',
+          position: 'top',
+          visibilityTime: 3000,
+        });
+        // Set a fallback code
+        setReferralCode('N/A');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchReferralCode();
+  }, []);
 
   const handleCopyCode = () => {
-    Clipboard.setString(referralCode);
-    Alert.alert('Copied!', 'Referral code copied to clipboard');
+    if (referralCode && referralCode !== 'N/A') {
+      Clipboard.setString(referralCode);
+      Toast.show({
+        type: 'success',
+        text1: 'Copied!',
+        text2: 'Referral code copied to clipboard',
+        position: 'top',
+        visibilityTime: 2000,
+      });
+    }
   };
 
   const handleShare = () => {
@@ -65,10 +109,20 @@ const InviteFriendScreen: React.FC<InviteFriendScreenProps> = ({ onBack }) => {
         <View style={styles.codeContainer}>
           <Text style={styles.codeLabel}>{t('inviteFriend.yourCode')}</Text>
           <View style={styles.codeBox}>
-            <Text style={styles.codeText}>{referralCode}</Text>
-            <TouchableOpacity style={styles.copyButton} onPress={handleCopyCode}>
-              <Text style={styles.copyText}>Copy</Text>
-            </TouchableOpacity>
+            {isLoading ? (
+              <ActivityIndicator size="large" color={Colors.accent} />
+            ) : (
+              <>
+                <Text style={styles.codeText}>{referralCode}</Text>
+                <TouchableOpacity 
+                  style={styles.copyButton} 
+                  onPress={handleCopyCode}
+                  disabled={referralCode === 'N/A'}
+                >
+                  <Text style={styles.copyText}>Copy</Text>
+                </TouchableOpacity>
+              </>
+            )}
           </View>
         </View>
 
@@ -77,6 +131,7 @@ const InviteFriendScreen: React.FC<InviteFriendScreenProps> = ({ onBack }) => {
           title={t('inviteFriend.title')}
           onPress={handleShare}
           style={styles.shareButton}
+          disabled={isLoading || referralCode === 'N/A'}
         />
 
         {/* How it Works */}
@@ -105,6 +160,7 @@ const InviteFriendScreen: React.FC<InviteFriendScreenProps> = ({ onBack }) => {
           </View>
         </View>
       </ScrollView>
+      <Toast />
     </View>
   );
 };

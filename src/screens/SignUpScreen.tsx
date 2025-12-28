@@ -9,9 +9,12 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { Colors } from '../styles/colors';
+import { signupWorker } from '../services/apiClient';
+import { saveAuthToken, saveProfileCompleted } from '../utils/storage';
 
 interface SignUpScreenProps {
   onSignUpComplete?: () => void;
@@ -25,6 +28,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUpComplete, onLoginPr
   const [showPassword, setShowPassword] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // 🔹 Same phone validation logic as Login page
   const handlePhoneChange = (text: string) => {
@@ -48,7 +52,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUpComplete, onLoginPr
     return true;
   };
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     if (!validatePhone()) return;
 
     if (!password) {
@@ -84,8 +88,44 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUpComplete, onLoginPr
       return;
     }
 
-    console.log({ phoneNo, password, rePassword });
-    onSignUpComplete?.();
+    setIsLoading(true);
+
+    try {
+      // Call the signup API
+      const response = await signupWorker(phoneNo, password);
+
+      // Save the auth token and profile completion status
+      await saveAuthToken(response.token);
+      await saveProfileCompleted(response.profileCompleted);
+
+      // Show success message
+      Toast.show({
+        type: 'success',
+        text1: 'Account Created',
+        text2: 'Welcome to ProWorker!',
+        position: 'top',
+        visibilityTime: 2000,
+      });
+
+      // Call the success callback after a short delay
+      setTimeout(() => {
+        onSignUpComplete?.();
+      }, 500);
+
+    } catch (error: any) {
+      console.error('Signup error:', error);
+      
+      // Show error message
+      Toast.show({
+        type: 'error',
+        text1: 'Signup Failed',
+        text2: error.message || 'An error occurred during signup. Please try again.',
+        position: 'top',
+        visibilityTime: 4000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -238,9 +278,17 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUpComplete, onLoginPr
             </TouchableOpacity>
 
             {/* Button */}
-            <TouchableOpacity style={styles.signUpButton} onPress={handleSignUp}>
+            <TouchableOpacity 
+              style={[styles.signUpButton, isLoading && styles.signUpButtonDisabled]} 
+              onPress={handleSignUp}
+              disabled={isLoading}
+            >
               <View style={styles.buttonGradient}>
-                <Text style={styles.signUpButtonText}>Create Account →</Text>
+                {isLoading ? (
+                  <ActivityIndicator color={Colors.white} size="small" />
+                ) : (
+                  <Text style={styles.signUpButtonText}>Create Account →</Text>
+                )}
               </View>
             </TouchableOpacity>
 
@@ -393,6 +441,9 @@ const styles = StyleSheet.create({
     marginTop: 18,
     borderRadius: 12,
     overflow: 'hidden',
+  },
+  signUpButtonDisabled: {
+    opacity: 0.6,
   },
   buttonGradient: {
     backgroundColor: Colors.accent,

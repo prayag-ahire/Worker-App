@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,10 +8,14 @@ import {
   StatusBar,
   ScrollView,
   Switch,
+  ActivityIndicator,
 } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { Colors } from '../styles/colors';
 import { useLanguage } from '../contexts/LanguageContext';
 import { ScreenHeader } from '../components';
+import { getUserProfile, UserProfileResponse } from '../services/apiClient';
+import { getAuthToken } from '../utils/storage';
 
 interface UserProfileScreenProps {
   onBack?: () => void;
@@ -20,12 +24,39 @@ interface UserProfileScreenProps {
 
 const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit }) => {
   const { t } = useLanguage();
-  const [name, setName] = useState('Praveg Amine');
-  const [charges, setCharges] = useState('200/hr');
-  const [rating] = useState(4); // 4 out of 5 stars
+  const [profileData, setProfileData] = useState<UserProfileResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [distanceCharges, setDistanceCharges] = useState(true);
-  const description = 'Hi, I am a professional developer with 2 years of experience in plumbing and electrical work. I provide quality service at affordable rates.';
   const [activeTab, setActiveTab] = useState<'image' | 'video' | 'review'>('image');
+
+  // Fetch user profile on mount
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = await getAuthToken();
+        if (!token) {
+          throw new Error('No authentication token found. Please login again.');
+        }
+
+        const data = await getUserProfile(token);
+        setProfileData(data);
+        console.log('Fetched user profile:', data);
+      } catch (error: any) {
+        console.error('Error fetching profile:', error);
+        Toast.show({
+          type: 'error',
+          text1: 'Failed to Load Profile',
+          text2: error.message || 'Could not fetch profile data',
+          position: 'top',
+          visibilityTime: 3000,
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   const handleEdit = () => {
     // TODO: Navigate to edit profile screen
@@ -38,118 +69,134 @@ const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit })
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={Colors.accent} translucent={true} />
 
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Header with Edit Button */}
-        <View style={styles.headerContainer}>
-          <ScreenHeader title={t('profile.title')} onBack={onBack} variant="blue" />
-          <TouchableOpacity style={styles.editButton} onPress={handleEdit}>
-            <Text style={styles.editButtonText}>{t('profile.edit')}</Text>
-          </TouchableOpacity>
+      {isLoading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors.accent} />
+          <Text style={styles.loadingText}>Loading profile...</Text>
         </View>
+      ) : (
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Header with Edit Button */}
+          <View style={styles.headerContainer}>
+            <ScreenHeader title={t('profile.title')} onBack={onBack} variant="blue" />
+            <TouchableOpacity style={styles.editButton} onPress={handleEdit}>
+              <Text style={styles.editButtonText}>{t('profile.edit')}</Text>
+            </TouchableOpacity>
+          </View>
 
-        {/* Profile Card - Combined */}
-        <View style={styles.profileCard}>
-          {/* Profile Header */}
-          <View style={styles.profileHeader}>
-            {/* Left: Profile Image */}
-            <View style={styles.profileImage}>
-              <Text style={styles.profileImageText}>📷</Text>
-            </View>
-
-            {/* Right: Details */}
-            <View style={styles.detailsSection}>
-              {/* Name */}
-              <Text style={styles.nameText}>{name}</Text>
-
-              {/* Visit Charge */}
-              <View style={styles.infoRow}>
-                <Text style={styles.label}>{t('profile.visitCharge')} : </Text>
-                <Text style={styles.value}>{charges}</Text>
+          {/* Profile Card - Combined */}
+          <View style={styles.profileCard}>
+            {/* Profile Header */}
+            <View style={styles.profileHeader}>
+              {/* Left: Profile Image */}
+              <View style={styles.profileImage}>
+                <Text style={styles.profileImageText}>📷</Text>
               </View>
 
-              {/* Rating */}
-              <View style={styles.ratingRow}>
-                <Text style={styles.label}>{t('profile.rating')} </Text>
-                <View style={styles.stars}>
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Text key={star} style={styles.star}>
-                      {star <= rating ? '⭐' : '☆'}
-                    </Text>
-                  ))}
+              {/* Right: Details */}
+              <View style={styles.detailsSection}>
+                {/* Name */}
+                <Text style={styles.nameText}>{profileData?.username || 'N/A'}</Text>
+
+                {/* Visit Charge */}
+                <View style={styles.infoRow}>
+                  <Text style={styles.label}>{t('profile.visitCharge')} : </Text>
+                  <Text style={styles.value}>₹{profileData?.Charges_PerVisit || 0}</Text>
+                </View>
+
+                {/* Rating */}
+                <View style={styles.ratingRow}>
+                  <Text style={styles.label}>{t('profile.rating')} </Text>
+                  <View style={styles.stars}>
+                    {[1, 2, 3, 4, 5].map((star) => {
+                      const rating = parseFloat(profileData?.Rating || '0');
+                      return (
+                        <Text key={star} style={styles.star}>
+                          {star <= rating ? '⭐' : '☆'}
+                        </Text>
+                      );
+                    })}
+                  </View>
+                </View>
+
+                {/* Distance Charges */}
+                <View style={styles.distanceRow}>
+                  <Text style={styles.distanceLabel}>{t('profile.distanceCharges')}</Text>
+                  <View style={styles.switchContainer}>
+                    <Switch
+                      value={distanceCharges}
+                      onValueChange={setDistanceCharges}
+                      trackColor={{ false: Colors.border, true: Colors.accent }}
+                      thumbColor={Colors.white}
+                    />
+                    <Text style={styles.switchLabel}>{distanceCharges ? t('profile.on') : t('profile.off')}</Text>
+                  </View>
                 </View>
               </View>
+            </View>
 
-              {/* Distance Charges */}
-              <View style={styles.distanceRow}>
-                <Text style={styles.distanceLabel}>{t('profile.distanceCharges')}</Text>
-                <View style={styles.switchContainer}>
-                  <Switch
-                    value={distanceCharges}
-                    onValueChange={setDistanceCharges}
-                    trackColor={{ false: Colors.border, true: Colors.accent }}
-                    thumbColor={Colors.white}
-                  />
-                  <Text style={styles.switchLabel}>{distanceCharges ? t('profile.on') : t('profile.off')}</Text>
-                </View>
-              </View>
+            {/* Divider */}
+            <View style={styles.divider} />
+
+            {/* Description */}
+            <View>
+              <Text style={styles.descriptionLabel}>{t('profile.description')}</Text>
+              <Text style={styles.descriptionText}>
+                {profileData?.Description || t('profile.noDescription')}
+              </Text>
             </View>
           </View>
 
-          {/* Divider */}
-          <View style={styles.divider} />
+          {/* Media Card - Combined */}
+          <View style={styles.mediaCard}>
+            {/* Tabs */}
+            <View style={styles.tabsContainer}>
+              <TouchableOpacity
+                style={[styles.tab, activeTab === 'image' && styles.tabActive]}
+                onPress={() => setActiveTab('image')}
+              >
+                <Text style={[styles.tabText, activeTab === 'image' && styles.tabTextActive]}>
+                  {t('profile.image')} ({profileData?.worker_image?.length || 0})
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.tab, activeTab === 'video' && styles.tabActive]}
+                onPress={() => setActiveTab('video')}
+              >
+                <Text style={[styles.tabText, activeTab === 'video' && styles.tabTextActive]}>
+                  {t('profile.video')} ({profileData?.Worker_video?.length || 0})
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.tab, activeTab === 'review' && styles.tabActive]}
+                onPress={() => setActiveTab('review')}
+              >
+                <Text style={[styles.tabText, activeTab === 'review' && styles.tabTextActive]}>
+                  {t('profile.review')} ({profileData?.review?.length || 0})
+                </Text>
+              </TouchableOpacity>
+            </View>
 
-          {/* Description */}
-          <View>
-            <Text style={styles.descriptionLabel}>{t('profile.description')}</Text>
-            <Text style={styles.descriptionText}>
-              {description || t('profile.noDescription')}
-            </Text>
+            {/* Content Area */}
+            <View style={styles.contentArea}>
+              {activeTab === 'image' && (profileData?.worker_image?.length || 0) === 0 && (
+                <Text style={styles.contentPlaceholder}>{t('profile.imagesPlaceholder')}</Text>
+              )}
+              {activeTab === 'video' && (profileData?.Worker_video?.length || 0) === 0 && (
+                <Text style={styles.contentPlaceholder}>{t('profile.videosPlaceholder')}</Text>
+              )}
+              {activeTab === 'review' && (profileData?.review?.length || 0) === 0 && (
+                <Text style={styles.contentPlaceholder}>{t('profile.reviewsPlaceholder')}</Text>
+              )}
+              {/* TODO: Display actual images, videos, and reviews when available */}
+            </View>
           </View>
-        </View>
-
-        {/* Media Card - Combined */}
-        <View style={styles.mediaCard}>
-          {/* Tabs */}
-          <View style={styles.tabsContainer}>
-            <TouchableOpacity
-              style={[styles.tab, activeTab === 'image' && styles.tabActive]}
-              onPress={() => setActiveTab('image')}
-            >
-              <Text style={[styles.tabText, activeTab === 'image' && styles.tabTextActive]}>
-                {t('profile.image')}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.tab, activeTab === 'video' && styles.tabActive]}
-              onPress={() => setActiveTab('video')}
-            >
-              <Text style={[styles.tabText, activeTab === 'video' && styles.tabTextActive]}>
-                {t('profile.video')}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.tab, activeTab === 'review' && styles.tabActive]}
-              onPress={() => setActiveTab('review')}
-            >
-              <Text style={[styles.tabText, activeTab === 'review' && styles.tabTextActive]}>
-                {t('profile.review')}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Content Area */}
-          <View style={styles.contentArea}>
-            <Text style={styles.contentPlaceholder}>
-              {activeTab === 'image' && t('profile.imagesPlaceholder')}
-              {activeTab === 'video' && t('profile.videosPlaceholder')}
-              {activeTab === 'review' && t('profile.reviewsPlaceholder')}
-            </Text>
-          </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      )}
+      <Toast />
     </View>
   );
 };
@@ -158,6 +205,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.white,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: Colors.textMedium,
+    fontWeight: '500',
   },
   scrollContent: {
     flexGrow: 1,

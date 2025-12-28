@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -9,10 +9,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { Colors } from '../styles/colors';
 import { useLanguage } from '../contexts/LanguageContext';
+import { createWorkerProfile } from '../services/apiClient';
+import { getAuthToken, saveProfileCompleted } from '../utils/storage';
 
 interface PersonalDetailsScreenProps {
   onComplete?: () => void;
@@ -23,23 +26,38 @@ const PersonalDetailsScreen: React.FC<PersonalDetailsScreenProps> = ({ onComplet
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
   const [gender, setGender] = useState<'male' | 'female' | null>(null);
+  const [profession, setProfession] = useState('');
+  const [description, setDescription] = useState('');
+  const [charges, setCharges] = useState('');
+  const [distanceCharges, setDistanceCharges] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Refs for keyboard navigation
+  const ageInputRef = useRef<TextInput>(null);
+  const emailInputRef = useRef<TextInput>(null);
+  const professionInputRef = useRef<TextInput>(null);
+  const descriptionInputRef = useRef<TextInput>(null);
+  const chargesInputRef = useRef<TextInput>(null);
+  const distanceChargesInputRef = useRef<TextInput>(null);
+
 
   // ---------- VALIDATION HELPERS ----------
   const isValidEmail = (value: string) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-
-  const isValidPhone = (value: string) =>
-    /^[0-9]{10}$/.test(value);
 
   const isValidAge = (value: string) => {
     const num = Number(value);
     return num >= 18 && num <= 120;
   };
 
+  const isValidCharges = (value: string) => {
+    const num = Number(value);
+    return num > 0 && num <= 10000;
+  };
+
   // ---------- SUBMIT ----------
-  const handleCreateProfile = () => {
+  const handleCreateProfile = async () => {
     if (name.trim().length < 2) {
       Toast.show({
         type: 'error',
@@ -73,17 +91,6 @@ const PersonalDetailsScreen: React.FC<PersonalDetailsScreenProps> = ({ onComplet
       return;
     }
 
-    if (!phone || !isValidPhone(phone)) {
-      Toast.show({
-        type: 'error',
-        text1: t('personalDetails.invalidPhone'),
-        text2: t('personalDetails.invalidPhoneMessage'),
-        position: 'top',
-        visibilityTime: 3000,
-      });
-      return;
-    }
-
     if (!gender) {
       Toast.show({
         type: 'error',
@@ -95,8 +102,106 @@ const PersonalDetailsScreen: React.FC<PersonalDetailsScreenProps> = ({ onComplet
       return;
     }
 
-    console.log({ name, age, email, phone, gender });
-    onComplete?.();
+    if (profession.trim().length < 2) {
+      Toast.show({
+        type: 'error',
+        text1: 'Invalid Profession',
+        text2: 'Please enter your profession.',
+        position: 'top',
+        visibilityTime: 3000,
+      });
+      return;
+    }
+
+    if (description.trim().length < 10) {
+      Toast.show({
+        type: 'error',
+        text1: 'Invalid Description',
+        text2: 'Please provide a description (at least 10 characters).',
+        position: 'top',
+        visibilityTime: 3000,
+      });
+      return;
+    }
+
+    if (!charges || !isValidCharges(charges)) {
+      Toast.show({
+        type: 'error',
+        text1: 'Invalid Charges',
+        text2: 'Please enter valid charges per visit (1-10000).',
+        position: 'top',
+        visibilityTime: 3000,
+      });
+      return;
+    }
+
+    if (!distanceCharges || !isValidCharges(distanceCharges)) {
+      Toast.show({
+        type: 'error',
+        text1: 'Invalid Distance Charges',
+        text2: 'Please enter valid distance charges (1-10000).',
+        position: 'top',
+        visibilityTime: 3000,
+      });
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Get the auth token
+      const token = await getAuthToken();
+      
+      if (!token) {
+        throw new Error('No authentication token found. Please login again.');
+      }
+
+      // Create the profile with proper gender enum values
+      const profileData = {
+        username: name.trim(),
+        Email: email.trim(),
+        Age: Number(age),
+        gender: gender === 'male' ? 'MALE' : 'Female', // Convert to API enum format
+        profession: profession.trim(),
+        Description: description.trim(),
+        Distance_charges: Number(distanceCharges),
+        Charges_PerVisit: Number(charges),
+        ImgURL: '', // Optional, can be added later
+      };
+
+      await createWorkerProfile(token, profileData);
+
+      // Update profile completed status
+      await saveProfileCompleted(true);
+
+      // Show success message
+      Toast.show({
+        type: 'success',
+        text1: 'Profile Created',
+        text2: 'Your worker profile has been created successfully!',
+        position: 'top',
+        visibilityTime: 2000,
+      });
+
+      // Call the success callback after a short delay
+      setTimeout(() => {
+        onComplete?.();
+      }, 500);
+
+    } catch (error: any) {
+      console.error('Profile creation error:', error);
+      
+      // Show error message
+      Toast.show({
+        type: 'error',
+        text1: 'Profile Creation Failed',
+        text2: error.message || 'An error occurred. Please try again.',
+        position: 'top',
+        visibilityTime: 4000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -138,6 +243,9 @@ const PersonalDetailsScreen: React.FC<PersonalDetailsScreenProps> = ({ onComplet
                   placeholderTextColor={Colors.textLight}
                   value={name}
                   onChangeText={setName}
+                  returnKeyType="next"
+                  onSubmitEditing={() => ageInputRef.current?.focus()}
+                  blurOnSubmit={false}
                 />
               </View>
             </View>
@@ -147,12 +255,16 @@ const PersonalDetailsScreen: React.FC<PersonalDetailsScreenProps> = ({ onComplet
               <Text style={styles.label}>{t('personalDetails.age')}</Text>
               <View style={styles.inputWrapper}>
                 <TextInput
+                  ref={ageInputRef}
                   style={styles.input}
                   placeholder={t('personalDetails.agePlaceholder')}
                   placeholderTextColor={Colors.textLight}
                   value={age}
                   keyboardType="number-pad"
+                  returnKeyType="next"
                   onChangeText={(t) => setAge(t.replace(/[^0-9]/g, ''))}
+                  onSubmitEditing={() => emailInputRef.current?.focus()}
+                  blurOnSubmit={false}
                 />
               </View>
             </View>
@@ -162,29 +274,17 @@ const PersonalDetailsScreen: React.FC<PersonalDetailsScreenProps> = ({ onComplet
               <Text style={styles.label}>{t('personalDetails.email')}</Text>
               <View style={styles.inputWrapper}>
                 <TextInput
+                  ref={emailInputRef}
                   style={styles.input}
                   placeholder={t('personalDetails.emailPlaceholder')}
                   placeholderTextColor={Colors.textLight}
                   value={email}
                   keyboardType="email-address"
                   autoCapitalize="none"
+                  returnKeyType="next"
                   onChangeText={setEmail}
-                />
-              </View>
-            </View>
-
-            {/* Phone */}
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>{t('personalDetails.phone')}</Text>
-              <View style={styles.inputWrapper}>
-                <TextInput
-                  style={styles.input}
-                  placeholder={t('personalDetails.phonePlaceholder')}
-                  placeholderTextColor={Colors.textLight}
-                  value={phone}
-                  keyboardType="number-pad"
-                  maxLength={10}
-                  onChangeText={(t) => setPhone(t.replace(/[^0-9]/g, ''))}
+                  onSubmitEditing={() => professionInputRef.current?.focus()}
+                  blurOnSubmit={false}
                 />
               </View>
             </View>
@@ -219,13 +319,94 @@ const PersonalDetailsScreen: React.FC<PersonalDetailsScreenProps> = ({ onComplet
               </View>
             </View>
 
+            {/* Profession */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Profession</Text>
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  ref={professionInputRef}
+                  style={styles.input}
+                  placeholder="e.g., Plumber, Electrician, Carpenter"
+                  placeholderTextColor={Colors.textLight}
+                  value={profession}
+                  onChangeText={setProfession}
+                  returnKeyType="next"
+                  onSubmitEditing={() => descriptionInputRef.current?.focus()}
+                  blurOnSubmit={false}
+                />
+              </View>
+            </View>
+
+            {/* Description */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>About Your Services</Text>
+              <View style={[styles.inputWrapper, styles.textAreaWrapper]}>
+                <TextInput
+                  ref={descriptionInputRef}
+                  style={[styles.input, styles.textArea]}
+                  placeholder="Describe your skills and experience..."
+                  placeholderTextColor={Colors.textLight}
+                  value={description}
+                  onChangeText={setDescription}
+                  multiline
+                  numberOfLines={4}
+                  textAlignVertical="top"
+                  returnKeyType="next"
+                  onSubmitEditing={() => chargesInputRef.current?.focus()}
+                  blurOnSubmit={false}
+                />
+              </View>
+            </View>
+
+            {/* Charges */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Charges Per Visit (₹)</Text>
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  ref={chargesInputRef}
+                  style={styles.input}
+                  placeholder="Enter your service charge"
+                  placeholderTextColor={Colors.textLight}
+                  value={charges}
+                  keyboardType="number-pad"
+                  returnKeyType="next"
+                  onChangeText={(t) => setCharges(t.replace(/[^0-9]/g, ''))}
+                  onSubmitEditing={() => distanceChargesInputRef.current?.focus()}
+                  blurOnSubmit={false}
+                />
+              </View>
+            </View>
+
+            {/* Distance Charges */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Distance Charges (₹/km)</Text>
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  ref={distanceChargesInputRef}
+                  style={styles.input}
+                  placeholder="Enter distance charges per km"
+                  placeholderTextColor={Colors.textLight}
+                  value={distanceCharges}
+                  keyboardType="number-pad"
+                  returnKeyType="done"
+                  onChangeText={(t) => setDistanceCharges(t.replace(/[^0-9]/g, ''))}
+                  onSubmitEditing={handleCreateProfile}
+                />
+              </View>
+            </View>
+
             {/* Button */}
             <TouchableOpacity
-              style={styles.createButton}
+              style={[styles.createButton, isLoading && styles.createButtonDisabled]}
               onPress={handleCreateProfile}
               activeOpacity={0.9}
+              disabled={isLoading}
             >
-              <Text style={styles.createButtonText}>{t('personalDetails.createProfile')}</Text>
+              {isLoading ? (
+                <ActivityIndicator color={Colors.white} size="small" />
+              ) : (
+                <Text style={styles.createButtonText}>{t('personalDetails.createProfile')}</Text>
+              )}
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -335,6 +516,15 @@ const styles = StyleSheet.create({
     color: Colors.textDark,
     fontWeight: '500',
   },
+  textAreaWrapper: {
+    height: 100,
+    alignItems: 'flex-start',
+    paddingVertical: 12,
+  },
+  textArea: {
+    height: '100%',
+    textAlignVertical: 'top',
+  },
   genderContainer: {
     flexDirection: 'row',
     gap: 12,
@@ -396,6 +586,9 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
+  },
+  createButtonDisabled: {
+    opacity: 0.6,
   },
   createButtonText: {
     fontSize: 17,

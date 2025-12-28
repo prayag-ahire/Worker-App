@@ -7,9 +7,12 @@ import {
   StyleSheet,
   StatusBar,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { Colors } from '../styles/colors';
+import { loginWorker } from '../services/apiClient';
+import { saveAuthToken, saveProfileCompleted } from '../utils/storage';
 
 interface LoginScreenProps {
   onLoginSuccess?: () => void;
@@ -24,6 +27,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
   const [password, setPassword] = useState('');
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const phoneInputRef = useRef<TextInput>(null);
   const passwordInputRef = useRef<TextInput>(null);
@@ -49,7 +53,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
     return true;
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!validatePhone()) return;
 
     if (!password) {
@@ -63,9 +67,44 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
       return;
     }
 
-    console.log({ phoneNo, password });
+    setIsLoading(true);
 
-    onLoginSuccess?.();
+    try {
+      // Call the login API
+      const response = await loginWorker(phoneNo, password);
+
+      // Save the auth token and profile completion status
+      await saveAuthToken(response.token);
+      await saveProfileCompleted(response.profileCompleted);
+
+      // Show success message
+      Toast.show({
+        type: 'success',
+        text1: 'Login Successful',
+        text2: 'Welcome back!',
+        position: 'top',
+        visibilityTime: 2000,
+      });
+
+      // Call the success callback after a short delay
+      setTimeout(() => {
+        onLoginSuccess?.();
+      }, 500);
+
+    } catch (error: any) {
+      console.error('Login error:', error);
+      
+      // Show error message
+      Toast.show({
+        type: 'error',
+        text1: 'Login Failed',
+        text2: error.message || 'An error occurred during login. Please try again.',
+        position: 'top',
+        visibilityTime: 4000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -168,8 +207,16 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
           </View>
 
           {/* Login Button */}
-          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-            <Text style={styles.loginButtonText}>Login</Text>
+          <TouchableOpacity 
+            style={[styles.loginButton, isLoading && styles.loginButtonDisabled]} 
+            onPress={handleLogin}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator color={Colors.white} size="small" />
+            ) : (
+              <Text style={styles.loginButtonText}>Login</Text>
+            )}
           </TouchableOpacity>
 
           {/* Signup */}
@@ -334,6 +381,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     color: Colors.white,
+  },
+  loginButtonDisabled: {
+    opacity: 0.6,
   },
   signUpLink: {
     marginTop: 20,
