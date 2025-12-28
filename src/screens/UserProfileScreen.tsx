@@ -98,8 +98,8 @@ const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit, s
             </TouchableOpacity>
           </View>
 
-          {/* Profile Card - Combined */}
-          <View style={styles.profileCard}>
+          {/* Profile Section - No Card */}
+          <View>
             {/* Profile Header */}
             <View style={styles.profileHeader}>
               {/* Left: Profile Image */}
@@ -152,8 +152,8 @@ const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit, s
             {/* Divider */}
             <View style={styles.divider} />
 
-            {/* Description */}
-            <View>
+            {/* Description - In Card */}
+            <View style={styles.descriptionCard}>
               <Text style={styles.descriptionLabel}>{t('profile.description')}</Text>
               <Text style={styles.descriptionText}>
                 {profileData?.Description || t('profile.noDescription')}
@@ -274,9 +274,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   profileImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 100,              // Reduced width for vertical rectangle
+    height: 160,             // Keep height
+    borderRadius: 12,        // Square with rounded corners
     backgroundColor: Colors.backgroundAccent,
     justifyContent: 'center',
     alignItems: 'center',
@@ -284,14 +284,14 @@ const styles = StyleSheet.create({
     borderColor: Colors.accent,
   },
   profileImageText: {
-    fontSize: 32,
+    fontSize: 64,            // 2x icon size
   },
   detailsSection: {
     flex: 1,
     justifyContent: 'center',
   },
   nameText: {
-    fontSize: 18,
+    fontSize: 20,        // Increased from 18
     fontWeight: '700',
     color: Colors.textDark,
     marginBottom: 8,
@@ -303,12 +303,12 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   label: {
-    fontSize: 14,
+    fontSize: 15,        // Increased from 14
     color: Colors.textMedium,
     fontWeight: '500',
   },
   value: {
-    fontSize: 14,
+    fontSize: 18,        // Increased from 14 (charges - bigger!)
     color: Colors.accent,
     fontWeight: '700',
   },
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   star: {
-    fontSize: 14,
+    fontSize: 27,        // Increased to 1.5x (27px) - much bigger!
   },
   distanceRow: {
     flexDirection: 'row',
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.borderLight,
   },
   distanceLabel: {
-    fontSize: 14,
+    fontSize: 15,        // Increased from 14
     fontWeight: '600',
     color: Colors.textDark,
   },
@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   switchLabel: {
-    fontSize: 13,
+    fontSize: 14,        // Increased from 13
     fontWeight: '600',
     color: Colors.accent,
   },
@@ -352,6 +352,17 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: Colors.borderLight,
     marginBottom: 20,
+  },
+  descriptionCard: {
+    backgroundColor: Colors.white,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
   },
   descriptionLabel: {
     fontSize: 16,

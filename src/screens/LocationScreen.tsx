@@ -44,10 +44,10 @@ const LocationScreen: React.FC<LocationScreenProps> = ({ onBack }) => {
   const watchIdRef = useRef<number | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Default location (New York City as fallback)
+  // Default location (Mumbai, Taj Hotel as fallback)
   const defaultRegion: LocationCoords = {
-    latitude: 40.7128,
-    longitude: -74.0060,
+    latitude: 18.9220,   // Taj Mahal Palace, Mumbai
+    longitude: 72.8332,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   };
