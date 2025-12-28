@@ -19,6 +19,7 @@ interface HomeScreenProps {
   onOrdersPress?: () => void;
   onWorkItemPress?: (workId: string, status: string) => void;
   onHomePress?: () => void;
+  shouldRefresh?: boolean;
 }
 
 type ViewMode = 'day' | 'week' | 'month';
@@ -30,7 +31,14 @@ interface WorkItem {
   status: 'Pending' | 'Confirmed' | 'Completed';
 }
 
-const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePress, onOrdersPress, onWorkItemPress, onHomePress }) => {
+const HomeScreen: React.FC<HomeScreenProps> = ({ 
+  onSettingsPress, 
+  onSchedulePress, 
+  onOrdersPress, 
+  onWorkItemPress, 
+  onHomePress,
+  shouldRefresh = false 
+}) => {
   const { t } = useLanguage();
   const [userName, setUserName] = useState('User'); // Default fallback
   const [isLoading, setIsLoading] = useState(true); // Add loading state
@@ -38,7 +46,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [activeTab, setActiveTab] = useState<'home' | 'orders' | 'schedule' | 'profile'>('home');
 
-  // Load cached user profile on mount
+  // Load cached user profile on mount and when shouldRefresh changes
   useEffect(() => {
     const loadUserProfile = async () => {
       try {
@@ -55,7 +63,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
     };
 
     loadUserProfile();
-  }, []);
+  }, [shouldRefresh]); // Re-run when shouldRefresh changes
 
   // Sample data - Day view
   const todayWork: WorkItem[] = [

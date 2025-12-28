@@ -9,14 +9,16 @@ import {
 } from 'react-native';
 import { Colors } from '../styles/colors';
 import { useLanguage } from '../contexts/LanguageContext';
+import { getAuthToken } from '../utils/storage';
 
 const { width, height } = Dimensions.get('window');
 
 interface SplashScreenProps {
   onFinish?: () => void;
+  onAuthenticatedFinish?: () => void;
 }
 
-const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
+const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish, onAuthenticatedFinish }) => {
   const { t } = useLanguage();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.5)).current;
@@ -43,15 +45,34 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
       }),
     ]).start();
 
-    // Navigate to sign up after 3 seconds
-    const timer = setTimeout(() => {
-      if (onFinish) {
-        onFinish();
+    // Check auth token and navigate accordingly
+    const checkAuthAndNavigate = async () => {
+      try {
+        const token = await getAuthToken();
+        
+        // Wait for splash animation (3 seconds)
+        setTimeout(() => {
+          if (token) {
+            // User is logged in, go to home
+            console.log('Auth token found, navigating to home');
+            onAuthenticatedFinish?.();
+          } else {
+            // No token, go to login
+            console.log('No auth token, navigating to login');
+            onFinish?.();
+          }
+        }, 3000);
+      } catch (error) {
+        console.error('Error checking auth token:', error);
+        // On error, go to login
+        setTimeout(() => {
+          onFinish?.();
+        }, 3000);
       }
-    }, 3000);
+    };
 
-    return () => clearTimeout(timer);
-  }, [fadeAnim, scaleAnim, slideAnim, onFinish]);
+    checkAuthAndNavigate();
+  }, [fadeAnim, scaleAnim, slideAnim, onFinish, onAuthenticatedFinish]);
 
   return (
     <View style={styles.container}>

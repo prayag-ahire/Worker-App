@@ -17,7 +17,7 @@ import { signupWorker } from '../services/apiClient';
 import { saveAuthToken, saveProfileCompleted } from '../utils/storage';
 
 interface SignUpScreenProps {
-  onSignUpComplete?: () => void;
+  onSignUpComplete?: (referralCode?: string) => void;
   onLoginPress?: () => void;
 }
 
@@ -25,6 +25,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUpComplete, onLoginPr
   const [phoneNo, setPhoneNo] = useState('');
   const [password, setPassword] = useState('');
   const [rePassword, setRePassword] = useState('');
+  const [referralCode, setReferralCode] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -77,6 +78,31 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUpComplete, onLoginPr
       return;
     }
 
+    // Validate referral code if provided
+    if (referralCode && referralCode.trim()) {
+      if (referralCode.trim().length < 3) {
+        Toast.show({
+          type: 'error',
+          text1: 'Invalid Referral Code',
+          text2: 'Referral code must be at least 3 digits.',
+          position: 'top',
+          visibilityTime: 3000,
+        });
+        return;
+      }
+      // Additional validation: check if it's a valid number
+      if (isNaN(Number(referralCode.trim()))) {
+        Toast.show({
+          type: 'error',
+          text1: 'Invalid Referral Code',
+          text2: 'Referral code must contain only numbers.',
+          position: 'top',
+          visibilityTime: 3000,
+        });
+        return;
+      }
+    }
+
     if (!termsAccepted) {
       Toast.show({
         type: 'error',
@@ -107,9 +133,9 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUpComplete, onLoginPr
         visibilityTime: 2000,
       });
 
-      // Call the success callback after a short delay
+      // Call the success callback after a short delay, passing referral code
       setTimeout(() => {
-        onSignUpComplete?.();
+        onSignUpComplete?.(referralCode);
       }, 500);
 
     } catch (error: any) {
@@ -259,6 +285,32 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUpComplete, onLoginPr
                   onChangeText={setRePassword}
                   onFocus={() => setFocusedField('rePassword')}
                   onBlur={() => setFocusedField(null)}
+                />
+              </View>
+            </View>
+
+            {/* Referral Code (Optional) */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Referral Code (Optional)</Text>
+              <View
+                style={[
+                  styles.inputWrapper,
+                  focusedField === 'referralCode' && styles.inputWrapperFocused,
+                ]}
+              >
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter referral code"
+                  placeholderTextColor={Colors.textLight}
+                  value={referralCode}
+                  onChangeText={(text) => {
+                    // Only allow numeric input
+                    const numericText = text.replace(/[^0-9]/g, '');
+                    setReferralCode(numericText);
+                  }}
+                  onFocus={() => setFocusedField('referralCode')}
+                  onBlur={() => setFocusedField(null)}
+                  keyboardType="numeric"
                 />
               </View>
             </View>

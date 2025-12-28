@@ -10,6 +10,7 @@ import {
   PermissionsAndroid,
   ActivityIndicator,
   Modal,
+  Linking,
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
@@ -134,26 +135,76 @@ const LocationScreen: React.FC<LocationScreenProps> = ({ onBack }) => {
     setIsLoading(false);
   };
 
-  const requestLocationPermission = async () => {
+  const requestLocationPermission = async (): Promise<boolean> => {
     if (Platform.OS === 'android') {
       try {
+        // Check if permission is already granted
+        const checkResult = await PermissionsAndroid.check(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+        );
+
+        if (checkResult) {
+          return true;
+        }
+
+        // Request permission
         const granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
           {
-            title: 'Location Permission',
-            message: 'This app needs access to your location to show it on the map.',
+            title: 'Location Permission Required',
+            message: 'ProWorker needs access to your location to set your home address and show nearby work opportunities.',
             buttonNeutral: 'Ask Me Later',
             buttonNegative: 'Cancel',
-            buttonPositive: 'OK',
+            buttonPositive: 'Allow',
           }
         );
-        return granted === PermissionsAndroid.RESULTS.GRANTED;
+
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          return true;
+        } else if (granted === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+          // Permission permanently denied, guide user to settings
+          Alert.alert(
+            'Location Permission Required',
+            'Location access is required to use this feature. Please enable it in your device settings.\n\nSettings > Apps > ProWorker > Permissions > Location',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              {
+                text: 'Open Settings',
+                onPress: () => {
+                  // On Android, we can try to open app settings
+                  if (Platform.OS === 'android') {
+                    const { Linking } = require('react-native');
+                    Linking.openSettings();
+                  }
+                },
+              },
+            ]
+          );
+          return false;
+        } else {
+          // Permission denied
+          Toast.show({
+            type: 'error',
+            text1: 'Permission Denied',
+            text2: 'Location permission is required to get your current location.',
+            position: 'top',
+            visibilityTime: 3000,
+          });
+          return false;
+        }
       } catch (err) {
-        console.warn(err);
+        console.warn('Permission error:', err);
+        Toast.show({
+          type: 'error',
+          text1: 'Permission Error',
+          text2: 'Failed to request location permission.',
+          position: 'top',
+          visibilityTime: 3000,
+        });
         return false;
       }
     }
-    return true;
+    return true; // iOS handles permissions differently
   };
 
   const reverseGeocode = async (latitude: number, longitude: number): Promise<string> => {
@@ -209,12 +260,7 @@ const LocationScreen: React.FC<LocationScreenProps> = ({ onBack }) => {
   
     if (!hasPermission) {
       setIsLoading(false);
-      Alert.alert(
-        'Permission Denied',
-        'Location permission is required to get your current location.',
-        [{ text: 'OK' }]
-      );
-      return;
+      return; // Permission function already showed feedback
     }
 
     // Get current position
@@ -253,11 +299,60 @@ const LocationScreen: React.FC<LocationScreenProps> = ({ onBack }) => {
       (error) => {
         console.error('Location error:', error);
         setIsLoading(false);
-        Alert.alert(
-          'Location Error',
-          `Unable to get your location: ${error.message}. Please make sure location services are enabled.`,
-          [{ text: 'OK' }]
-        );
+        
+        // Handle different error codes
+        if (error.code === 1) {
+          // PERMISSION_DENIED
+          Alert.alert(
+            'Location Permission Denied',
+            'Please enable location permission in your device settings to use this feature.\n\nSettings > Apps > ProWorker > Permissions > Location',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              {
+                text: 'Open Settings',
+                onPress: () => Linking.openSettings(),
+              },
+            ]
+          );
+        } else if (error.code === 2) {
+          // POSITION_UNAVAILABLE - GPS might be off
+          Alert.alert(
+            'Location Services Disabled',
+            'Please enable Location/GPS in your device settings to get your current location.\n\nSettings > Location > Turn ON',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              {
+                text: 'Open Settings',
+                onPress: () => {
+                  // Try to open location settings
+                  if (Platform.OS === 'android') {
+                    Linking.sendIntent('android.settings.LOCATION_SOURCE_SETTINGS').catch(() => {
+                      Linking.openSettings();
+                    });
+                  } else {
+                    Linking.openSettings();
+                  }
+                },
+              },
+            ]
+          );
+        } else if (error.code === 3) {
+          // TIMEOUT
+          Toast.show({
+            type: 'error',
+            text1: 'Location Timeout',
+            text2: 'Unable to get location. Please try again.',
+            position: 'top',
+            visibilityTime: 3000,
+          });
+        } else {
+          // Other errors
+          Alert.alert(
+            'Location Error',
+            `Unable to get your location: ${error.message}. Please make sure location services are enabled.`,
+            [{ text: 'OK' }]
+          );
+        }
       },
       {
         enableHighAccuracy: true,

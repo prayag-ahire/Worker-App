@@ -36,9 +36,16 @@ const AppLanguageScreen: React.FC<AppLanguageScreenProps> = ({ onBack, onComplet
     // { id: 4, code: 'mr', name: 'Marathi', nativeName: 'मराठी' },
   ];
 
-  // Fetch user's current language on mount
+  // Fetch user's current language on mount (skip during signup flow)
   useEffect(() => {
     const fetchUserLanguage = async () => {
+      // Skip fetching if this is part of signup flow (onComplete exists)
+      if (onComplete) {
+        console.log('Signup flow detected, skipping language fetch');
+        setIsFetching(false);
+        return;
+      }
+
       try {
         const token = await getAuthToken();
         if (!token) {
@@ -65,7 +72,7 @@ const AppLanguageScreen: React.FC<AppLanguageScreenProps> = ({ onBack, onComplet
     };
 
     fetchUserLanguage();
-  }, []);
+  }, [onComplete]);
 
   const filteredLanguages = languages.filter(lang =>
     lang.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -115,22 +122,10 @@ const AppLanguageScreen: React.FC<AppLanguageScreenProps> = ({ onBack, onComplet
   const handleContinue = async () => {
     if (!onComplete) return;
 
-    setIsLoading(true);
-    try {
-      const token = await getAuthToken();
-      if (token) {
-        // Map language code to API language name
-        const apiLanguage = selectedLanguage === 'hi' ? 'Hindi' : 'English';
-        await updateUserLanguage(token, apiLanguage);
-      }
-      onComplete();
-    } catch (error: any) {
-      console.error('Error updating language:', error);
-      // Continue anyway, don't block the flow
-      onComplete();
-    } finally {
-      setIsLoading(false);
-    }
+    // During signup flow, just continue without API call
+    // User's language will be saved when they complete their profile
+    console.log('Language selected during signup:', selectedLanguage);
+    onComplete();
   };
 
   return (

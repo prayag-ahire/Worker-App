@@ -19,9 +19,10 @@ import { getAuthToken, saveProfileCompleted, saveUserProfile } from '../utils/st
 
 interface PersonalDetailsScreenProps {
   onComplete?: () => void;
+  referralCode?: string;
 }
 
-const PersonalDetailsScreen: React.FC<PersonalDetailsScreenProps> = ({ onComplete }) => {
+const PersonalDetailsScreen: React.FC<PersonalDetailsScreenProps> = ({ onComplete, referralCode }) => {
   const { t } = useLanguage();
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
@@ -157,7 +158,7 @@ const PersonalDetailsScreen: React.FC<PersonalDetailsScreenProps> = ({ onComplet
       }
 
       // Create the profile with proper gender enum values
-      const profileData = {
+      const profileData: any = {
         username: name.trim(),
         Email: email.trim(),
         Age: Number(age),
@@ -168,6 +169,11 @@ const PersonalDetailsScreen: React.FC<PersonalDetailsScreenProps> = ({ onComplet
         Charges_PerVisit: Number(charges),
         ImgURL: '', // Optional, can be added later
       };
+
+      // Add ReferenceId if referral code was provided
+      if (referralCode && referralCode.trim()) {
+        profileData.ReferenceId = Number(referralCode.trim());
+      }
 
       await createWorkerProfile(token, profileData);
 

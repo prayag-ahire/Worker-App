@@ -14,7 +14,7 @@ import { Colors } from '../styles/colors';
 import { useLanguage } from '../contexts/LanguageContext';
 import { ScreenHeader } from '../components';
 import { getUserProfile, updateUserProfile } from '../services/apiClient';
-import { getAuthToken } from '../utils/storage';
+import { getAuthToken, saveUserProfile } from '../utils/storage';
 
 interface EditProfileScreenProps {
   onBack?: () => void;
@@ -156,6 +156,10 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ onBack, onSave })
       };
 
       const updatedProfile = await updateUserProfile(token, updateData);
+
+      // Update cached profile
+      await saveUserProfile(updatedProfile);
+      console.log('Profile cache updated after edit');
 
       Toast.show({
         type: 'success',

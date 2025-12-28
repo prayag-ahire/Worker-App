@@ -41,6 +41,8 @@ function App() {
   const [confirmationType, setConfirmationType] = useState<'cancel' | 'reschedule'>('cancel');
   const [isSignupFlow, setIsSignupFlow] = useState(false);
   const [shouldRefreshProfile, setShouldRefreshProfile] = useState(false);
+  const [shouldRefreshHome, setShouldRefreshHome] = useState(false);
+  const [referralCode, setReferralCode] = useState<string>('');
 
   // Handle hardware back button
   useEffect(() => {
@@ -147,6 +149,10 @@ function App() {
     setCurrentScreen('login');
   };
 
+  const handleSplashAuthenticatedFinish = () => {
+    setCurrentScreen('home');
+  };
+
   const handleLoginSuccess = () => {
     setCurrentScreen('home');
   };
@@ -159,7 +165,8 @@ function App() {
     setCurrentScreen('login');
   };
 
-  const handleSignUpComplete = () => {
+  const handleSignUpComplete = (refCode?: string) => {
+    setReferralCode(refCode || ''); // Store referral code
     setIsSignupFlow(true);
     setCurrentScreen('appLanguage');
   };
@@ -180,6 +187,7 @@ function App() {
   const handleSettingsPress = () => {
     // Only navigate if not already on settings screen
     if (currentScreen !== 'settings') {
+      setShouldRefreshHome(false); // Reset refresh flag
       setCurrentScreen('settings');
     }
   };
@@ -225,12 +233,14 @@ function App() {
 
   const handleEditProfileBack = () => {
     setShouldRefreshProfile(true); // Trigger refresh when returning from edit
+    setShouldRefreshHome(true); // Also refresh home screen
     setCurrentScreen('userProfile');
   };
 
   const handleEditProfileSave = (data: any) => {
     console.log('Profile saved:', data);
     setShouldRefreshProfile(true); // Trigger refresh after save
+    setShouldRefreshHome(true); // Also refresh home screen
     setCurrentScreen('userProfile');
   };
 
@@ -386,7 +396,10 @@ function App() {
       <SafeAreaProvider>
         <View style={styles.container}>
         {currentScreen === 'splash' && (
-          <SplashScreen onFinish={handleSplashFinish} />
+          <SplashScreen 
+            onFinish={handleSplashFinish} 
+            onAuthenticatedFinish={handleSplashAuthenticatedFinish}
+          />
         )}
         {currentScreen === 'login' && (
           <LoginScreen
@@ -404,7 +417,10 @@ function App() {
           <OnboardingScreen onFinish={handleOnboardingFinish} />
         )}
         {currentScreen === 'personalDetails' && (
-          <PersonalDetailsScreen onComplete={handlePersonalDetailsComplete} />
+          <PersonalDetailsScreen 
+            onComplete={handlePersonalDetailsComplete} 
+            referralCode={referralCode}
+          />
         )}
         {currentScreen === 'home' && (
           <HomeScreen
@@ -413,6 +429,7 @@ function App() {
             onOrdersPress={handleOrdersPress}
             onWorkItemPress={handleWorkItemPress}
             onHomePress={handleHomePress}
+            shouldRefresh={shouldRefreshHome}
           />
         )}
         {currentScreen === 'settings' && (
