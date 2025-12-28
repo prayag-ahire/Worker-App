@@ -11,8 +11,8 @@ import {
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { Colors } from '../styles/colors';
-import { loginWorker } from '../services/apiClient';
-import { saveAuthToken, saveProfileCompleted } from '../utils/storage';
+import { loginWorker, getUserProfile as fetchUserProfile } from '../services/apiClient';
+import { saveAuthToken, saveProfileCompleted, saveUserProfile } from '../utils/storage';
 
 interface LoginScreenProps {
   onLoginSuccess?: () => void;
@@ -76,6 +76,16 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
       // Save the auth token and profile completion status
       await saveAuthToken(response.token);
       await saveProfileCompleted(response.profileCompleted);
+
+      // Fetch and cache user profile
+      try {
+        const profileData = await fetchUserProfile(response.token);
+        await saveUserProfile(profileData);
+        console.log('User profile cached after login');
+      } catch (profileError) {
+        console.error('Error fetching profile after login:', profileError);
+        // Don't fail login if profile fetch fails
+      }
 
       // Show success message
       Toast.show({

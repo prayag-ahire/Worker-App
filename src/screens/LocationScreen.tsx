@@ -8,12 +8,17 @@ import {
   Alert,
   Platform,
   PermissionsAndroid,
+  ActivityIndicator,
+  Modal,
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
+import Toast from 'react-native-toast-message';
 import { Colors } from '../styles/colors';
 import { ScreenHeader, PrimaryButton, SecondaryButton } from '../components';
 import { useLanguage } from '../contexts/LanguageContext';
+import { getUserLocation, updateUserLocation } from '../services/apiClient';
+import { getAuthToken } from '../utils/storage';
 
 interface LocationScreenProps {
   onBack?: () => void;
@@ -31,7 +36,12 @@ const LocationScreen: React.FC<LocationScreenProps> = ({ onBack }) => {
   const [location, setLocation] = useState<string>('');
   const [currentLocation, setCurrentLocation] = useState<LocationCoords | null>(null);
   const [markerPosition, setMarkerPosition] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isFetchingLocation, setIsFetchingLocation] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const mapRef = useRef<MapView>(null);
+  const watchIdRef = useRef<number | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // Default location (New York City as fallback)
   const defaultRegion: LocationCoords = {
@@ -42,9 +52,87 @@ const LocationScreen: React.FC<LocationScreenProps> = ({ onBack }) => {
   };
 
   useEffect(() => {
-    // Request location permissions on mount
-    requestLocationPermission();
+    // Request location permissions and fetch saved location on mount
+    const initializeLocation = async () => {
+      await requestLocationPermission();
+      await fetchSavedLocation();
+    };
+
+    initializeLocation();
+
+    // Cleanup on unmount
+    return () => {
+      cancelLocationRequest();
+    };
   }, []);
+
+  const fetchSavedLocation = async () => {
+    try {
+      const token = await getAuthToken();
+      if (!token) {
+        console.log('No token found, skipping location fetch');
+        setIsFetchingLocation(false);
+        return;
+      }
+
+      console.log('Fetching saved location...');
+      const savedLocation = await getUserLocation(token);
+      
+      if (savedLocation && savedLocation.latitude && savedLocation.longitude) {
+        const newLocation: LocationCoords = {
+          latitude: savedLocation.latitude,
+          longitude: savedLocation.longitude,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        };
+
+        setCurrentLocation(newLocation);
+        setMarkerPosition({ 
+          latitude: savedLocation.latitude, 
+          longitude: savedLocation.longitude 
+        });
+
+        // Get address for saved location
+        const address = await reverseGeocode(savedLocation.latitude, savedLocation.longitude);
+        if (address) {
+          setLocation(address);
+        }
+
+        console.log('Loaded saved location:', savedLocation);
+      }
+    } catch (error: any) {
+      console.error('Error fetching saved location:', error);
+      // Don't show error toast for missing location (user might not have set one yet)
+      if (!error.message?.includes('404')) {
+        Toast.show({
+          type: 'info',
+          text1: 'No Saved Location',
+          text2: 'Please set your home location',
+          position: 'top',
+          visibilityTime: 2000,
+        });
+      }
+    } finally {
+      setIsFetchingLocation(false);
+    }
+  };
+
+  const cancelLocationRequest = () => {
+    // Cancel geolocation watch
+    if (watchIdRef.current !== null) {
+      Geolocation.clearWatch(watchIdRef.current);
+      watchIdRef.current = null;
+    }
+
+    // Abort fetch request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+
+    // Reset loading state
+    setIsLoading(false);
+  };
 
   const requestLocationPermission = async () => {
     if (Platform.OS === 'android') {
@@ -70,6 +158,9 @@ const LocationScreen: React.FC<LocationScreenProps> = ({ onBack }) => {
 
   const reverseGeocode = async (latitude: number, longitude: number): Promise<string> => {
     try {
+      // Create new AbortController for this request
+      abortControllerRef.current = new AbortController();
+
       // Using Nominatim API (OpenStreetMap's free geocoding service)
       const response = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`,
@@ -77,6 +168,7 @@ const LocationScreen: React.FC<LocationScreenProps> = ({ onBack }) => {
           headers: {
             'User-Agent': 'WorkerApp/1.0', // Required by Nominatim
           },
+          signal: abortControllerRef.current.signal,
         }
       );
 
@@ -92,7 +184,11 @@ const LocationScreen: React.FC<LocationScreenProps> = ({ onBack }) => {
       const state = address.state || 'Unknown State';
       
       return `${city}, ${state}`;
-    } catch (error) {
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        console.log('Geocoding request was cancelled');
+        return '';
+      }
       console.error('Reverse geocoding error:', error);
       // Fallback to coordinates if geocoding fails
       return `Lat: ${latitude.toFixed(6)}, Lng: ${longitude.toFixed(6)}`;
@@ -100,25 +196,32 @@ const LocationScreen: React.FC<LocationScreenProps> = ({ onBack }) => {
   };
 
   const handleGetCurrentLocation = async () => {
-    console.log('Get current location pressed');
-    
-      // Request permission first
-      const hasPermission = await requestLocationPermission();
-    
-      if (!hasPermission) {
-        Alert.alert(
-          'Permission Denied',
-        'Location permission is required to get your current location.',
-          [{ text: 'OK' }]
-        );
-        return;
-      }
+    // Prevent multiple simultaneous requests
+    if (isLoading) {
+      return;
+    }
 
-      // Get current position
-      Geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords;
-        
+    console.log('Get current location pressed');
+    setIsLoading(true);
+    
+    // Request permission first
+    const hasPermission = await requestLocationPermission();
+  
+    if (!hasPermission) {
+      setIsLoading(false);
+      Alert.alert(
+        'Permission Denied',
+        'Location permission is required to get your current location.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+
+    // Get current position
+    Geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+      
         const newLocation: LocationCoords = {
           latitude,
           longitude,
@@ -139,10 +242,17 @@ const LocationScreen: React.FC<LocationScreenProps> = ({ onBack }) => {
 
         // Get human-readable address
         const address = await reverseGeocode(latitude, longitude);
-        setLocation(address);
+        
+        // Only update if request wasn't cancelled
+        if (address) {
+          setLocation(address);
+        }
+        
+        setIsLoading(false);
       },
       (error) => {
         console.error('Location error:', error);
+        setIsLoading(false);
         Alert.alert(
           'Location Error',
           `Unable to get your location: ${error.message}. Please make sure location services are enabled.`,
@@ -157,95 +267,186 @@ const LocationScreen: React.FC<LocationScreenProps> = ({ onBack }) => {
     );
   };
 
-  const handleSetHomeLocation = () => {
+  const handleSetHomeLocation = async () => {
     console.log('Set home location pressed');
     
     if (!currentLocation) {
-      Alert.alert(
-        'No Location Selected',
-        'Please get your current location first before setting it as home location.',
-        [{ text: 'OK' }]
-      );
+      Toast.show({
+        type: 'error',
+        text1: 'No Location Selected',
+        text2: 'Please get your current location first',
+        position: 'top',
+        visibilityTime: 3000,
+      });
       return;
     }
 
-    // TODO: Save location to backend
-    Alert.alert(
-      'Home Location Set',
-      `Your home location has been set to:\n${location}`,
-      [
-        {
-          text: 'OK',
-          onPress: () => {
-            if (onBack) {
-              onBack();
-            }
-          },
-        },
-      ]
-    );
+    setIsSaving(true);
+
+    try {
+      const token = await getAuthToken();
+      if (!token) {
+        throw new Error('No authentication token found. Please login again.');
+      }
+
+      // Save location to backend
+      const locationData = {
+        latitude: currentLocation.latitude,
+        longitude: currentLocation.longitude,
+      };
+
+      await updateUserLocation(token, locationData);
+
+      Toast.show({
+        type: 'success',
+        text1: 'Home Location Set',
+        text2: `Your home location has been saved: ${location}`,
+        position: 'top',
+        visibilityTime: 2000,
+      });
+
+      // Navigate back after a short delay
+      setTimeout(() => {
+        if (onBack) {
+          onBack();
+        }
+      }, 500);
+
+    } catch (error: any) {
+      console.error('Error saving location:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Failed to Save Location',
+        text2: error.message || 'Could not save your home location',
+        position: 'top',
+        visibilityTime: 3000,
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleBack = () => {
+    // Cancel any ongoing location requests
+    cancelLocationRequest();
+    
+    // Call the original onBack
+    if (onBack) {
+      onBack();
+    }
   };
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={Colors.accent} translucent={true} />
 
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Header */}
-        <ScreenHeader title={t('location.title')} onBack={onBack} variant="blue" />
-
-        {/* Map Container */}
-        <View style={styles.mapContainer}>
-          <MapView
-            ref={mapRef}
-            style={styles.map}
-            initialRegion={defaultRegion}
-            showsUserLocation={true}
-            showsMyLocationButton={false}
-            showsCompass={true}
-            zoomEnabled={true}
-            scrollEnabled={true}
-          >
-            {markerPosition && (
-              <Marker
-                coordinate={markerPosition}
-                title={t('location.yourLocation')}
-                description={location}
-                pinColor={Colors.accent}
-              />
-            )}
-          </MapView>
-          
-          {location && (
-            <View style={styles.locationInfo}>
-              <Text style={styles.locationText}>{location}</Text>
-            </View>
-          )}
+      {isFetchingLocation ? (
+        <View style={styles.initialLoadingContainer}>
+          <ActivityIndicator size="large" color={Colors.accent} />
+          <Text style={styles.loadingText}>Loading location...</Text>
         </View>
+      ) : (
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Header */}
+          <ScreenHeader title={t('location.title')} onBack={handleBack} variant="blue" />
 
-        {/* GPS Button */}
-        <SecondaryButton
-          title={t('location.getCurrentLocation')}
-          onPress={handleGetCurrentLocation}
-          style={styles.gpsButton}
-          textStyle={styles.gpsButtonText}
-        />
+          {/* Map Container */}
+          <View style={styles.mapContainer}>
+            <MapView
+              ref={mapRef}
+              style={styles.map}
+              initialRegion={currentLocation || defaultRegion}
+              showsUserLocation={true}
+              showsMyLocationButton={false}
+              showsCompass={true}
+              zoomEnabled={true}
+              scrollEnabled={true}
+              onMapReady={() => {
+                // Map is ready, if we have a saved location, animate to it
+                if (currentLocation && mapRef.current) {
+                  mapRef.current.animateToRegion(currentLocation, 500);
+                }
+              }}
+            >
+              {markerPosition && (
+                <Marker
+                  coordinate={markerPosition}
+                  title={t('location.yourLocation')}
+                  description={location}
+                  pinColor={Colors.accent}
+                />
+              )}
+            </MapView>
+            
+            {location && (
+              <View style={styles.locationInfo}>
+                <Text style={styles.locationText}>{location}</Text>
+              </View>
+            )}
+          </View>
 
-        {/* Set Home Location Button */}
-        <PrimaryButton
-          title={t('location.setHomeLocation')}
-          onPress={handleSetHomeLocation}
-          style={styles.setLocationButton}
-        />
+          {/* GPS Button */}
+          <SecondaryButton
+            title={t('location.getCurrentLocation')}
+            onPress={handleGetCurrentLocation}
+            style={styles.gpsButton}
+            textStyle={styles.gpsButtonText}
+            disabled={isLoading || isSaving}
+          />
 
-        {/* Info Text */}
-        <Text style={styles.infoText}>
-          {t('location.infoText')}
-        </Text>
-      </ScrollView>
+          {/* Set Home Location Button */}
+          <PrimaryButton
+            title={isSaving ? 'Saving...' : t('location.setHomeLocation')}
+            onPress={handleSetHomeLocation}
+            style={styles.setLocationButton}
+            disabled={isLoading || isSaving}
+          />
+
+          {/* Info Text */}
+          <Text style={styles.infoText}>
+            {t('location.infoText')}
+          </Text>
+        </ScrollView>
+      )}
+
+      {/* Loading Overlay for Getting Location */}
+      <Modal
+        transparent={true}
+        visible={isLoading}
+        animationType="fade"
+        onRequestClose={() => {
+          // Allow back button to cancel the request
+          cancelLocationRequest();
+        }}
+      >
+        <View style={styles.loadingOverlay}>
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={Colors.accent} />
+            <Text style={styles.loadingText}>Getting your location...</Text>
+            <Text style={styles.loadingSubtext}>Please wait</Text>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Saving Overlay */}
+      <Modal
+        transparent={true}
+        visible={isSaving}
+        animationType="fade"
+      >
+        <View style={styles.loadingOverlay}>
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={Colors.accent} />
+            <Text style={styles.loadingText}>Saving location...</Text>
+            <Text style={styles.loadingSubtext}>Please wait</Text>
+          </View>
+        </View>
+      </Modal>
+
+      <Toast />
     </View>
   );
 };
@@ -335,6 +536,43 @@ const styles = StyleSheet.create({
     color: Colors.textLight,
     textAlign: 'center',
     lineHeight: 20,
+  },
+  loadingOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent dark background
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  initialLoadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.white,
+  },
+  loadingContainer: {
+    backgroundColor: Colors.white,
+    borderRadius: 16,
+    padding: 32,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+    minWidth: 200,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.textDark,
+    textAlign: 'center',
+  },
+  loadingSubtext: {
+    marginTop: 8,
+    fontSize: 14,
+    color: Colors.textMedium,
+    textAlign: 'center',
   },
 });
 

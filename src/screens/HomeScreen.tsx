@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,10 +6,12 @@ import {
   StatusBar,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import { Colors } from '../styles/colors';
 import { useLanguage } from '../contexts/LanguageContext';
 import BottomNavigation from '../components/BottomNavigation';
+import { getUserProfile } from '../utils/storage';
 
 interface HomeScreenProps {
   onSettingsPress?: () => void;
@@ -30,10 +32,30 @@ interface WorkItem {
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePress, onOrdersPress, onWorkItemPress, onHomePress }) => {
   const { t } = useLanguage();
-  const userName = 'Prayag Ahire'; // TODO: Get from user profile
+  const [userName, setUserName] = useState('User'); // Default fallback
+  const [isLoading, setIsLoading] = useState(true); // Add loading state
   const [viewMode, setViewMode] = useState<ViewMode>('day');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [activeTab, setActiveTab] = useState<'home' | 'orders' | 'schedule' | 'profile'>('home');
+
+  // Load cached user profile on mount
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      try {
+        const cachedProfile = await getUserProfile();
+        if (cachedProfile && cachedProfile.username) {
+          setUserName(cachedProfile.username);
+          console.log('Loaded username from cache:', cachedProfile.username);
+        }
+      } catch (error) {
+        console.error('Error loading cached profile:', error);
+      } finally {
+        setIsLoading(false); // Always stop loading
+      }
+    };
+
+    loadUserProfile();
+  }, []);
 
   // Sample data - Day view
   const todayWork: WorkItem[] = [
@@ -228,23 +250,29 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
         translucent={true} 
       />
 
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.greeting}>{t('home.greeting')}, {userName}</Text>
-      </View>
+      {isLoading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors.accent} />
+        </View>
+      ) : (
+        <>
+          {/* Header */}
+          <View style={styles.header}>
+            <Text style={styles.greeting}>{t('home.greeting')}, {userName}</Text>
+          </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* View Mode Tabs */}
-        <View style={styles.tabsContainer}>
-          <TouchableOpacity
-            style={[styles.tab, viewMode === 'day' && styles.tabActive]}
-            onPress={handleDayTabClick}
-            activeOpacity={0.7}
-          >
-            <Text style={[styles.tabText, viewMode === 'day' && styles.tabTextActive]}>
-              {t('home.day')}
-            </Text>
-          </TouchableOpacity>
+          <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+            {/* View Mode Tabs */}
+            <View style={styles.tabsContainer}>
+              <TouchableOpacity
+                style={[styles.tab, viewMode === 'day' && styles.tabActive]}
+                onPress={handleDayTabClick}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.tabText, viewMode === 'day' && styles.tabTextActive]}>
+                  {t('home.day')}
+                </Text>
+              </TouchableOpacity>
           <TouchableOpacity
             style={[styles.tab, viewMode === 'week' && styles.tabActive]}
             onPress={() => setViewMode('week')}
@@ -371,6 +399,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
         onSchedulePress={onSchedulePress}
         onProfilePress={onSettingsPress}
       />
+        </>
+      )}
     </View>
   );
 };
@@ -378,6 +408,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSettingsPress, onSchedulePres
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: Colors.backgroundPrimary,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: Colors.backgroundPrimary,
   },
   header: {

@@ -14,8 +14,8 @@ import {
 import Toast from 'react-native-toast-message';
 import { Colors } from '../styles/colors';
 import { useLanguage } from '../contexts/LanguageContext';
-import { createWorkerProfile } from '../services/apiClient';
-import { getAuthToken, saveProfileCompleted } from '../utils/storage';
+import { createWorkerProfile, getUserProfile as fetchUserProfile } from '../services/apiClient';
+import { getAuthToken, saveProfileCompleted, saveUserProfile } from '../utils/storage';
 
 interface PersonalDetailsScreenProps {
   onComplete?: () => void;
@@ -173,6 +173,16 @@ const PersonalDetailsScreen: React.FC<PersonalDetailsScreenProps> = ({ onComplet
 
       // Update profile completed status
       await saveProfileCompleted(true);
+
+      // Fetch and cache the created profile
+      try {
+        const createdProfile = await fetchUserProfile(token);
+        await saveUserProfile(createdProfile);
+        console.log('User profile cached after creation');
+      } catch (profileError) {
+        console.error('Error fetching profile after creation:', profileError);
+        // Don't fail if profile fetch fails
+      }
 
       // Show success message
       Toast.show({

@@ -72,6 +72,32 @@ export const getProfileCompleted = async (): Promise<boolean> => {
 };
 
 /**
+ * Save user profile data to cache
+ */
+export const saveUserProfile = async (profileData: any): Promise<void> => {
+  try {
+    await AsyncStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(profileData));
+    console.log('User profile cached successfully');
+  } catch (error) {
+    console.error('Error saving user profile:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get cached user profile data
+ */
+export const getUserProfile = async (): Promise<any | null> => {
+  try {
+    const value = await AsyncStorage.getItem(STORAGE_KEYS.USER_DATA);
+    return value ? JSON.parse(value) : null;
+  } catch (error) {
+    console.error('Error getting user profile:', error);
+    return null;
+  }
+};
+
+/**
  * Clear all auth data
  */
 export const clearAuthData = async (): Promise<void> => {

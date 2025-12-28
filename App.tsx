@@ -40,6 +40,7 @@ function App() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmationType, setConfirmationType] = useState<'cancel' | 'reschedule'>('cancel');
   const [isSignupFlow, setIsSignupFlow] = useState(false);
+  const [shouldRefreshProfile, setShouldRefreshProfile] = useState(false);
 
   // Handle hardware back button
   useEffect(() => {
@@ -65,11 +66,16 @@ function App() {
           currentScreen === 'help') ||
           (currentScreen === 'appLanguage' && !isSignupFlow)) {
         setCurrentScreen('settings');
+        // Reset refresh flag when leaving profile
+        if (currentScreen === 'userProfile') {
+          setShouldRefreshProfile(false);
+        }
         return true;
       }
 
       // Edit profile - go to user profile
       if (currentScreen === 'editProfile') {
+        setShouldRefreshProfile(true); // Trigger refresh when returning from edit
         setCurrentScreen('userProfile');
         return true;
       }
@@ -184,6 +190,7 @@ function App() {
 
   const handleSettingsNavigate = (screen: string) => {
     if (screen === 'userProfile') {
+      setShouldRefreshProfile(false); // Don't refresh when first opening
       setCurrentScreen('userProfile');
     }
     if (screen === 'location') {
@@ -208,6 +215,7 @@ function App() {
   };
 
   const handleUserProfileBack = () => {
+    setShouldRefreshProfile(false); // Reset refresh flag
     setCurrentScreen('settings');
   };
 
@@ -216,11 +224,13 @@ function App() {
   };
 
   const handleEditProfileBack = () => {
+    setShouldRefreshProfile(true); // Trigger refresh when returning from edit
     setCurrentScreen('userProfile');
   };
 
   const handleEditProfileSave = (data: any) => {
     console.log('Profile saved:', data);
+    setShouldRefreshProfile(true); // Trigger refresh after save
     setCurrentScreen('userProfile');
   };
 
@@ -418,6 +428,7 @@ function App() {
           <UserProfileScreen
             onBack={handleUserProfileBack}
             onEdit={handleUserProfileEdit}
+            shouldRefresh={shouldRefreshProfile}
           />
         )}
         {currentScreen === 'editProfile' && (

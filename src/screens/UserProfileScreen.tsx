@@ -20,26 +20,37 @@ import { getAuthToken } from '../utils/storage';
 interface UserProfileScreenProps {
   onBack?: () => void;
   onEdit?: () => void;
+  shouldRefresh?: boolean; // Flag to indicate if data should be refreshed
 }
 
-const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit }) => {
+const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit, shouldRefresh = false }) => {
   const { t } = useLanguage();
   const [profileData, setProfileData] = useState<UserProfileResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [distanceCharges, setDistanceCharges] = useState(true);
   const [activeTab, setActiveTab] = useState<'image' | 'video' | 'review'>('image');
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
 
-  // Fetch user profile on mount
+  // Fetch user profile on mount or when shouldRefresh changes
   useEffect(() => {
     const fetchProfile = async () => {
+      // Skip if already loaded and not forced to refresh
+      if (hasLoadedOnce && !shouldRefresh) {
+        console.log('Using cached profile data');
+        return;
+      }
+
+      setIsLoading(true);
       try {
         const token = await getAuthToken();
         if (!token) {
           throw new Error('No authentication token found. Please login again.');
         }
 
+        console.log('Fetching fresh profile data...');
         const data = await getUserProfile(token);
         setProfileData(data);
+        setHasLoadedOnce(true);
         console.log('Fetched user profile:', data);
       } catch (error: any) {
         console.error('Error fetching profile:', error);
@@ -56,7 +67,7 @@ const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit })
     };
 
     fetchProfile();
-  }, []);
+  }, [shouldRefresh]); // Only refetch when shouldRefresh changes
 
   const handleEdit = () => {
     // TODO: Navigate to edit profile screen

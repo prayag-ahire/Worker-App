@@ -137,37 +137,36 @@ const AppLanguageScreen: React.FC<AppLanguageScreenProps> = ({ onBack, onComplet
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={Colors.accent} translucent={true} />
 
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Header */}
-        <ScreenHeader 
-          title="App Language" 
-          onBack={onBack} 
-          showBackButton={!onComplete}
-          variant="blue" 
-        />
-
-        {/* Language List Container */}
-        <Card style={styles.languageCard}>
-          {/* Search */}
-          <TextInputField
-            placeholder="Search"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            containerStyle={styles.searchContainer}
-            editable={!isFetching && !isLoading}
+      {isFetching ? (
+        <View style={styles.fullScreenLoadingContainer}>
+          <ActivityIndicator size="large" color={Colors.accent} />
+          <Text style={styles.loadingText}>Loading language settings...</Text>
+        </View>
+      ) : (
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Header */}
+          <ScreenHeader 
+            title="App Language" 
+            onBack={onBack} 
+            showBackButton={!onComplete}
+            variant="blue" 
           />
 
-          {/* Loading State */}
-          {isFetching ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={Colors.accent} />
-              <Text style={styles.loadingText}>Loading language settings...</Text>
-            </View>
-          ) : (
-            /* Language List */
+          {/* Language List Container */}
+          <Card style={styles.languageCard}>
+            {/* Search */}
+            <TextInputField
+              placeholder="Search"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              containerStyle={styles.searchContainer}
+              editable={!isLoading}
+            />
+
+            {/* Language List */}
             <View style={styles.languageList}>
               {filteredLanguages.map((language, index) => (
                 <TouchableOpacity
@@ -190,25 +189,25 @@ const AppLanguageScreen: React.FC<AppLanguageScreenProps> = ({ onBack, onComplet
                 </TouchableOpacity>
               ))}
             </View>
-          )}
-        </Card>
+          </Card>
 
-        {/* Continue Button - Only show during signup flow */}
-        {onComplete && (
-          <TouchableOpacity 
-            style={[styles.continueButton, isLoading && styles.continueButtonDisabled]}
-            onPress={handleContinue}
-            activeOpacity={0.9}
-            disabled={isLoading || isFetching}
-          >
-            {isLoading ? (
-              <ActivityIndicator color={Colors.white} size="small" />
-            ) : (
-              <Text style={styles.continueButtonText}>Continue</Text>
-            )}
-          </TouchableOpacity>
-        )}
-      </ScrollView>
+          {/* Continue Button - Only show during signup flow */}
+          {onComplete && (
+            <TouchableOpacity 
+              style={[styles.continueButton, isLoading && styles.continueButtonDisabled]}
+              onPress={handleContinue}
+              activeOpacity={0.9}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <ActivityIndicator color={Colors.white} size="small" />
+              ) : (
+                <Text style={styles.continueButtonText}>Continue</Text>
+              )}
+            </TouchableOpacity>
+          )}
+        </ScrollView>
+      )}
       <Toast />
     </View>
   );
@@ -217,6 +216,12 @@ const AppLanguageScreen: React.FC<AppLanguageScreenProps> = ({ onBack, onComplet
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: Colors.white,
+  },
+  fullScreenLoadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: Colors.white,
   },
   scrollContent: {

@@ -80,86 +80,87 @@ const InviteFriendScreen: React.FC<InviteFriendScreenProps> = ({ onBack }) => {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={Colors.accent} translucent={true} />
 
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Header */}
-        <ScreenHeader title={t('inviteFriend.title')} onBack={onBack} variant="blue" />
-
-        {/* Illustration */}
-        <Card style={styles.illustrationCard}>
-          <Text style={styles.illustrationEmoji}>👥</Text>
-          <Text style={styles.illustrationText}>{t('inviteFriend.shareCode')}</Text>
-        </Card>
-
-        {/* Benefits Section */}
-        <View style={styles.benefitsContainer}>
-          <View style={styles.benefitItem}>
-            <Text style={styles.benefitIcon}>🎁</Text>
-            <Text style={styles.benefitText}>{t('inviteFriend.benefit1')}</Text>
-          </View>
-          <View style={styles.benefitItem}>
-            <Text style={styles.benefitIcon}>💰</Text>
-            <Text style={styles.benefitText}>{t('inviteFriend.benefit2')}</Text>
-          </View>
+      {isLoading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors.accent} />
+          <Text style={styles.loadingText}>Loading referral code...</Text>
         </View>
+      ) : (
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Header */}
+          <ScreenHeader title={t('inviteFriend.title')} onBack={onBack} variant="blue" />
 
-        {/* Referral Code Section */}
-        <View style={styles.codeContainer}>
-          <Text style={styles.codeLabel}>{t('inviteFriend.yourCode')}</Text>
-          <View style={styles.codeBox}>
-            {isLoading ? (
-              <ActivityIndicator size="large" color={Colors.accent} />
-            ) : (
-              <>
-                <Text style={styles.codeText}>{referralCode}</Text>
-                <TouchableOpacity 
-                  style={styles.copyButton} 
-                  onPress={handleCopyCode}
-                  disabled={referralCode === 'N/A'}
-                >
-                  <Text style={styles.copyText}>Copy</Text>
-                </TouchableOpacity>
-              </>
-            )}
-          </View>
-        </View>
+          {/* Illustration */}
+          <Card style={styles.illustrationCard}>
+            <Text style={styles.illustrationEmoji}>👥</Text>
+            <Text style={styles.illustrationText}>{t('inviteFriend.shareCode')}</Text>
+          </Card>
 
-        {/* Share Button */}
-        <PrimaryButton
-          title={t('inviteFriend.title')}
-          onPress={handleShare}
-          style={styles.shareButton}
-          disabled={isLoading || referralCode === 'N/A'}
-        />
-
-        {/* How it Works */}
-        <View style={styles.howItWorksContainer}>
-          <Text style={styles.howItWorksTitle}>{t('inviteFriend.howItWorks')}</Text>
-          
-          <View style={styles.stepItem}>
-            <View style={styles.stepNumber}>
-              <Text style={styles.stepNumberText}>1</Text>
+          {/* Benefits Section */}
+          <View style={styles.benefitsContainer}>
+            <View style={styles.benefitItem}>
+              <Text style={styles.benefitIcon}>🎁</Text>
+              <Text style={styles.benefitText}>{t('inviteFriend.benefit1')}</Text>
             </View>
-            <Text style={styles.stepText}>{t('inviteFriend.step1')}</Text>
+            <View style={styles.benefitItem}>
+              <Text style={styles.benefitIcon}>💰</Text>
+              <Text style={styles.benefitText}>{t('inviteFriend.benefit2')}</Text>
+            </View>
           </View>
 
-          <View style={styles.stepItem}>
-            <View style={styles.stepNumber}>
-              <Text style={styles.stepNumberText}>2</Text>
+          {/* Referral Code Section */}
+          <View style={styles.codeContainer}>
+            <Text style={styles.codeLabel}>{t('inviteFriend.yourCode')}</Text>
+            <View style={styles.codeBox}>
+              <Text style={styles.codeText}>{referralCode}</Text>
+              <TouchableOpacity 
+                style={styles.copyButton} 
+                onPress={handleCopyCode}
+                disabled={referralCode === 'N/A'}
+              >
+                <Text style={styles.copyText}>Copy</Text>
+              </TouchableOpacity>
             </View>
-            <Text style={styles.stepText}>{t('inviteFriend.step2')}</Text>
           </View>
 
-          <View style={styles.stepItem}>
-            <View style={styles.stepNumber}>
-              <Text style={styles.stepNumberText}>3</Text>
+          {/* Share Button */}
+          <PrimaryButton
+            title={t('inviteFriend.shareButton')}
+            onPress={handleShare}
+            style={styles.shareButton}
+            disabled={referralCode === 'N/A'}
+          />
+
+          {/* How it Works */}
+          <View style={styles.howItWorksContainer}>
+            <Text style={styles.howItWorksTitle}>{t('inviteFriend.howItWorks')}</Text>
+            
+            <View style={styles.stepItem}>
+              <View style={styles.stepNumber}>
+                <Text style={styles.stepNumberText}>1</Text>
+              </View>
+              <Text style={styles.stepText}>{t('inviteFriend.step1')}</Text>
             </View>
-            <Text style={styles.stepText}>{t('inviteFriend.step3')}</Text>
+
+            <View style={styles.stepItem}>
+              <View style={styles.stepNumber}>
+                <Text style={styles.stepNumberText}>2</Text>
+              </View>
+              <Text style={styles.stepText}>{t('inviteFriend.step2')}</Text>
+            </View>
+
+            <View style={styles.stepItem}>
+              <View style={styles.stepNumber}>
+                <Text style={styles.stepNumberText}>3</Text>
+              </View>
+              <Text style={styles.stepText}>{t('inviteFriend.step3')}</Text>
+            </View>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      )}
       <Toast />
     </View>
   );
@@ -169,6 +170,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.white,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.white,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: Colors.textMedium,
+    fontWeight: '500',
   },
   scrollContent: {
     flexGrow: 1,

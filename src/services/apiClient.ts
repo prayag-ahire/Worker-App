@@ -675,6 +675,118 @@ export const updateUserProfile = async (
   }
 };
 
+/**
+ * Location response interface
+ */
+export interface LocationResponse {
+  id: number;
+  latitude: number;
+  longitude: number;
+  workerSettingsId: number;
+}
+
+/**
+ * Location update request interface
+ */
+export interface LocationUpdateRequest {
+  latitude: number;
+  longitude: number;
+}
+
+/**
+ * Get user's home location
+ * @param token - The authentication token
+ * @returns The user's saved home location
+ */
+export const getUserLocation = async (token: string): Promise<LocationResponse> => {
+  try {
+    console.log(`Fetching user location from ${PRODUCTION_API_URL}/worker/settings/me/location`);
+    const response = await fetchWithTimeout(
+      `${PRODUCTION_API_URL}/worker/settings/me/location`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      },
+      REQUEST_TIMEOUT
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({})) as ApiErrorResponse;
+      throw new Error(errorData.error || `Failed to fetch location: ${response.status}`);
+    }
+
+    const data = await response.json() as LocationResponse;
+    return data;
+  } catch (error: any) {
+    console.error('Get User Location API Error:', error);
+    
+    if (error.message?.includes('Network request failed')) {
+      throw new Error('Cannot connect to server. Please check your internet connection.');
+    }
+    if (error.message?.includes('timeout')) {
+      throw new Error('Server is taking too long to respond. Please try again.');
+    }
+    if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
+      throw new Error('Session expired. Please login again.');
+    }
+    
+    throw error;
+  }
+};
+
+/**
+ * Update user's home location
+ * @param token - The authentication token
+ * @param locationData - The location coordinates to save
+ * @returns The updated location information
+ */
+export const updateUserLocation = async (
+  token: string,
+  locationData: LocationUpdateRequest
+): Promise<LocationResponse> => {
+  try {
+    console.log(`Updating user location at ${PRODUCTION_API_URL}/worker/settings/me/location`);
+    const response = await fetchWithTimeout(
+      `${PRODUCTION_API_URL}/worker/settings/me/location`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(locationData),
+      },
+      REQUEST_TIMEOUT
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({})) as ApiErrorResponse;
+      throw new Error(errorData.error || `Failed to update location: ${response.status}`);
+    }
+
+    const data = await response.json() as LocationResponse;
+    return data;
+  } catch (error: any) {
+    console.error('Update User Location API Error:', error);
+    
+    if (error.message?.includes('Network request failed')) {
+      throw new Error('Cannot connect to server. Please check your internet connection.');
+    }
+    if (error.message?.includes('timeout')) {
+      throw new Error('Server is taking too long to respond. Please try again.');
+    }
+    if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
+      throw new Error('Session expired. Please login again.');
+    }
+    
+    throw error;
+  }
+};
+
+
 
 
 
