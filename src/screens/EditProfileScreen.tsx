@@ -220,9 +220,15 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ onBack, onSave })
           </View>
 
           {/* Professional Details Section */}
-          <View style={styles.sectionCard}>
-            <Text style={styles.sectionTitle}>Professional Details</Text>
-            
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionHeaderLeft}>
+              <View style={styles.sectionIcon} />
+              <Text style={[styles.sectionHeaderText, styles.sectionHeaderTextPrimary]}>Professional Details</Text>
+            </View>
+            <View style={styles.sectionLine} />
+          </View>
+
+          <View style={styles.sectionContent}>
             {/* Profession */}
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Profession</Text>
@@ -265,7 +271,7 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ onBack, onSave })
             </View>
 
             {/* Description */}
-            <View style={styles.inputGroup}>
+            <View style={[styles.inputGroup, styles.lastInputGroup]}>
               <Text style={styles.label}>About Your Services</Text>
               <TextInput
                 style={styles.descriptionInput}
@@ -282,8 +288,15 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ onBack, onSave })
           </View>
 
           {/* Personal Details Section */}
-          <View style={styles.sectionCard}>
-            <Text style={styles.sectionTitle}>Personal Details</Text>
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionHeaderLeft}>
+              <View style={[styles.sectionIcon, styles.sectionIconSecondary]} />
+              <Text style={[styles.sectionHeaderText, styles.sectionHeaderTextSecondary]}>Personal Details</Text>
+            </View>
+            <View style={styles.sectionLine} />
+          </View>
+
+          <View style={styles.sectionContent}>
             
             {/* Name */}
             <View style={styles.inputGroup}>
@@ -433,26 +446,52 @@ const styles = StyleSheet.create({
     position: 'relative',
     marginBottom: 16,
   },
-  sectionCard: {
-    backgroundColor: Colors.white,
-    borderRadius: 16,
-    padding: 20,
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
     marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
   },
-  sectionTitle: {
-    fontSize: 18,
+  sectionHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  sectionIcon: {
+    width: 4,
+    height: 24,
+    backgroundColor: Colors.accent,
+    borderRadius: 2,
+    marginRight: 12,
+  },
+  sectionIconSecondary: {
+    backgroundColor: '#FF6B6B', // Different color for second section
+  },
+  sectionHeaderText: {
+    fontSize: 20,
     fontWeight: '700',
-    color: Colors.textDark,
-    marginBottom: 20,
-    letterSpacing: -0.3,
+    letterSpacing: -0.5,
+  },
+  sectionHeaderTextPrimary: {
+    color: Colors.accent, // Blue color for Professional section
+  },
+  sectionHeaderTextSecondary: {
+    color: '#FF6B6B', // Red color for Personal section
+  },
+  sectionLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: Colors.border,
+    opacity: 0.3,
+  },
+  sectionContent: {
+    // No horizontal padding - full width
   },
   inputGroup: {
     marginBottom: 20,
+  },
+  lastInputGroup: {
+    marginBottom: 40, // Extra space before next section
   },
   label: {
     fontSize: 15,
