@@ -967,8 +967,204 @@ export const updateWeeklySchedule = async (
   }
 };
 
+/**
+ * Holiday interface
+ */
+export interface Holiday {
+  id: number;
+  workerId: number;
+  date: string;
+  note: string;
+}
 
+/**
+ * Monthly schedule response interface
+ */
+export interface MonthlyScheduleResponse {
+  month: string;
+  holidays: Holiday[];
+}
 
+/**
+ * Add holiday request interface
+ */
+export interface AddHolidayRequest {
+  date: string;
+  note: string;
+}
 
+/**
+ * Add holiday response interface
+ */
+export interface AddHolidayResponse {
+  message: string;
+  holiday: Holiday;
+  canceledOrders: any[];
+  notifications: any[];
+}
 
+/**
+ * Get worker's monthly schedule (holidays)
+ * @param token - The authentication token
+ * @param month - The month in YYYY-MM format (e.g., "2025-12")
+ * @returns The worker's holidays for the specified month
+ */
+export const getMonthlySchedule = async (
+  token: string,
+  month: string
+): Promise<MonthlyScheduleResponse> => {
+  try {
+    console.log(`Fetching monthly schedule from ${PRODUCTION_API_URL}/worker/WorkerSchedule/month?month=${month}`);
+    
+    const response = await fetchWithTimeout(
+      `${PRODUCTION_API_URL}/worker/WorkerSchedule/month?month=${month}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      },
+      REQUEST_TIMEOUT
+    );
 
+    console.log('Monthly schedule response status:', response.status);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({})) as ApiErrorResponse;
+      throw new Error(errorData.error || `Failed to fetch monthly schedule: ${response.status}`);
+    }
+
+    const data = await response.json() as MonthlyScheduleResponse;
+    console.log('Monthly schedule response:', JSON.stringify(data, null, 2));
+    return data;
+  } catch (error: any) {
+    console.error('Get Monthly Schedule API Error:', error);
+    
+    if (error.message?.includes('Network request failed')) {
+      throw new Error('Cannot connect to server. Please check your internet connection.');
+    }
+    if (error.message?.includes('timeout')) {
+      throw new Error('Server is taking too long to respond. Please try again.');
+    }
+    if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
+      throw new Error('Session expired. Please login again.');
+    }
+    
+    throw error;
+  }
+};
+
+/**
+ * Add a holiday to the monthly schedule
+ * @param token - The authentication token
+ * @param holidayData - The holiday data (date and note)
+ * @returns The added holiday and any canceled orders/notifications
+ */
+export const addHoliday = async (
+  token: string,
+  holidayData: AddHolidayRequest
+): Promise<AddHolidayResponse> => {
+  try {
+    console.log(`Adding holiday at ${PRODUCTION_API_URL}/worker/WorkerSchedule/month`);
+    console.log('Holiday data:', JSON.stringify(holidayData, null, 2));
+    
+    const response = await fetchWithTimeout(
+      `${PRODUCTION_API_URL}/worker/WorkerSchedule/month`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(holidayData),
+      },
+      REQUEST_TIMEOUT
+    );
+
+    console.log('Add holiday response status:', response.status);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({})) as ApiErrorResponse;
+      throw new Error(errorData.error || `Failed to add holiday: ${response.status}`);
+    }
+
+    const data = await response.json() as AddHolidayResponse;
+    console.log('Add holiday response:', JSON.stringify(data, null, 2));
+    return data;
+  } catch (error: any) {
+    console.error('Add Holiday API Error:', error);
+    
+    if (error.message?.includes('Network request failed')) {
+      throw new Error('Cannot connect to server. Please check your internet connection.');
+    }
+    if (error.message?.includes('timeout')) {
+      throw new Error('Server is taking too long to respond. Please try again.');
+    }
+    if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
+      throw new Error('Session expired. Please login again.');
+    }
+    
+    throw error;
+  }
+};
+
+/**
+ * Delete holiday response interface
+ */
+export interface DeleteHolidayResponse {
+  message: string;
+  deletedDate: string;
+}
+
+/**
+ * Delete a holiday from the monthly schedule
+ * @param token - The authentication token
+ * @param date - The date to delete in YYYY-MM-DD format
+ * @returns The deletion confirmation
+ */
+export const deleteHoliday = async (
+  token: string,
+  date: string
+): Promise<DeleteHolidayResponse> => {
+  try {
+    console.log(`Deleting holiday at ${PRODUCTION_API_URL}/worker/WorkerSchedule/month?date=${date}`);
+    
+    const response = await fetchWithTimeout(
+      `${PRODUCTION_API_URL}/worker/WorkerSchedule/month?date=${date}`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      },
+      REQUEST_TIMEOUT
+    );
+
+    console.log('Delete holiday response status:', response.status);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({})) as ApiErrorResponse;
+      throw new Error(errorData.error || `Failed to delete holiday: ${response.status}`);
+    }
+
+    const data = await response.json() as DeleteHolidayResponse;
+    console.log('Delete holiday response:', JSON.stringify(data, null, 2));
+    return data;
+  } catch (error: any) {
+    console.error('Delete Holiday API Error:', error);
+    
+    if (error.message?.includes('Network request failed')) {
+      throw new Error('Cannot connect to server. Please check your internet connection.');
+    }
+    if (error.message?.includes('timeout')) {
+      throw new Error('Server is taking too long to respond. Please try again.');
+    }
+    if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
+      throw new Error('Session expired. Please login again.');
+    }
+    
+    throw error;
+  }
+};

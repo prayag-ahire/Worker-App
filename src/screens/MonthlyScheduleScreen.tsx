@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,30 +8,59 @@ import {
   ScrollView,
   TextInput,
   Modal,
+  ActivityIndicator,
 } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { Colors } from '../styles/colors';
 import { useLanguage } from '../contexts/LanguageContext';
 import { ScreenHeader } from '../components';
+import { getMonthlySchedule, addHoliday, deleteHoliday, Holiday } from '../services/apiClient';
+import { getAuthToken } from '../utils/storage';
 
 interface MonthlyScheduleScreenProps {
   onBack?: () => void;
 }
 
-interface LeaveData {
-  [key: string]: string; // date as key, reason as value
-}
-
 const MonthlyScheduleScreen: React.FC<MonthlyScheduleScreenProps> = ({ onBack }) => {
   const { t } = useLanguage();
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [leaves, setLeaves] = useState<LeaveData>({
-    '2025-10-12': 'Personal work',
-    '2025-10-16': 'Family function',
-    '2025-10-22': 'Medical appointment',
-  });
+  const [holidays, setHolidays] = useState<Holiday[]>([]);
+  const [loading, setLoading] = useState(false);
   const [showLeaveModal, setShowLeaveModal] = useState(false);
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [leaveReason, setLeaveReason] = useState('');
+
+  // Fetch holidays when month changes
+  useEffect(() => {
+    fetchMonthlySchedule();
+  }, [selectedDate]);
+
+  const fetchMonthlySchedule = async () => {
+    try {
+      setLoading(true);
+      const token = await getAuthToken();
+      if (!token) {
+        throw new Error('No authentication token found. Please login again.');
+      }
+
+      const year = selectedDate.getFullYear();
+      const month = (selectedDate.getMonth() + 1).toString().padStart(2, '0');
+      const monthString = `${year}-${month}`;
+
+      const data = await getMonthlySchedule(token, monthString);
+      setHolidays(data.holidays || []);
+    } catch (error: any) {
+      console.error('Failed to fetch monthly schedule:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: error.message || 'Failed to load schedule',
+        position: 'top',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const formatMonth = () => {
     const months = [
@@ -97,6 +126,7 @@ const MonthlyScheduleScreen: React.FC<MonthlyScheduleScreenProps> = ({ onBack })
       calendar.push(week);
     }
 
+    console.log('Generated calendar for', selectedDate.getMonth() + 1, selectedDate.getFullYear(), ':', calendar);
     return calendar;
   };
 
@@ -106,39 +136,145 @@ const MonthlyScheduleScreen: React.FC<MonthlyScheduleScreenProps> = ({ onBack })
     return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
   };
 
-  const isLeaveDay = (day: number | null) => {
+  const isHoliday = (day: number | null) => {
     if (day === null) return false;
-    return leaves[getDateKey(day)] !== undefined;
+    const dateKey = getDateKey(day);
+    return holidays.some(holiday => {
+      const holidayDate = new Date(holiday.date);
+      const holidayKey = `${holidayDate.getFullYear()}-${(holidayDate.getMonth() + 1).toString().padStart(2, '0')}-${holidayDate.getDate().toString().padStart(2, '0')}`;
+      return holidayKey === dateKey;
+    });
+  };
+
+  const getHolidayNote = (day: number): string => {
+    const dateKey = getDateKey(day);
+    const holiday = holidays.find(h => {
+      const holidayDate = new Date(h.date);
+      const holidayKey = `${holidayDate.getFullYear()}-${(holidayDate.getMonth() + 1).toString().padStart(2, '0')}-${holidayDate.getDate().toString().padStart(2, '0')}`;
+      return holidayKey === dateKey;
+    });
+    return holiday?.note || '';
+  };
+
+  const isPastDate = (day: number | null): boolean => {
+    if (day === null) return false;
+    
+    // Create a fresh current date for comparison
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const year = selectedDate.getFullYear();
+    const month = selectedDate.getMonth();
+    const dateToCheck = new Date(year, month, day);
+    dateToCheck.setHours(0, 0, 0, 0);
+    
+    return dateToCheck < today;
   };
 
   const handleDayPress = (day: number | null) => {
     if (day === null) return;
+    
+    // Prevent clicking on past dates
+    if (isPastDate(day)) {
+      return;
+    }
+
     setSelectedDay(day);
-    const dateKey = getDateKey(day);
-    setLeaveReason(leaves[dateKey] || '');
+    setLeaveReason(getHolidayNote(day));
     setShowLeaveModal(true);
   };
 
-  const handleUpdateLeave = () => {
+  const handleUpdateLeave = async () => {
     if (selectedDay === null) return;
-    const dateKey = getDateKey(selectedDay);
-    if (leaveReason.trim()) {
-      setLeaves({ ...leaves, [dateKey]: leaveReason.trim() });
+
+    if (!leaveReason.trim()) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Please enter a reason for the holiday',
+        position: 'top',
+      });
+      return;
     }
-    setShowLeaveModal(false);
-    setLeaveReason('');
-    setSelectedDay(null);
+
+    try {
+      setLoading(true);
+      const token = await getAuthToken();
+      if (!token) {
+        throw new Error('No authentication token found. Please login again.');
+      }
+
+      const dateKey = getDateKey(selectedDay);
+      
+      const response = await addHoliday(token, {
+        date: dateKey,
+        note: leaveReason.trim(),
+      });
+
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: response.message || 'Holiday added successfully',
+        position: 'top',
+      });
+
+      // Refresh the schedule
+      await fetchMonthlySchedule();
+      
+      setShowLeaveModal(false);
+      setLeaveReason('');
+      setSelectedDay(null);
+    } catch (error: any) {
+      console.error('Failed to add holiday:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: error.message || 'Failed to add holiday',
+        position: 'top',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleCancelLeave = () => {
+  const handleCancelLeave = async () => {
     if (selectedDay === null) return;
-    const dateKey = getDateKey(selectedDay);
-    const newLeaves = { ...leaves };
-    delete newLeaves[dateKey];
-    setLeaves(newLeaves);
-    setShowLeaveModal(false);
-    setLeaveReason('');
-    setSelectedDay(null);
+
+    try {
+      setLoading(true);
+      const token = await getAuthToken();
+      if (!token) {
+        throw new Error('No authentication token found. Please login again.');
+      }
+
+      const dateKey = getDateKey(selectedDay);
+      
+      const response = await deleteHoliday(token, dateKey);
+
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: response.message || 'Holiday removed successfully',
+        position: 'top',
+      });
+
+      // Refresh the schedule
+      await fetchMonthlySchedule();
+      
+      setShowLeaveModal(false);
+      setLeaveReason('');
+      setSelectedDay(null);
+    } catch (error: any) {
+      console.error('Failed to delete holiday:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: error.message || 'Failed to remove holiday',
+        position: 'top',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -164,41 +300,62 @@ const MonthlyScheduleScreen: React.FC<MonthlyScheduleScreenProps> = ({ onBack })
         </View>
 
         {/* Calendar */}
-        <View style={styles.calendarContainer}>
+        <View 
+          key={`calendar-${selectedDate.getMonth()}-${selectedDate.getFullYear()}-${holidays.map(h => h.id).join('-')}`}
+          style={styles.calendarContainer}
+        >
           {/* Day Headers */}
           <View style={styles.weekHeader}>
             {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
-              <Text key={index} style={styles.weekHeaderText}>{day}</Text>
+              <Text key={`header-${index}`} style={styles.weekHeaderText}>{day}</Text>
             ))}
           </View>
 
           {/* Calendar Grid */}
           {generateMonthCalendar().map((week, weekIndex) => (
-            <View key={weekIndex} style={styles.week}>
-              {week.map((day, dayIndex) => (
-                <TouchableOpacity
-                  key={dayIndex}
-                  style={[
-                    styles.day,
-                    isLeaveDay(day) && styles.leaveDay,
-                  ]}
-                  onPress={() => handleDayPress(day)}
-                  disabled={day === null}
-                >
-                  {day !== null && (
+            <View key={`week-${weekIndex}`} style={styles.week}>
+              {week.map((day, dayIndex) => {
+                if (day === null) {
+                  // Empty cell - just a transparent placeholder
+                  return <View key={`empty-${weekIndex}-${dayIndex}`} style={styles.emptyDay} />;
+                }
+                
+                const isHolidayDay = isHoliday(day);
+                const isPast = isPastDate(day);
+                
+                return (
+                  <TouchableOpacity
+                    key={`day-${weekIndex}-${dayIndex}-${day}`}
+                    style={[
+                      styles.day,
+                      isHolidayDay && styles.leaveDay,
+                      isPast && styles.pastDay,
+                    ]}
+                    onPress={() => handleDayPress(day)}
+                    disabled={isPast}
+                  >
                     <Text style={[
                       styles.dayNumber,
-                      isLeaveDay(day) && styles.leaveDayNumber,
+                      isHolidayDay && styles.leaveDayNumber,
+                      isPast && styles.pastDayNumber,
                     ]}>
                       {day}
                     </Text>
-                  )}
-                </TouchableOpacity>
-              ))}
+                  </TouchableOpacity>
+                );
+              })}
             </View>
           ))}
         </View>
       </ScrollView>
+
+      {/* Loading Overlay */}
+      {loading && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color={Colors.accent} />
+          <Text style={styles.loadingText}>Loading...</Text>
+        </View>
+      )}
 
       {/* Leave Modal */}
       <Modal
@@ -210,7 +367,7 @@ const MonthlyScheduleScreen: React.FC<MonthlyScheduleScreenProps> = ({ onBack })
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>
-              {leaves[getDateKey(selectedDay || 0)] ? t('monthlySchedule.editLeave') : t('monthlySchedule.addLeave')}
+              {selectedDay && isHoliday(selectedDay) ? t('monthlySchedule.editLeave') : t('monthlySchedule.addLeave')}
             </Text>
             <Text style={styles.modalDate}>
               {t('monthlySchedule.date')}: {selectedDay} {formatMonth()}
@@ -234,7 +391,7 @@ const MonthlyScheduleScreen: React.FC<MonthlyScheduleScreenProps> = ({ onBack })
                 <Text style={styles.updateButtonText}>{t('monthlySchedule.update')}</Text>
               </TouchableOpacity>
 
-              {leaves[getDateKey(selectedDay || 0)] && (
+              {selectedDay && isHoliday(selectedDay) && (
                 <TouchableOpacity
                   style={styles.cancelButton}
                   onPress={handleCancelLeave}
@@ -257,6 +414,7 @@ const MonthlyScheduleScreen: React.FC<MonthlyScheduleScreenProps> = ({ onBack })
           </View>
         </View>
       </Modal>
+      <Toast />
     </View>
   );
 };
@@ -270,6 +428,23 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: 24,
     paddingVertical: 20,
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: Colors.textMedium,
+    fontWeight: '500',
   },
   monthNavigation: {
     flexDirection: 'row',
@@ -349,6 +524,10 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2, // Android shadow
   },
+  emptyDay: {
+    flex: 1,
+    aspectRatio: 1,
+  },
   leaveDay: {
     backgroundColor: '#ffebee', // Softer red background
     borderWidth: 2,
@@ -362,6 +541,13 @@ const styles = StyleSheet.create({
   leaveDayNumber: {
     color: '#d32f2f', // Darker red for better contrast
     fontWeight: '700',
+  },
+  pastDay: {
+    backgroundColor: '#e0e0e0', // Solid grey background for past dates (more visible)
+  },
+  pastDayNumber: {
+    color: '#9e9e9e', // Grey text for past dates
+    fontWeight: '400',
   },
   modalOverlay: {
     flex: 1,
