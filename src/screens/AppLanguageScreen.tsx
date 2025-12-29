@@ -223,7 +223,6 @@ const AppLanguageScreen: React.FC<AppLanguageScreenProps> = ({ onBack, onComplet
           )}
         </ScrollView>
       )}
-      <Toast />
     </View>
   );
 };

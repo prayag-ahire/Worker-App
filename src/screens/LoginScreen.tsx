@@ -86,8 +86,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
         await saveUserProfile(profileData);
         console.log('User profile cached after login');
       } catch (profileError) {
-        console.error('Error fetching profile after login:', profileError);
-        // Don't fail login if profile fetch fails
+        // App-level error handler will catch session issues, 
+        // and we don't want to block login success if just profile sync fails
+        console.log('Post-login profile cache skipped:', profileError);
       }
 
       // Show success message
@@ -241,7 +242,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
           </TouchableOpacity>
         </View>
       </ScrollView>
-      <Toast />
     </View>
   );
 };

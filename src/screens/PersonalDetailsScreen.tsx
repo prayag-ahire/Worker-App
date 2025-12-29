@@ -427,7 +427,6 @@ const PersonalDetailsScreen: React.FC<PersonalDetailsScreenProps> = ({ onComplet
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-      <Toast />
     </View>
   );
 };

@@ -359,7 +359,6 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUpComplete, onLoginPr
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-      <Toast />
     </View>
   );
 };

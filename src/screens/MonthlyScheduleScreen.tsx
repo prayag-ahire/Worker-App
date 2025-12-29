@@ -414,7 +414,6 @@ const MonthlyScheduleScreen: React.FC<MonthlyScheduleScreenProps> = ({ onBack })
           </View>
         </View>
       </Modal>
-      <Toast />
     </View>
   );
 };

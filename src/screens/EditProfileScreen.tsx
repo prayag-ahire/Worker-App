@@ -416,7 +416,6 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ onBack, onSave })
           </TouchableOpacity>
         </ScrollView>
       )}
-      <Toast />
     </View>
   );
 };

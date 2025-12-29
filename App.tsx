@@ -29,6 +29,7 @@ import ErrorScreen from './src/screens/ErrorScreen';
 import NotificationScreen from './src/screens/NotificationScreen';
 import { Colors } from './src/styles/colors';
 import { LanguageProvider } from './src/contexts/LanguageContext';
+import Toast from 'react-native-toast-message';
 
 type Screen = 'splash' | 'login' | 'signup' | 'onboarding' | 'personalDetails' | 'home' | 'settings' | 'userProfile' | 'editProfile' | 'location' | 'appLanguage' | 'inviteFriend' | 'tutorialVideos' | 'help' | 'aiChat' | 'scheduleMain' | 'weeklySchedule' | 'monthlySchedule' | 'orderHistory' | 'orderDetails' | 'activeOrder' | 'comment' | 'rescheduleCalendar' | 'timeSlots' | 'error' | 'notification';
 
@@ -663,6 +664,7 @@ function App() {
             </View>
           </View>
         </Modal>
+        <Toast position="top" />
         </View>
       </SafeAreaProvider>
     </LanguageProvider>

@@ -172,7 +172,6 @@ const InviteFriendScreen: React.FC<InviteFriendScreenProps> = ({ onBack, onShowE
           </View>
         </ScrollView>
       )}
-      <Toast />
     </View>
   );
 };

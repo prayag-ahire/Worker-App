@@ -553,8 +553,6 @@ const LocationScreen: React.FC<LocationScreenProps> = ({ onBack, onShowError }) 
           </View>
         </View>
       </Modal>
-
-      <Toast />
     </View>
   );
 };

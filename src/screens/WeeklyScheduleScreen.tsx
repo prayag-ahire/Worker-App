@@ -442,7 +442,6 @@ const WeeklyScheduleScreen: React.FC<WeeklyScheduleScreenProps> = ({ onBack, onS
           </View>
         </View>
       </Modal>
-      <Toast />
     </View>
   );
 };
