@@ -17,11 +17,13 @@ import { saveAuthToken, saveProfileCompleted, saveUserProfile, clearAuthData } f
 interface LoginScreenProps {
   onLoginSuccess?: () => void;
   onSignUpPress?: () => void;
+  onShowError?: (fromScreen: 'login', message?: string) => void;
 }
 
 const LoginScreen: React.FC<LoginScreenProps> = ({
   onLoginSuccess,
   onSignUpPress,
+  onShowError,
 }) => {
   const [phoneNo, setPhoneNo] = useState('');
   const [password, setPassword] = useState('');
@@ -108,14 +110,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
     } catch (error: any) {
       console.error('Login error:', error);
       
-      // Show error message
-      Toast.show({
-        type: 'error',
-        text1: 'Login Failed',
-        text2: error.message || 'An error occurred during login. Please try again.',
-        position: 'top',
-        visibilityTime: 4000,
-      });
+      if (onShowError) {
+        onShowError('login', error.message);
+      }
     } finally {
       setIsLoading(false);
     }

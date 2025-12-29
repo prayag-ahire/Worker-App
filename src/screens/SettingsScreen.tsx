@@ -19,9 +19,10 @@ interface SettingsScreenProps {
   onOrdersPress?: () => void;
   onSchedulePress?: () => void;
   onNotificationPress?: () => void;
+  onShowError?: (fromScreen: 'settings', message?: string) => void;
 }
 
-const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onNavigate, onHomePress, onOrdersPress, onSchedulePress, onNotificationPress }) => {
+const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onNavigate, onHomePress, onOrdersPress, onSchedulePress, onNotificationPress, onShowError }) => {
   const { t } = useLanguage();
   
   const settingsOptions = [

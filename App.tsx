@@ -482,12 +482,14 @@ function App() {
           <LoginScreen
             onLoginSuccess={handleLoginSuccess}
             onSignUpPress={handleSignUpPress}
+            onShowError={handleShowError}
           />
         )}
         {currentScreen === 'signup' && (
           <SignUpScreen 
             onSignUpComplete={handleSignUpComplete}
             onLoginPress={handleLoginPress}
+            onShowError={handleShowError}
           />
         )}
         {currentScreen === 'onboarding' && (
@@ -497,6 +499,7 @@ function App() {
           <PersonalDetailsScreen 
             onComplete={handlePersonalDetailsComplete} 
             referralCode={referralCode}
+            onShowError={handleShowError}
           />
         )}
         {currentScreen === 'home' && (
@@ -510,6 +513,7 @@ function App() {
             viewMode={homeViewMode}
             onViewModeChange={setHomeViewMode}
             onNotificationPress={handleNotificationPress}
+            onShowError={handleShowError}
           />
         )}
         {currentScreen === 'settings' && (
@@ -520,6 +524,7 @@ function App() {
             onOrdersPress={handleOrdersPress}
             onSchedulePress={handleSchedulePress}
             onNotificationPress={handleNotificationPress}
+            onShowError={handleShowError}
           />
         )}
         {currentScreen === 'userProfile' && (
@@ -534,31 +539,34 @@ function App() {
           <EditProfileScreen
             onBack={handleEditProfileBack}
             onSave={handleEditProfileSave}
+            onShowError={handleShowError}
           />
         )}
         {currentScreen === 'location' && (
-          <LocationScreen onBack={handleLocationBack} />
+          <LocationScreen onBack={handleLocationBack} onShowError={handleShowError} />
         )}
         {currentScreen === 'appLanguage' && (
           <AppLanguageScreen 
             onBack={handleAppLanguageBack}
             onComplete={isSignupFlow ? handleLanguageSelectionComplete : undefined}
+            onShowError={handleShowError}
           />
         )}
         {currentScreen === 'inviteFriend' && (
-          <InviteFriendScreen onBack={handleInviteFriendBack} />
+          <InviteFriendScreen onBack={handleInviteFriendBack} onShowError={handleShowError} />
         )}
         {currentScreen === 'tutorialVideos' && (
-          <TutorialVideosScreen onBack={handleTutorialVideosBack} />
+          <TutorialVideosScreen onBack={handleTutorialVideosBack} onShowError={handleShowError} />
         )}
         {currentScreen === 'help' && (
           <HelpScreen
             onBack={handleHelpBack}
             onAIChatPress={handleAIChatPress}
+            onShowError={handleShowError}
           />
         )}
         {currentScreen === 'aiChat' && (
-          <AIChatScreen onBack={handleAIChatBack} />
+          <AIChatScreen onBack={handleAIChatBack} onShowError={handleShowError} />
         )}
         {currentScreen === 'scheduleMain' && (
           <ScheduleMainScreen
@@ -568,13 +576,14 @@ function App() {
             onOrdersPress={handleOrdersPress}
             onSettingsPress={handleSettingsPress}
             onNotificationPress={handleNotificationPress}
+            onShowError={handleShowError}
           />
         )}
         {currentScreen === 'weeklySchedule' && (
-          <WeeklyScheduleScreen onBack={handleWeeklyScheduleBack} />
+          <WeeklyScheduleScreen onBack={handleWeeklyScheduleBack} onShowError={handleShowError} />
         )}
         {currentScreen === 'monthlySchedule' && (
-          <MonthlyScheduleScreen onBack={handleMonthlyScheduleBack} />
+          <MonthlyScheduleScreen onBack={handleMonthlyScheduleBack} onShowError={handleShowError} />
         )}
         {currentScreen === 'orderHistory' && (
           <OrderHistoryScreen
@@ -584,6 +593,7 @@ function App() {
             onSchedulePress={handleSchedulePress}
             onSettingsPress={handleSettingsPress}
             onNotificationPress={handleNotificationPress}
+            onShowError={handleShowError}
           />
         )}
         {currentScreen === 'orderDetails' && (
@@ -592,6 +602,7 @@ function App() {
             orderId={selectedOrderId}
             onNavigateToAIChat={handleAIChatPress}
             onNavigateToHelp={handleHelpPress}
+            onShowError={handleShowError}
           />
         )}
         {currentScreen === 'activeOrder' && (
@@ -600,6 +611,7 @@ function App() {
             orderId={selectedOrderId}
             orderStatus="Pending"
             onNavigateToComment={handleNavigateToComment}
+            onShowError={handleShowError}
           />
         )}
         {currentScreen === 'comment' && (
@@ -607,18 +619,21 @@ function App() {
             onBack={handleCommentBack}
             onNext={handleCommentNext}
             commentType={commentType}
+            onShowError={handleShowError}
           />
         )}
         {currentScreen === 'rescheduleCalendar' && (
           <RescheduleCalendarScreen
             onBack={handleCalendarBack}
             onNext={handleCalendarNext}
+            onShowError={handleShowError}
           />
         )}
         {currentScreen === 'timeSlots' && (
           <TimeSlotsScreen
             onBack={handleTimeSlotsBack}
             onReschedule={handleReschedule}
+            onShowError={handleShowError}
           />
         )}
         {currentScreen === 'error' && (
@@ -629,7 +644,7 @@ function App() {
           />
         )}
         {currentScreen === 'notification' && (
-          <NotificationScreen onBack={handleNotificationBack} />
+          <NotificationScreen onBack={handleNotificationBack} onShowError={handleShowError} />
         )}
 
         {/* Confirmation Modal */}

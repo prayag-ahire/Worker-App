@@ -19,9 +19,10 @@ import { getAuthToken } from '../utils/storage';
 
 interface MonthlyScheduleScreenProps {
   onBack?: () => void;
+  onShowError?: (fromScreen: 'monthlySchedule', message?: string) => void;
 }
 
-const MonthlyScheduleScreen: React.FC<MonthlyScheduleScreenProps> = ({ onBack }) => {
+const MonthlyScheduleScreen: React.FC<MonthlyScheduleScreenProps> = ({ onBack, onShowError }) => {
   const { t } = useLanguage();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [holidays, setHolidays] = useState<Holiday[]>([]);
@@ -51,12 +52,9 @@ const MonthlyScheduleScreen: React.FC<MonthlyScheduleScreenProps> = ({ onBack })
       setHolidays(data.holidays || []);
     } catch (error: any) {
       console.error('Failed to fetch monthly schedule:', error);
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: error.message || 'Failed to load schedule',
-        position: 'top',
-      });
+      if (onShowError) {
+        onShowError('monthlySchedule', error.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -226,12 +224,9 @@ const MonthlyScheduleScreen: React.FC<MonthlyScheduleScreenProps> = ({ onBack })
       setSelectedDay(null);
     } catch (error: any) {
       console.error('Failed to add holiday:', error);
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: error.message || 'Failed to add holiday',
-        position: 'top',
-      });
+      if (onShowError) {
+        onShowError('monthlySchedule', error.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -266,12 +261,9 @@ const MonthlyScheduleScreen: React.FC<MonthlyScheduleScreenProps> = ({ onBack })
       setSelectedDay(null);
     } catch (error: any) {
       console.error('Failed to delete holiday:', error);
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: error.message || 'Failed to remove holiday',
-        position: 'top',
-      });
+      if (onShowError) {
+        onShowError('monthlySchedule', error.message);
+      }
     } finally {
       setLoading(false);
     }

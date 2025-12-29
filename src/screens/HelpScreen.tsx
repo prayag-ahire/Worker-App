@@ -16,9 +16,10 @@ import { ScreenHeader } from '../components';
 interface HelpScreenProps {
   onBack?: () => void;
   onAIChatPress?: () => void;
+  onShowError?: (fromScreen: 'help', message?: string) => void;
 }
 
-const HelpScreen: React.FC<HelpScreenProps> = ({ onBack, onAIChatPress }) => {
+const HelpScreen: React.FC<HelpScreenProps> = ({ onBack, onAIChatPress, onShowError }) => {
   const { t } = useLanguage();
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
 

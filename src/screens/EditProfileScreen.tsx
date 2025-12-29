@@ -19,9 +19,10 @@ import { getAuthToken, saveUserProfile } from '../utils/storage';
 interface EditProfileScreenProps {
   onBack?: () => void;
   onSave?: (data: any) => void;
+  onShowError?: (fromScreen: 'editProfile', message?: string) => void;
 }
 
-const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ onBack, onSave }) => {
+const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ onBack, onSave, onShowError }) => {
   const { t } = useLanguage();
   
   // Personal Details
@@ -63,13 +64,9 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ onBack, onSave })
         console.log('Loaded profile data for editing');
       } catch (error: any) {
         console.error('Error fetching profile:', error);
-        Toast.show({
-          type: 'error',
-          text1: 'Failed to Load Profile',
-          text2: error.message || 'Could not fetch profile data',
-          position: 'top',
-          visibilityTime: 3000,
-        });
+        if (onShowError) {
+          onShowError('editProfile', error.message);
+        }
       } finally {
         setIsFetching(false);
       }
@@ -183,13 +180,9 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ onBack, onSave })
 
     } catch (error: any) {
       console.error('Profile update error:', error);
-      Toast.show({
-        type: 'error',
-        text1: 'Update Failed',
-        text2: error.message || 'Failed to update profile',
-        position: 'top',
-        visibilityTime: 3000,
-      });
+      if (onShowError) {
+        onShowError('editProfile', error.message);
+      }
     } finally {
       setIsLoading(false);
     }

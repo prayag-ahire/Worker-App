@@ -16,12 +16,14 @@ interface CommentScreenProps {
   onBack?: () => void;
   onNext?: (comment: string) => void;
   commentType?: 'cancel' | 'reschedule';
+  onShowError?: (fromScreen: 'comment', message?: string) => void;
 }
 
 const CommentScreen: React.FC<CommentScreenProps> = ({ 
   onBack, 
   onNext,
-  commentType = 'cancel'
+  commentType = 'cancel',
+  onShowError
 }) => {
   const [comment, setComment] = useState('');
 

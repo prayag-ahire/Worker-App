@@ -13,9 +13,10 @@ import { useLanguage } from '../contexts/LanguageContext';
 
 interface TutorialVideosScreenProps {
   onBack?: () => void;
+  onShowError?: (fromScreen: 'tutorialVideos', message?: string) => void;
 }
 
-const TutorialVideosScreen: React.FC<TutorialVideosScreenProps> = ({ onBack }) => {
+const TutorialVideosScreen: React.FC<TutorialVideosScreenProps> = ({ onBack, onShowError }) => {
   const { t } = useLanguage();
   
   const videos = [

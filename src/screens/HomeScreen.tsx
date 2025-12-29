@@ -23,6 +23,7 @@ interface HomeScreenProps {
   viewMode?: 'day' | 'week' | 'month';
   onViewModeChange?: (mode: 'day' | 'week' | 'month') => void;
   onNotificationPress?: () => void;
+  onShowError?: (fromScreen: 'home', message?: string) => void;
 }
 
 type ViewMode = 'day' | 'week' | 'month';
@@ -43,7 +44,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
   shouldRefresh = false,
   viewMode: externalViewMode,
   onViewModeChange,
-  onNotificationPress
+  onNotificationPress,
+  onShowError
 }) => {
   const { t } = useLanguage();
   const [userName, setUserName] = useState('User'); // Default fallback
@@ -73,8 +75,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
           setUserName(cachedProfile.username);
           console.log('Loaded username from cache:', cachedProfile.username);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error loading cached profile:', error);
+        if (onShowError) {
+          onShowError('home', error.message);
+        }
       } finally {
         setIsLoading(false); // Always stop loading
       }

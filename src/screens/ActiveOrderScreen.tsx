@@ -17,13 +17,15 @@ interface ActiveOrderScreenProps {
   orderId?: string;
   orderStatus?: 'Pending' | 'Completed' | 'Cancelled';
   onNavigateToComment?: (type: 'cancel' | 'reschedule') => void;
+  onShowError?: (fromScreen: 'activeOrder', message?: string) => void;
 }
 
 const ActiveOrderScreen: React.FC<ActiveOrderScreenProps> = ({ 
   onBack, 
   orderId = '1245',
   orderStatus = 'Pending',
-  onNavigateToComment
+  onNavigateToComment,
+  onShowError
 }) => {
   const [showOTPModal, setShowOTPModal] = useState(false);
   const [showAlertModal, setShowAlertModal] = useState(false);

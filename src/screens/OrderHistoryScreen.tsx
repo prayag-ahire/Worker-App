@@ -18,6 +18,7 @@ interface OrderHistoryScreenProps {
   onSchedulePress?: () => void;
   onSettingsPress?: () => void;
   onNotificationPress?: () => void;
+  onShowError?: (fromScreen: 'orderHistory', message?: string) => void;
 }
 
 interface Order {
@@ -26,7 +27,7 @@ interface Order {
   status: string;
 }
 
-const OrderHistoryScreen: React.FC<OrderHistoryScreenProps> = ({ onBack, onOrderPress, onHomePress, onSchedulePress, onSettingsPress, onNotificationPress }) => {
+const OrderHistoryScreen: React.FC<OrderHistoryScreenProps> = ({ onBack, onOrderPress, onHomePress, onSchedulePress, onSettingsPress, onNotificationPress, onShowError }) => {
   const { t } = useLanguage();
   
   const orders: Order[] = [

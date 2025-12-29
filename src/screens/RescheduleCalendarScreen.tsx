@@ -12,9 +12,10 @@ import { Colors } from '../styles/colors';
 interface RescheduleCalendarScreenProps {
   onBack?: () => void;
   onNext?: (selectedDate: Date) => void;
+  onShowError?: (fromScreen: 'rescheduleCalendar', message?: string) => void;
 }
 
-const RescheduleCalendarScreen: React.FC<RescheduleCalendarScreenProps> = ({ onBack, onNext }) => {
+const RescheduleCalendarScreen: React.FC<RescheduleCalendarScreenProps> = ({ onBack, onNext, onShowError }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 

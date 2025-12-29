@@ -20,9 +20,10 @@ import { getAuthToken, saveProfileCompleted, saveUserProfile } from '../utils/st
 interface PersonalDetailsScreenProps {
   onComplete?: () => void;
   referralCode?: string;
+  onShowError?: (fromScreen: 'personalDetails', message?: string) => void;
 }
 
-const PersonalDetailsScreen: React.FC<PersonalDetailsScreenProps> = ({ onComplete, referralCode }) => {
+const PersonalDetailsScreen: React.FC<PersonalDetailsScreenProps> = ({ onComplete, referralCode, onShowError }) => {
   const { t } = useLanguage();
   const [name, setName] = useState('');
   const [age, setAge] = useState('');

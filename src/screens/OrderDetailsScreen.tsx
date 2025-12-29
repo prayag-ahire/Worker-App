@@ -19,13 +19,15 @@ interface OrderDetailsScreenProps {
   orderId?: string;
   onNavigateToAIChat?: () => void;
   onNavigateToHelp?: () => void;
+  onShowError?: (fromScreen: 'orderDetails', message?: string) => void;
 }
 
 const OrderDetailsScreen: React.FC<OrderDetailsScreenProps> = ({ 
   onBack, 
   orderId = '1245',
   onNavigateToAIChat,
-  onNavigateToHelp 
+  onNavigateToHelp,
+  onShowError
 }) => {
   const { t } = useLanguage();
   const [showHelpModal, setShowHelpModal] = useState(false);

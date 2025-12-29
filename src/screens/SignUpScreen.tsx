@@ -19,9 +19,10 @@ import { saveAuthToken, saveProfileCompleted, clearAuthData } from '../utils/sto
 interface SignUpScreenProps {
   onSignUpComplete?: (referralCode?: string) => void;
   onLoginPress?: () => void;
+  onShowError?: (fromScreen: 'signup', message?: string) => void;
 }
 
-const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUpComplete, onLoginPress }) => {
+const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUpComplete, onLoginPress, onShowError }) => {
   const [phoneNo, setPhoneNo] = useState('');
   const [password, setPassword] = useState('');
   const [rePassword, setRePassword] = useState('');

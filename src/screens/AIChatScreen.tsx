@@ -18,12 +18,13 @@ import { Message, WorkerContext } from '../services/types';
 
 interface AIChatScreenProps {
   onBack?: () => void;
+  onShowError?: (fromScreen: 'aiChat', message?: string) => void;
 }
 
 // Hardcoded for demo, same as chatbot frontend
 const WORKER_ID = 1;
 
-const AIChatScreen: React.FC<AIChatScreenProps> = ({ onBack }) => {
+const AIChatScreen: React.FC<AIChatScreenProps> = ({ onBack, onShowError }) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',

@@ -12,6 +12,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 
 interface NotificationScreenProps {
   onBack?: () => void;
+  onShowError?: (fromScreen: 'notification', message?: string) => void;
 }
 
 interface Notification {
@@ -22,7 +23,7 @@ interface Notification {
   isRead: boolean;
 }
 
-const NotificationScreen: React.FC<NotificationScreenProps> = ({ onBack }) => {
+const NotificationScreen: React.FC<NotificationScreenProps> = ({ onBack, onShowError }) => {
   const { t } = useLanguage();
 
   // Static notification data

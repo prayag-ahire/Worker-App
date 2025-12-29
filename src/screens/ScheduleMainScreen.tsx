@@ -18,9 +18,10 @@ interface ScheduleMainScreenProps {
   onOrdersPress?: () => void;
   onSettingsPress?: () => void;
   onNotificationPress?: () => void;
+  onShowError?: (fromScreen: 'scheduleMain', message?: string) => void;
 }
 
-const ScheduleMainScreen: React.FC<ScheduleMainScreenProps> = ({ onBack, onNavigate, onHomePress, onOrdersPress, onSettingsPress, onNotificationPress }) => {
+const ScheduleMainScreen: React.FC<ScheduleMainScreenProps> = ({ onBack, onNavigate, onHomePress, onOrdersPress, onSettingsPress, onNotificationPress, onShowError }) => {
   const { t } = useLanguage();
   
   const scheduleOptions = [

@@ -144,24 +144,9 @@ const WeeklyScheduleScreen: React.FC<WeeklyScheduleScreenProps> = ({ onBack, onS
         setSchedule(newSchedule);
       } catch (error: any) {
         console.error('Error fetching schedule:', error);
-        console.error('Error stack:', error.stack);
         
-        // Show error screen instead of toast if onShowError is provided
         if (onShowError) {
-          const errorMessage = error.message === 'No authentication token found. Please login again.'
-            ? 'Your session has expired. Please login again.'
-            : 'Unable to load your schedule. Please check your internet connection and try again.';
-          
-          onShowError('weeklySchedule', errorMessage);
-        } else {
-          // Fallback to toast if onShowError is not provided
-          Toast.show({
-            type: 'error',
-            text1: 'Failed to Load Schedule',
-            text2: error.message || 'Could not fetch schedule data',
-            position: 'top',
-            visibilityTime: 3000,
-          });
+          onShowError('weeklySchedule', error.message);
         }
       } finally {
         setIsLoading(false);
@@ -291,6 +276,11 @@ const WeeklyScheduleScreen: React.FC<WeeklyScheduleScreenProps> = ({ onBack, onS
     } catch (error: any) {
       console.error('Error updating schedule:', error);
       
+      if (onShowError && (error.message?.includes('Session expired') || error.message?.includes('Unauthorized'))) {
+        onShowError('weeklySchedule', error.message);
+        return;
+      }
+
       Toast.show({
         type: 'error',
         text1: 'Update Failed',

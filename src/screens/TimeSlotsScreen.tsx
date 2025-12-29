@@ -12,9 +12,10 @@ import { Colors } from '../styles/colors';
 interface TimeSlotsScreenProps {
   onBack?: () => void;
   onReschedule?: (selectedTimes: string[]) => void;
+  onShowError?: (fromScreen: 'timeSlots', message?: string) => void;
 }
 
-const TimeSlotsScreen: React.FC<TimeSlotsScreenProps> = ({ onBack, onReschedule }) => {
+const TimeSlotsScreen: React.FC<TimeSlotsScreenProps> = ({ onBack, onReschedule, onShowError }) => {
   const [selectedSlots, setSelectedSlots] = useState<number[]>([]);
 
   const timeSlots = [
