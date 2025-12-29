@@ -18,9 +18,10 @@ import { getAuthToken } from '../utils/storage';
 interface AppLanguageScreenProps {
   onBack?: () => void;
   onComplete?: () => void;
+  onShowError?: (fromScreen: 'appLanguage', message?: string) => void;
 }
 
-const AppLanguageScreen: React.FC<AppLanguageScreenProps> = ({ onBack, onComplete }) => {
+const AppLanguageScreen: React.FC<AppLanguageScreenProps> = ({ onBack, onComplete, onShowError }) => {
   const { language, changeLanguage } = useLanguage();
   const [selectedLanguage, setSelectedLanguage] = useState<string>(language);
   const [searchQuery, setSearchQuery] = useState('');
@@ -65,7 +66,16 @@ const AppLanguageScreen: React.FC<AppLanguageScreenProps> = ({ onBack, onComplet
         console.log('Fetched user language:', apiLanguage);
       } catch (error: any) {
         console.error('Error fetching language:', error);
-        // Don't show error toast on initial load, just use default
+        
+        // Show error screen for critical errors during settings flow
+        if (!onComplete && onShowError) {
+          const errorMessage = error.message === 'No authentication token found. Please login again.'
+            ? 'Your session has expired. Please login again.'
+            : 'Unable to load language settings. Please check your internet connection and try again.';
+          
+          onShowError('appLanguage', errorMessage);
+        }
+        // Don't show error during signup flow, just use default
       } finally {
         setIsFetching(false);
       }
@@ -106,13 +116,23 @@ const AppLanguageScreen: React.FC<AppLanguageScreenProps> = ({ onBack, onComplet
         });
       } catch (error: any) {
         console.error('Error updating language:', error);
-        Toast.show({
-          type: 'error',
-          text1: 'Update Failed',
-          text2: error.message || 'Failed to update language',
-          position: 'top',
-          visibilityTime: 3000,
-        });
+        
+        // Show error screen instead of toast if onShowError is provided
+        if (onShowError) {
+          const errorMessage = error.message === 'No authentication token found. Please login again.'
+            ? 'Your session has expired. Please login again.'
+            : 'Unable to update language. Please check your internet connection and try again.';
+          
+          onShowError('appLanguage', errorMessage);
+        } else {
+          Toast.show({
+            type: 'error',
+            text1: 'Update Failed',
+            text2: error.message || 'Failed to update language',
+            position: 'top',
+            visibilityTime: 3000,
+          });
+        }
       } finally {
         setIsLoading(false);
       }

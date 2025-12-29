@@ -19,9 +19,10 @@ import { getAuthToken } from '../utils/storage';
 
 interface InviteFriendScreenProps {
   onBack?: () => void;
+  onShowError?: (fromScreen: 'inviteFriend', message?: string) => void;
 }
 
-const InviteFriendScreen: React.FC<InviteFriendScreenProps> = ({ onBack }) => {
+const InviteFriendScreen: React.FC<InviteFriendScreenProps> = ({ onBack, onShowError }) => {
   const { t } = useLanguage();
   const [referralCode, setReferralCode] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
@@ -40,13 +41,23 @@ const InviteFriendScreen: React.FC<InviteFriendScreenProps> = ({ onBack }) => {
         console.log('Fetched referral code:', response.ReferCode);
       } catch (error: any) {
         console.error('Error fetching referral code:', error);
-        Toast.show({
-          type: 'error',
-          text1: 'Failed to Load',
-          text2: error.message || 'Could not fetch referral code',
-          position: 'top',
-          visibilityTime: 3000,
-        });
+        
+        // Show error screen instead of toast if onShowError is provided
+        if (onShowError) {
+          const errorMessage = error.message === 'No authentication token found. Please login again.'
+            ? 'Your session has expired. Please login again.'
+            : 'Unable to load your referral code. Please check your internet connection and try again.';
+          
+          onShowError('inviteFriend', errorMessage);
+        } else {
+          Toast.show({
+            type: 'error',
+            text1: 'Failed to Load',
+            text2: error.message || 'Could not fetch referral code',
+            position: 'top',
+            visibilityTime: 3000,
+          });
+        }
         // Set a fallback code
         setReferralCode('N/A');
       } finally {

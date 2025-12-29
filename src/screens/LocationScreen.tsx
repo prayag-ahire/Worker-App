@@ -23,6 +23,7 @@ import { getAuthToken } from '../utils/storage';
 
 interface LocationScreenProps {
   onBack?: () => void;
+  onShowError?: (fromScreen: 'location', message?: string) => void;
 }
 
 interface LocationCoords {
@@ -32,7 +33,7 @@ interface LocationCoords {
   longitudeDelta: number;
 }
 
-const LocationScreen: React.FC<LocationScreenProps> = ({ onBack }) => {
+const LocationScreen: React.FC<LocationScreenProps> = ({ onBack, onShowError }) => {
   const { t } = useLanguage();
   const [location, setLocation] = useState<string>('');
   const [currentLocation, setCurrentLocation] = useState<LocationCoords | null>(null);
@@ -103,8 +104,20 @@ const LocationScreen: React.FC<LocationScreenProps> = ({ onBack }) => {
       }
     } catch (error: any) {
       console.error('Error fetching saved location:', error);
-      // Don't show error toast for missing location (user might not have set one yet)
-      if (!error.message?.includes('404')) {
+      
+      // Don't show error for missing location (user might not have set one yet)
+      if (error.message?.includes('404')) {
+        // Just log it, no user feedback needed
+        console.log('No saved location found (404)');
+      } else if (onShowError) {
+        // Show error screen for critical errors
+        const errorMessage = error.message === 'No authentication token found. Please login again.'
+          ? 'Your session has expired. Please login again.'
+          : 'Unable to load your saved location. Please check your internet connection and try again.';
+        
+        onShowError('location', errorMessage);
+      } else {
+        // Fallback to toast for non-critical errors
         Toast.show({
           type: 'info',
           text1: 'No Saved Location',

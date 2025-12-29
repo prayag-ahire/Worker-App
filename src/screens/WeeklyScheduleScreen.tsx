@@ -19,6 +19,7 @@ import { getAuthToken } from '../utils/storage';
 
 interface WeeklyScheduleScreenProps {
   onBack?: () => void;
+  onShowError?: (fromScreen: 'weeklySchedule', message?: string) => void;
 }
 
 interface DaySchedule {
@@ -27,7 +28,7 @@ interface DaySchedule {
   endTime: string;
 }
 
-const WeeklyScheduleScreen: React.FC<WeeklyScheduleScreenProps> = ({ onBack }) => {
+const WeeklyScheduleScreen: React.FC<WeeklyScheduleScreenProps> = ({ onBack, onShowError }) => {
   const { t } = useLanguage();
   
   const [schedule, setSchedule] = useState<DaySchedule[]>([
@@ -145,13 +146,23 @@ const WeeklyScheduleScreen: React.FC<WeeklyScheduleScreenProps> = ({ onBack }) =
         console.error('Error fetching schedule:', error);
         console.error('Error stack:', error.stack);
         
-        Toast.show({
-          type: 'error',
-          text1: 'Failed to Load Schedule',
-          text2: error.message || 'Could not fetch schedule data',
-          position: 'top',
-          visibilityTime: 3000,
-        });
+        // Show error screen instead of toast if onShowError is provided
+        if (onShowError) {
+          const errorMessage = error.message === 'No authentication token found. Please login again.'
+            ? 'Your session has expired. Please login again.'
+            : 'Unable to load your schedule. Please check your internet connection and try again.';
+          
+          onShowError('weeklySchedule', errorMessage);
+        } else {
+          // Fallback to toast if onShowError is not provided
+          Toast.show({
+            type: 'error',
+            text1: 'Failed to Load Schedule',
+            text2: error.message || 'Could not fetch schedule data',
+            position: 'top',
+            visibilityTime: 3000,
+          });
+        }
       } finally {
         setIsLoading(false);
       }
