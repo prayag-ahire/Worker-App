@@ -22,3 +22,4 @@ export { default as ActiveOrderScreen } from './ActiveOrderScreen';
 export { default as CommentScreen } from './CommentScreen';
 export { default as RescheduleCalendarScreen } from './RescheduleCalendarScreen';
 export { default as TimeSlotsScreen } from './TimeSlotsScreen';
+export { default as ErrorScreen } from './ErrorScreen';

@@ -25,10 +25,11 @@ import ActiveOrderScreen from './src/screens/ActiveOrderScreen';
 import CommentScreen from './src/screens/CommentScreen';
 import RescheduleCalendarScreen from './src/screens/RescheduleCalendarScreen';
 import TimeSlotsScreen from './src/screens/TimeSlotsScreen';
+import ErrorScreen from './src/screens/ErrorScreen';
 import { Colors } from './src/styles/colors';
 import { LanguageProvider } from './src/contexts/LanguageContext';
 
-type Screen = 'splash' | 'login' | 'signup' | 'onboarding' | 'personalDetails' | 'home' | 'settings' | 'userProfile' | 'editProfile' | 'location' | 'appLanguage' | 'inviteFriend' | 'tutorialVideos' | 'help' | 'aiChat' | 'scheduleMain' | 'weeklySchedule' | 'monthlySchedule' | 'orderHistory' | 'orderDetails' | 'activeOrder' | 'comment' | 'rescheduleCalendar' | 'timeSlots';
+type Screen = 'splash' | 'login' | 'signup' | 'onboarding' | 'personalDetails' | 'home' | 'settings' | 'userProfile' | 'editProfile' | 'location' | 'appLanguage' | 'inviteFriend' | 'tutorialVideos' | 'help' | 'aiChat' | 'scheduleMain' | 'weeklySchedule' | 'monthlySchedule' | 'orderHistory' | 'orderDetails' | 'activeOrder' | 'comment' | 'rescheduleCalendar' | 'timeSlots' | 'error';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('splash');
@@ -43,12 +44,26 @@ function App() {
   const [shouldRefreshProfile, setShouldRefreshProfile] = useState(false);
   const [shouldRefreshHome, setShouldRefreshHome] = useState(false);
   const [referralCode, setReferralCode] = useState<string>('');
+  const [previousScreen, setPreviousScreen] = useState<Screen>('home');
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [homeViewMode, setHomeViewMode] = useState<'day' | 'week' | 'month'>('day');
 
   // Handle hardware back button
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      // Home screen - check view mode
+      if (currentScreen === 'home') {
+        if (homeViewMode === 'week' || homeViewMode === 'month') {
+          // Go back to day view
+          setHomeViewMode('day');
+          return true; // Prevent exit
+        }
+        // Already on day view - exit app
+        return false; // Let default behavior (exit app)
+      }
+
       // Exit app from these screens
-      if (currentScreen === 'splash' || currentScreen === 'login' || currentScreen === 'home') {
+      if (currentScreen === 'splash' || currentScreen === 'login') {
         return false; // Let default behavior (exit app)
       }
 
@@ -137,13 +152,19 @@ function App() {
         return true; // Prevent back
       }
 
+      // Error screen - go back to previous screen
+      if (currentScreen === 'error') {
+        setCurrentScreen(previousScreen);
+        return true;
+      }
+
       // Default - go to home
       setCurrentScreen('home');
       return true;
     });
 
     return () => backHandler.remove();
-  }, [currentScreen]);
+  }, [currentScreen, homeViewMode]);
 
   const handleSplashFinish = () => {
     setCurrentScreen('login');
@@ -391,6 +412,22 @@ function App() {
     setCurrentScreen('home');
   };
 
+  const handleShowError = (fromScreen: Screen, message?: string) => {
+    setPreviousScreen(fromScreen);
+    setErrorMessage(message || '');
+    setCurrentScreen('error');
+  };
+
+  const handleErrorRetry = () => {
+    // Go back to previous screen and let it retry
+    setCurrentScreen(previousScreen);
+  };
+
+  const handleErrorGoBack = () => {
+    // Go back to previous screen
+    setCurrentScreen(previousScreen);
+  };
+
   return (
     <LanguageProvider>
       <SafeAreaProvider>
@@ -430,6 +467,8 @@ function App() {
             onWorkItemPress={handleWorkItemPress}
             onHomePress={handleHomePress}
             shouldRefresh={shouldRefreshHome}
+            viewMode={homeViewMode}
+            onViewModeChange={setHomeViewMode}
           />
         )}
         {currentScreen === 'settings' && (
@@ -445,6 +484,7 @@ function App() {
           <UserProfileScreen
             onBack={handleUserProfileBack}
             onEdit={handleUserProfileEdit}
+            onShowError={handleShowError}
             shouldRefresh={shouldRefreshProfile}
           />
         )}
@@ -535,6 +575,13 @@ function App() {
           <TimeSlotsScreen
             onBack={handleTimeSlotsBack}
             onReschedule={handleReschedule}
+          />
+        )}
+        {currentScreen === 'error' && (
+          <ErrorScreen
+            onRetry={handleErrorRetry}
+            onGoBack={handleErrorGoBack}
+            errorMessage={errorMessage}
           />
         )}
 

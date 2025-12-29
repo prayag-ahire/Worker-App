@@ -326,5 +326,11 @@
     "send": "Send",
     "greeting": "Hello! How can I help you today?",
     "thinking": "Thinking..."
+  },
+  "errorScreen": {
+    "title": "Oops! Something Went Wrong",
+    "defaultMessage": "We're having trouble connecting to the server. Please check your internet connection and try again.",
+    "retry": "Try Again",
+    "goBack": "Go Back"
   }
 }

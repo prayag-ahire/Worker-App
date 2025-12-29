@@ -20,10 +20,11 @@ import { getAuthToken } from '../utils/storage';
 interface UserProfileScreenProps {
   onBack?: () => void;
   onEdit?: () => void;
+  onShowError?: (fromScreen: 'userProfile', message?: string) => void;
   shouldRefresh?: boolean; // Flag to indicate if data should be refreshed
 }
 
-const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit, shouldRefresh = false }) => {
+const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit, onShowError, shouldRefresh = false }) => {
   const { t } = useLanguage();
   const [profileData, setProfileData] = useState<UserProfileResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -54,13 +55,24 @@ const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit, s
         console.log('Fetched user profile:', data);
       } catch (error: any) {
         console.error('Error fetching profile:', error);
-        Toast.show({
-          type: 'error',
-          text1: 'Failed to Load Profile',
-          text2: error.message || 'Could not fetch profile data',
-          position: 'top',
-          visibilityTime: 3000,
-        });
+        
+        // Show error screen instead of toast
+        if (onShowError) {
+          const errorMessage = error.message === 'No authentication token found. Please login again.'
+            ? 'Your session has expired. Please login again.'
+            : 'Unable to load your profile. Please check your internet connection and try again.';
+          
+          onShowError('userProfile', errorMessage);
+        } else {
+          // Fallback to toast if onShowError is not provided
+          Toast.show({
+            type: 'error',
+            text1: 'Failed to Load Profile',
+            text2: error.message || 'Could not fetch profile data',
+            position: 'top',
+            visibilityTime: 3000,
+          });
+        }
       } finally {
         setIsLoading(false);
       }
@@ -124,9 +136,16 @@ const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit, s
                   <View style={styles.stars}>
                     {[1, 2, 3, 4, 5].map((star) => {
                       const rating = parseFloat(profileData?.Rating || '0');
+                      const isFilled = star <= rating;
                       return (
-                        <Text key={star} style={styles.star}>
-                          {star <= rating ? '⭐' : '☆'}
+                        <Text 
+                          key={star} 
+                          style={[
+                            styles.star,
+                            isFilled ? styles.starFilled : styles.starEmpty
+                          ]}
+                        >
+                          ★
                         </Text>
                       );
                     })}
@@ -323,6 +342,12 @@ const styles = StyleSheet.create({
   },
   star: {
     fontSize: 27,        // Increased to 1.5x (27px) - much bigger!
+  },
+  starFilled: {
+    color: '#FFD700',    // Golden yellow for filled stars
+  },
+  starEmpty: {
+    color: '#D1D5DB',    // Light gray for empty stars
   },
   distanceRow: {
     flexDirection: 'row',

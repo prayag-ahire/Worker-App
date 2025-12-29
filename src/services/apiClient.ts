@@ -784,9 +784,188 @@ export const updateUserLocation = async (
     
     throw error;
   }
+};/**
+ * Weekly schedule response interface
+ */
+export interface WeeklyScheduleResponse {
+  schedule?: {
+    Start_Sunday: string | null;
+    End_Sunday: string | null;
+    Start_Monday: string | null;
+    End_Monday: string | null;
+    Start_Tuesday: string | null;
+    End_Tuesday: string | null;
+    Start_Wednesday: string | null;
+    End_Wednesday: string | null;
+    Start_Thursday: string | null;
+    End_Thursday: string | null;
+    Start_Friday: string | null;
+    End_Friday: string | null;
+    Start_Saturday: string | null;
+    End_Saturday: string | null;
+  };
+  // In case the API returns the schedule data at the root level
+  Start_Sunday?: string | null;
+  End_Sunday?: string | null;
+  Start_Monday?: string | null;
+  End_Monday?: string | null;
+  Start_Tuesday?: string | null;
+  End_Tuesday?: string | null;
+  Start_Wednesday?: string | null;
+  End_Wednesday?: string | null;
+  Start_Thursday?: string | null;
+  End_Thursday?: string | null;
+  Start_Friday?: string | null;
+  End_Friday?: string | null;
+  Start_Saturday?: string | null;
+  End_Saturday?: string | null;
+}
+
+/**
+ * Get worker's weekly schedule
+ * @param token - The authentication token
+ * @returns The worker's weekly schedule
+ */
+export const getWeeklySchedule = async (token: string): Promise<WeeklyScheduleResponse> => {
+  try {
+    console.log(`Fetching weekly schedule from ${PRODUCTION_API_URL}/worker/WorkerSchedule/weekly`);
+    
+    const response = await fetchWithTimeout(
+      `${PRODUCTION_API_URL}/worker/WorkerSchedule/weekly`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      },
+      REQUEST_TIMEOUT
+    );
+
+    console.log('Weekly schedule response status:', response.status);
+    console.log('Weekly schedule response ok:', response.ok);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({})) as ApiErrorResponse;
+      throw new Error(errorData.error || `Failed to fetch schedule: ${response.status}`);
+    }
+
+    const data = await response.json() as WeeklyScheduleResponse;
+    console.log('Weekly schedule raw response:', JSON.stringify(data, null, 2));
+    return data;
+  } catch (error: any) {
+    console.error('Get Weekly Schedule API Error:', error);
+    
+    if (error.message?.includes('Network request failed')) {
+      throw new Error('Cannot connect to server. Please check your internet connection.');
+    }
+    if (error.message?.includes('timeout')) {
+      throw new Error('Server is taking too long to respond. Please try again.');
+    }
+    if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
+      throw new Error('Session expired. Please login again.');
+    }
+    
+    throw error;
+  }
 };
 
+/**
+ * Update weekly schedule request interface
+ */
+export interface UpdateWeeklyScheduleRequest {
+  Start_Sunday?: string;
+  End_Sunday?: string;
+  Start_Monday?: string;
+  End_Monday?: string;
+  Start_Tuesday?: string;
+  End_Tuesday?: string;
+  Start_Wednesday?: string;
+  End_Wednesday?: string;
+  Start_Thursday?: string;
+  End_Thursday?: string;
+  Start_Friday?: string;
+  End_Friday?: string;
+  Start_Saturday?: string;
+  End_Saturday?: string;
+}
 
+/**
+ * Update weekly schedule response interface
+ */
+export interface UpdateWeeklyScheduleResponse {
+  message: string;
+  schedule: {
+    Start_Sunday: string | null;
+    End_Sunday: string | null;
+    Start_Monday: string | null;
+    End_Monday: string | null;
+    Start_Tuesday: string | null;
+    End_Tuesday: string | null;
+    Start_Wednesday: string | null;
+    End_Wednesday: string | null;
+    Start_Thursday: string | null;
+    End_Thursday: string | null;
+    Start_Friday: string | null;
+    End_Friday: string | null;
+    Start_Saturday: string | null;
+    End_Saturday: string | null;
+  };
+}
+
+/**
+ * Update worker's weekly schedule
+ * @param token - The authentication token
+ * @param scheduleData - The schedule data to update (only changed days need to be included)
+ * @returns The updated schedule
+ */
+export const updateWeeklySchedule = async (
+  token: string,
+  scheduleData: UpdateWeeklyScheduleRequest
+): Promise<UpdateWeeklyScheduleResponse> => {
+  try {
+    console.log(`Updating weekly schedule at ${PRODUCTION_API_URL}/worker/WorkerSchedule/weekly`);
+    console.log('Schedule data to update:', JSON.stringify(scheduleData, null, 2));
+    
+    const response = await fetchWithTimeout(
+      `${PRODUCTION_API_URL}/worker/WorkerSchedule/weekly`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(scheduleData),
+      },
+      REQUEST_TIMEOUT
+    );
+
+    console.log('Update schedule response status:', response.status);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({})) as ApiErrorResponse;
+      throw new Error(errorData.error || `Failed to update schedule: ${response.status}`);
+    }
+
+    const data = await response.json() as UpdateWeeklyScheduleResponse;
+    console.log('Update schedule response:', JSON.stringify(data, null, 2));
+    return data;
+  } catch (error: any) {
+    console.error('Update Weekly Schedule API Error:', error);
+    
+    if (error.message?.includes('Network request failed')) {
+      throw new Error('Cannot connect to server. Please check your internet connection.');
+    }
+    if (error.message?.includes('timeout')) {
+      throw new Error('Server is taking too long to respond. Please try again.');
+    }
+    if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
+      throw new Error('Session expired. Please login again.');
+    }
+    
+    throw error;
+  }
+};
 
 
 

@@ -20,6 +20,8 @@ interface HomeScreenProps {
   onWorkItemPress?: (workId: string, status: string) => void;
   onHomePress?: () => void;
   shouldRefresh?: boolean;
+  viewMode?: 'day' | 'week' | 'month';
+  onViewModeChange?: (mode: 'day' | 'week' | 'month') => void;
 }
 
 type ViewMode = 'day' | 'week' | 'month';
@@ -37,14 +39,28 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
   onOrdersPress, 
   onWorkItemPress, 
   onHomePress,
-  shouldRefresh = false 
+  shouldRefresh = false,
+  viewMode: externalViewMode,
+  onViewModeChange
 }) => {
   const { t } = useLanguage();
   const [userName, setUserName] = useState('User'); // Default fallback
   const [isLoading, setIsLoading] = useState(true); // Add loading state
-  const [viewMode, setViewMode] = useState<ViewMode>('day');
+  const [internalViewMode, setInternalViewMode] = useState<ViewMode>('day');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [activeTab, setActiveTab] = useState<'home' | 'orders' | 'schedule' | 'profile'>('home');
+
+  // Use external viewMode if provided, otherwise use internal state
+  const viewMode = externalViewMode !== undefined ? externalViewMode : internalViewMode;
+  
+  // Function to update view mode
+  const updateViewMode = (mode: ViewMode) => {
+    if (onViewModeChange) {
+      onViewModeChange(mode);
+    } else {
+      setInternalViewMode(mode);
+    }
+  };
 
   // Load cached user profile on mount and when shouldRefresh changes
   useEffect(() => {
@@ -234,7 +250,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
     newDate.setDate(newDate.getDate() + daysToAdd);
     
     setSelectedDate(newDate);
-    setViewMode('day');
+    updateViewMode('day');
   };
 
   const handleMonthDayClick = (day: number) => {
@@ -242,12 +258,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
     newDate.setDate(day);
     
     setSelectedDate(newDate);
-    setViewMode('day');
+    updateViewMode('day');
   };
 
   const handleDayTabClick = () => {
     setSelectedDate(new Date()); // Reset to today
-    setViewMode('day');
+    updateViewMode('day');
   };
 
   return (
@@ -283,7 +299,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
               </TouchableOpacity>
           <TouchableOpacity
             style={[styles.tab, viewMode === 'week' && styles.tabActive]}
-            onPress={() => setViewMode('week')}
+            onPress={() => updateViewMode('week')}
             activeOpacity={0.7}
           >
             <Text style={[styles.tabText, viewMode === 'week' && styles.tabTextActive]}>
@@ -292,7 +308,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.tab, viewMode === 'month' && styles.tabActive]}
-            onPress={() => setViewMode('month')}
+            onPress={() => updateViewMode('month')}
             activeOpacity={0.7}
           >
             <Text style={[styles.tabText, viewMode === 'month' && styles.tabTextActive]}>

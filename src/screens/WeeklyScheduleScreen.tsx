@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,10 +7,15 @@ import {
   StatusBar,
   ScrollView,
   Modal,
+  ActivityIndicator,
 } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { Colors } from '../styles/colors';
 import { useLanguage } from '../contexts/LanguageContext';
 import { ScreenHeader } from '../components';
+import { getWeeklySchedule, updateWeeklySchedule, WeeklyScheduleResponse, UpdateWeeklyScheduleRequest } from '../services/apiClient';
+import { getAuthToken } from '../utils/storage';
+
 
 interface WeeklyScheduleScreenProps {
   onBack?: () => void;
@@ -27,14 +32,15 @@ const WeeklyScheduleScreen: React.FC<WeeklyScheduleScreenProps> = ({ onBack }) =
   
   const [schedule, setSchedule] = useState<DaySchedule[]>([
     { day: t('calendar.sunday'), startTime: 'NON', endTime: 'NON' },
-    { day: t('calendar.monday'), startTime: '09:00', endTime: '18:00' },
-    { day: t('calendar.tuesday'), startTime: '09:00', endTime: '18:00' },
-    { day: t('calendar.wednesday'), startTime: '09:00', endTime: '18:00' },
-    { day: t('calendar.thursday'), startTime: '09:00', endTime: '18:00' },
-    { day: t('calendar.friday'), startTime: '09:00', endTime: '18:00' },
-    { day: t('calendar.saturday'), startTime: '09:00', endTime: '18:00' },
+    { day: t('calendar.monday'), startTime: 'NON', endTime: 'NON' },
+    { day: t('calendar.tuesday'), startTime: 'NON', endTime: 'NON' },
+    { day: t('calendar.wednesday'), startTime: 'NON', endTime: 'NON' },
+    { day: t('calendar.thursday'), startTime: 'NON', endTime: 'NON' },
+    { day: t('calendar.friday'), startTime: 'NON', endTime: 'NON' },
+    { day: t('calendar.saturday'), startTime: 'NON', endTime: 'NON' },
   ]);
 
+  const [isLoading, setIsLoading] = useState(true);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [selectedDayIndex, setSelectedDayIndex] = useState<number | null>(null);
   const [selectedTimeType, setSelectedTimeType] = useState<'start' | 'end'>('start');
@@ -43,6 +49,116 @@ const WeeklyScheduleScreen: React.FC<WeeklyScheduleScreenProps> = ({ onBack }) =
 
   const hours = Array.from({ length: 24 }, (_, i) => i);
   const minutes = [0, 15, 30, 45];
+
+  // Helper function to convert ISO timestamp to time string (HH:MM)
+  const convertToTimeString = (isoString: string | null | undefined): string => {
+    if (!isoString) {
+      console.log('Time is null or undefined, returning NON');
+      return 'NON';
+    }
+    
+    try {
+      const date = new Date(isoString);
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        console.log('Invalid date:', isoString);
+        return 'NON';
+      }
+      
+      // Extract hours and minutes from the UTC time
+      const hours = date.getUTCHours();
+      const minutes = date.getUTCMinutes();
+      const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+      console.log(`Converted ${isoString} to ${timeString} (UTC hours: ${hours}, UTC minutes: ${minutes})`);
+      return timeString;
+    } catch (error) {
+      console.error('Error converting time:', error);
+      return 'NON';
+    }
+  };
+
+  // Fetch schedule data on mount
+  useEffect(() => {
+    const fetchSchedule = async () => {
+      setIsLoading(true);
+      try {
+        const token = await getAuthToken();
+        if (!token) {
+          throw new Error('No authentication token found. Please login again.');
+        }
+
+        console.log('Fetching weekly schedule...');
+        const data = await getWeeklySchedule(token);
+        console.log('Fetched schedule data:', JSON.stringify(data, null, 2));
+        
+        // The API might return the schedule directly or nested in a schedule property
+        const scheduleData = data.schedule || data;
+        console.log('Schedule object:', scheduleData);
+
+        // Check if scheduleData exists
+        if (!scheduleData) {
+          throw new Error('No schedule data received from server');
+        }
+
+        // Map API response to schedule state
+        const newSchedule: DaySchedule[] = [
+          { 
+            day: t('calendar.sunday'), 
+            startTime: convertToTimeString(scheduleData.Start_Sunday), 
+            endTime: convertToTimeString(scheduleData.End_Sunday) 
+          },
+          { 
+            day: t('calendar.monday'), 
+            startTime: convertToTimeString(scheduleData.Start_Monday), 
+            endTime: convertToTimeString(scheduleData.End_Monday) 
+          },
+          { 
+            day: t('calendar.tuesday'), 
+            startTime: convertToTimeString(scheduleData.Start_Tuesday), 
+            endTime: convertToTimeString(scheduleData.End_Tuesday) 
+          },
+          { 
+            day: t('calendar.wednesday'), 
+            startTime: convertToTimeString(scheduleData.Start_Wednesday), 
+            endTime: convertToTimeString(scheduleData.End_Wednesday) 
+          },
+          { 
+            day: t('calendar.thursday'), 
+            startTime: convertToTimeString(scheduleData.Start_Thursday), 
+            endTime: convertToTimeString(scheduleData.End_Thursday) 
+          },
+          { 
+            day: t('calendar.friday'), 
+            startTime: convertToTimeString(scheduleData.Start_Friday), 
+            endTime: convertToTimeString(scheduleData.End_Friday) 
+          },
+          { 
+            day: t('calendar.saturday'), 
+            startTime: convertToTimeString(scheduleData.Start_Saturday), 
+            endTime: convertToTimeString(scheduleData.End_Saturday) 
+          },
+        ];
+
+        console.log('Mapped schedule:', newSchedule);
+        setSchedule(newSchedule);
+      } catch (error: any) {
+        console.error('Error fetching schedule:', error);
+        console.error('Error stack:', error.stack);
+        
+        Toast.show({
+          type: 'error',
+          text1: 'Failed to Load Schedule',
+          text2: error.message || 'Could not fetch schedule data',
+          position: 'top',
+          visibilityTime: 3000,
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSchedule();
+  }, [t]);
 
   const handleTimeSlotPress = (dayIndex: number, timeType: 'start' | 'end') => {
     setSelectedDayIndex(dayIndex);
@@ -104,11 +220,73 @@ const WeeklyScheduleScreen: React.FC<WeeklyScheduleScreenProps> = ({ onBack }) =
     }
   };
 
-  const handleUpdate = () => {
-    // TODO: Save schedule to backend/storage
-    // Show success message or navigate back
-    if (onBack) {
-      onBack();
+  const handleUpdate = async () => {
+    try {
+      const token = await getAuthToken();
+      if (!token) {
+        throw new Error('No authentication token found. Please login again.');
+      }
+
+      // Build the update request object
+      // Send all days - NON values will be sent as null to clear them
+      const updateData: any = {};
+      
+      // Map schedule array to API format
+      const dayMapping = [
+        { start: 'Start_Sunday', end: 'End_Sunday', index: 0 },
+        { start: 'Start_Monday', end: 'End_Monday', index: 1 },
+        { start: 'Start_Tuesday', end: 'End_Tuesday', index: 2 },
+        { start: 'Start_Wednesday', end: 'End_Wednesday', index: 3 },
+        { start: 'Start_Thursday', end: 'End_Thursday', index: 4 },
+        { start: 'Start_Friday', end: 'End_Friday', index: 5 },
+        { start: 'Start_Saturday', end: 'End_Saturday', index: 6 },
+      ];
+
+      dayMapping.forEach(({ start, end, index }) => {
+        const daySchedule = schedule[index];
+        
+        // If time is 'NON', send null to clear it, otherwise send the time string
+        if (daySchedule.startTime.toUpperCase() === 'NON') {
+          updateData[start] = null;
+        } else {
+          updateData[start] = daySchedule.startTime;
+        }
+        
+        if (daySchedule.endTime.toUpperCase() === 'NON') {
+          updateData[end] = null;
+        } else {
+          updateData[end] = daySchedule.endTime;
+        }
+      });
+
+      console.log('Updating schedule with data:', updateData);
+
+      const response = await updateWeeklySchedule(token, updateData);
+      
+      console.log('Schedule updated successfully:', response);
+      
+      Toast.show({
+        type: 'success',
+        text1: 'Schedule Updated',
+        text2: response.message || 'Your weekly schedule has been saved',
+        position: 'top',
+        visibilityTime: 3000,
+      });
+
+      // Optionally navigate back after successful update
+      // if (onBack) {
+      //   setTimeout(() => onBack(), 1500);
+      // }
+    } catch (error: any) {
+      console.error('Error updating schedule:', error);
+      
+      Toast.show({
+        type: 'error',
+        text1: 'Update Failed',
+        text2: error.message || 'Could not save schedule',
+        position: 'top',
+        visibilityTime: 3000,
+      });
     }
   };
 
@@ -116,54 +294,61 @@ const WeeklyScheduleScreen: React.FC<WeeklyScheduleScreenProps> = ({ onBack }) =
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={Colors.accent} translucent={true} />
 
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Header */}
-        <ScreenHeader title={t('weeklySchedule.title')} onBack={onBack} variant="blue" />
-
-        {/* Table Header */}
-        <View style={styles.tableHeader}>
-          <Text style={[styles.headerCell, styles.dayColumn]}>{t('weeklySchedule.days')}</Text>
-          <Text style={[styles.headerCell, styles.timeColumn]}>{t('weeklySchedule.startTime')}</Text>
-          <Text style={[styles.headerCell, styles.timeColumn]}>{t('weeklySchedule.endTime')}</Text>
+      {isLoading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors.accent} />
+          <Text style={styles.loadingText}>Loading schedule...</Text>
         </View>
+      ) : (
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Header */}
+          <ScreenHeader title={t('weeklySchedule.title')} onBack={onBack} variant="blue" />
 
-        {/* Schedule Rows */}
-        {schedule.map((item, index) => (
-          <View key={index} style={styles.scheduleRow}>
-            <View style={[styles.cell, styles.dayColumn]}>
-              <Text style={styles.dayText}>{item.day}</Text>
-            </View>
-            <TouchableOpacity 
-              style={[styles.cell, styles.timeColumn]}
-              onPress={() => handleTimeSlotPress(index, 'start')}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.timeText}>{item.startTime}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.cell, styles.timeColumn]}
-              onPress={() => handleTimeSlotPress(index, 'end')}
-              activeOpacity={0.7}
-              disabled={item.startTime.toUpperCase() === 'NON'}
-            >
-              <Text style={[
-                styles.timeText,
-                item.startTime.toUpperCase() === 'NON' && styles.timeTextDisabled
-              ]}>
-                {item.endTime}
-              </Text>
-            </TouchableOpacity>
+          {/* Table Header */}
+          <View style={styles.tableHeader}>
+            <Text style={[styles.headerCell, styles.dayColumn]}>{t('weeklySchedule.days')}</Text>
+            <Text style={[styles.headerCell, styles.timeColumn]}>{t('weeklySchedule.startTime')}</Text>
+            <Text style={[styles.headerCell, styles.timeColumn]}>{t('weeklySchedule.endTime')}</Text>
           </View>
-        ))}
 
-        {/* Update Button */}
-        <TouchableOpacity style={styles.updateButton} onPress={handleUpdate}>
-          <Text style={styles.updateButtonText}>{t('actions.update')}</Text>
-        </TouchableOpacity>
-      </ScrollView>
+          {/* Schedule Rows */}
+          {schedule.map((item, index) => (
+            <View key={index} style={styles.scheduleRow}>
+              <View style={[styles.cell, styles.dayColumn]}>
+                <Text style={styles.dayText}>{item.day}</Text>
+              </View>
+              <TouchableOpacity 
+                style={[styles.cell, styles.timeColumn]}
+                onPress={() => handleTimeSlotPress(index, 'start')}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.timeText}>{item.startTime}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.cell, styles.timeColumn]}
+                onPress={() => handleTimeSlotPress(index, 'end')}
+                activeOpacity={0.7}
+                disabled={item.startTime.toUpperCase() === 'NON'}
+              >
+                <Text style={[
+                  styles.timeText,
+                  item.startTime.toUpperCase() === 'NON' && styles.timeTextDisabled
+                ]}>
+                  {item.endTime}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+
+          {/* Update Button */}
+          <TouchableOpacity style={styles.updateButton} onPress={handleUpdate}>
+            <Text style={styles.updateButtonText}>{t('actions.update')}</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      )}
 
       {/* Custom Time Picker Modal */}
       <Modal
@@ -246,6 +431,7 @@ const WeeklyScheduleScreen: React.FC<WeeklyScheduleScreenProps> = ({ onBack }) =
           </View>
         </View>
       </Modal>
+      <Toast />
     </View>
   );
 };
@@ -254,6 +440,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.white,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: Colors.textMedium,
+    fontWeight: '500',
   },
   scrollContent: {
     flexGrow: 1,
