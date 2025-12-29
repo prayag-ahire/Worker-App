@@ -421,7 +421,9 @@ function App() {
   };
 
   const handleShowError = (fromScreen: Screen, message?: string) => {
-    setPreviousScreen(fromScreen);
+    // If error is from userProfile, go back to settings instead
+    const returnScreen = fromScreen === 'userProfile' ? 'settings' : fromScreen;
+    setPreviousScreen(returnScreen);
     setErrorMessage(message || '');
     setCurrentScreen('error');
   };

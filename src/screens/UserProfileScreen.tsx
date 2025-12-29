@@ -10,7 +10,6 @@ import {
   Switch,
   ActivityIndicator,
 } from 'react-native';
-import Toast from 'react-native-toast-message';
 import { Colors } from '../styles/colors';
 import { useLanguage } from '../contexts/LanguageContext';
 import { ScreenHeader } from '../components';
@@ -56,22 +55,13 @@ const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit, o
       } catch (error: any) {
         console.error('Error fetching profile:', error);
         
-        // Show error screen instead of toast
+        // Show error screen
         if (onShowError) {
           const errorMessage = error.message === 'No authentication token found. Please login again.'
             ? 'Your session has expired. Please login again.'
             : 'Unable to load your profile. Please check your internet connection and try again.';
           
           onShowError('userProfile', errorMessage);
-        } else {
-          // Fallback to toast if onShowError is not provided
-          Toast.show({
-            type: 'error',
-            text1: 'Failed to Load Profile',
-            text2: error.message || 'Could not fetch profile data',
-            position: 'top',
-            visibilityTime: 3000,
-          });
         }
       } finally {
         setIsLoading(false);
@@ -226,7 +216,6 @@ const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit, o
           </View>
         </ScrollView>
       )}
-      <Toast />
     </View>
   );
 };

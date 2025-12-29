@@ -45,12 +45,6 @@ const ErrorScreen: React.FC<ErrorScreenProps> = ({
 
       {/* Action Buttons */}
       <View style={styles.buttonContainer}>
-        {onRetry && (
-          <TouchableOpacity style={styles.retryButton} onPress={onRetry}>
-            <Text style={styles.retryButtonText}>{t('errorScreen.retry')}</Text>
-          </TouchableOpacity>
-        )}
-
         {onGoBack && (
           <TouchableOpacity style={styles.backButton} onPress={onGoBack}>
             <Text style={styles.backButtonText}>{t('errorScreen.goBack')}</Text>
@@ -120,16 +114,22 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   backButton: {
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#2563EB',
     paddingVertical: 16,
     paddingHorizontal: 32,
     borderRadius: 12,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
+    shadowColor: '#2563EB',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   backButtonText: {
-    color: '#374151',
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
   },
