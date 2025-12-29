@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { StyleSheet, View, Modal, Text, TouchableOpacity, BackHandler } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import SplashScreen from './src/screens/SplashScreen';
@@ -175,58 +175,58 @@ function App() {
     return () => backHandler.remove();
   }, [currentScreen, homeViewMode]);
 
-  const handleSplashFinish = () => {
+  const handleSplashFinish = useCallback(() => {
     setCurrentScreen('login');
-  };
+  }, []);
 
-  const handleSplashAuthenticatedFinish = () => {
+  const handleSplashAuthenticatedFinish = useCallback(() => {
     setCurrentScreen('home');
-  };
+  }, []);
 
-  const handleLoginSuccess = () => {
+  const handleLoginSuccess = useCallback(() => {
     setCurrentScreen('home');
-  };
+  }, []);
 
-  const handleSignUpPress = () => {
+  const handleSignUpPress = useCallback(() => {
     setCurrentScreen('signup');
-  };
+  }, []);
 
-  const handleLoginPress = () => {
+  const handleLoginPress = useCallback(() => {
     setCurrentScreen('login');
-  };
+  }, []);
 
-  const handleSignUpComplete = (refCode?: string) => {
+  const handleSignUpComplete = useCallback((refCode?: string) => {
     setReferralCode(refCode || ''); // Store referral code
     setIsSignupFlow(true);
     setCurrentScreen('appLanguage');
-  };
+  }, []);
 
-  const handleLanguageSelectionComplete = () => {
+  const handleLanguageSelectionComplete = useCallback(() => {
     setCurrentScreen('onboarding');
-  };
+  }, []);
 
-  const handleOnboardingFinish = () => {
+  const handleOnboardingFinish = useCallback(() => {
     setCurrentScreen('personalDetails');
-  };
+  }, []);
 
-  const handlePersonalDetailsComplete = () => {
+  const handlePersonalDetailsComplete = useCallback(() => {
     setIsSignupFlow(false); // Reset signup flow flag
     setCurrentScreen('home');
-  };
+  }, []);
 
-  const handleSettingsPress = () => {
+  const handleSettingsPress = useCallback(() => {
     // Only navigate if not already on settings screen
     if (currentScreen !== 'settings') {
       setShouldRefreshHome(false); // Reset refresh flag
       setCurrentScreen('settings');
     }
-  };
+  }, [currentScreen]);
 
-  const handleSettingsBack = () => {
+  const handleSettingsBack = useCallback(() => {
     setCurrentScreen('home');
-  };
+  }, []);
 
-  const handleSettingsNavigate = (screen: string) => {
+  const handleSettingsNavigate = useCallback((screen: string) => {
     if (screen === 'userProfile') {
       setShouldRefreshProfile(false); // Don't refresh when first opening
       setCurrentScreen('userProfile');
@@ -250,134 +250,133 @@ function App() {
     if (screen === 'Login') {
       handleLogout();
     }
-  };
+  }, []);
 
-  const handleUserProfileBack = () => {
+  const handleUserProfileBack = useCallback(() => {
     setShouldRefreshProfile(false); // Reset refresh flag
     setShouldRefreshHome(true); // Trigger refresh for home screen to pick up any changes
     setCurrentScreen('settings');
-  };
+  }, []);
 
-  const handleUserProfileEdit = () => {
+  const handleUserProfileEdit = useCallback(() => {
     setCurrentScreen('editProfile');
-  };
+  }, []);
 
-  const handleEditProfileBack = () => {
+  const handleEditProfileBack = useCallback(() => {
     setShouldRefreshProfile(true); // Trigger refresh when returning from edit
     setShouldRefreshHome(true); // Also refresh home screen
     setCurrentScreen('userProfile');
-  };
+  }, []);
 
-  const handleEditProfileSave = (data: any) => {
-    console.log('Profile saved:', data);
+  const handleEditProfileSave = useCallback((data: any) => {
     setShouldRefreshProfile(true); // Trigger refresh after save
     setShouldRefreshHome(true); // Also refresh home screen
     setCurrentScreen('userProfile');
-  };
+  }, []);
 
-  const handleLocationBack = () => {
+  const handleLocationBack = useCallback(() => {
     setCurrentScreen('settings');
-  };
+  }, []);
 
-  const handleAppLanguageBack = () => {
+  const handleAppLanguageBack = useCallback(() => {
     if (isSignupFlow) {
       setCurrentScreen('signup');
     } else {
       setCurrentScreen('settings');
     }
-  };
+  }, [isSignupFlow]);
 
-  const handleInviteFriendBack = () => {
+  const handleInviteFriendBack = useCallback(() => {
     setCurrentScreen('settings');
-  };
+  }, []);
 
-  const handleTutorialVideosBack = () => {
+  const handleTutorialVideosBack = useCallback(() => {
     setCurrentScreen('settings');
-  };
+  }, []);
 
-  const handleHelpBack = () => {
+  const handleHelpBack = useCallback(() => {
     setCurrentScreen('settings');
-  };
+  }, []);
 
-  const handleAIChatPress = () => {
+  const handleAIChatPress = useCallback(() => {
     setCurrentScreen('aiChat');
-  };
+  }, []);
 
-  const handleAIChatBack = () => {
+  const handleAIChatBack = useCallback(() => {
     setCurrentScreen('help');
-  };
+  }, []);
 
-  const handleHelpPress = () => {
+  const handleHelpPress = useCallback(() => {
     setCurrentScreen('help');
-  };
+  }, []);
 
-  const handleSchedulePress = () => {
+  const handleSchedulePress = useCallback(() => {
     // Only navigate if not already on schedule screen
     if (currentScreen !== 'scheduleMain') {
       setCurrentScreen('scheduleMain');
     }
-  };
+  }, [currentScreen]);
 
-  const handleScheduleMainBack = () => {
+  const handleScheduleMainBack = useCallback(() => {
     setCurrentScreen('home');
-  };
+  }, []);
 
-  const handleScheduleNavigate = (screen: 'weekly' | 'monthly') => {
+  const handleScheduleNavigate = useCallback((screen: 'weekly' | 'monthly') => {
     if (screen === 'weekly') {
       setCurrentScreen('weeklySchedule');
     } else if (screen === 'monthly') {
       setCurrentScreen('monthlySchedule');
     }
-  };
+  }, []);
 
-  const handleWeeklyScheduleBack = () => {
+  const handleWeeklyScheduleBack = useCallback(() => {
     setCurrentScreen('scheduleMain');
-  };
+  }, []);
 
-  const handleMonthlyScheduleBack = () => {
+  const handleMonthlyScheduleBack = useCallback(() => {
     setCurrentScreen('scheduleMain');
-  };
+  }, []);
 
-  const handleOrdersPress = () => {
+  const handleOrdersPress = useCallback(() => {
     // Only navigate if not already on order history screen
     if (currentScreen !== 'orderHistory') {
       setCurrentScreen('orderHistory');
     }
-  };
+  }, [currentScreen]);
 
-  const handleOrderHistoryBack = () => {
+  const handleOrderHistoryBack = useCallback(() => {
     setCurrentScreen('home');
-  };
+  }, []);
 
-  const handleOrderPress = (orderId: string) => {
+  const handleOrderPress = useCallback((orderId: string) => {
     setSelectedOrderId(orderId);
     setCurrentScreen('orderDetails');
-  };
+  }, []);
 
-  const handleOrderDetailsBack = () => {
+  const handleOrderDetailsBack = useCallback(() => {
     setCurrentScreen('orderHistory');
-  };
+  }, []);
 
-  const handleWorkItemPress = (workId: string, status: string) => {
+  const handleWorkItemPress = useCallback((workId: string, status: string) => {
     setSelectedOrderId(workId);
     setCurrentScreen('activeOrder');
-  };
+  }, []);
 
-  const handleActiveOrderBack = () => {
+  const handleActiveOrderBack = useCallback(() => {
     setCurrentScreen('home');
-  };
+  }, []);
 
-  const handleNavigateToComment = (type: 'cancel' | 'reschedule') => {
+  const handleNavigateToComment = useCallback((type: 'cancel' | 'reschedule') => {
     setCommentType(type);
     setComment('');
     setCurrentScreen('comment');
-  };
+  }, []);
 
-  const handleCommentBack = () => {
+  const handleCommentBack = useCallback(() => {
     setCurrentScreen('activeOrder');
-  };
+  }, []);
 
-  const handleCommentNext = (commentText: string) => {
+  const handleCommentNext = useCallback((commentText: string) => {
     setComment(commentText);
     if (commentType === 'cancel') {
       // Show cancel confirmation modal
@@ -387,51 +386,51 @@ function App() {
       // Go to calendar for reschedule
       setCurrentScreen('rescheduleCalendar');
     }
-  };
+  }, [commentType]);
 
-  const handleCalendarBack = () => {
+  const handleCalendarBack = useCallback(() => {
     setCurrentScreen('comment');
-  };
+  }, []);
 
-  const handleCalendarNext = (date: Date) => {
+  const handleCalendarNext = useCallback((date: Date) => {
     setSelectedDate(date);
     setCurrentScreen('timeSlots');
-  };
+  }, []);
 
-  const handleTimeSlotsBack = () => {
+  const handleTimeSlotsBack = useCallback(() => {
     setCurrentScreen('rescheduleCalendar');
-  };
+  }, []);
 
-  const handleReschedule = (times: string[]) => {
+  const handleReschedule = useCallback((times: string[]) => {
     setSelectedTimeSlots(times);
     // Show reschedule confirmation modal
     setConfirmationType('reschedule');
     setShowConfirmModal(true);
-  };
+  }, []);
 
-  const handleConfirmAction = () => {
+  const handleConfirmAction = useCallback(() => {
     setShowConfirmModal(false);
     setCurrentScreen('home');
     // Reset states
     setComment('');
     setSelectedDate(new Date());
     setSelectedTimeSlots([]);
-  };
+  }, []);
 
-  const handleHomePress = () => {
+  const handleHomePress = useCallback(() => {
     setCurrentScreen('home');
-  };
+  }, []);
 
-  const handleNotificationPress = () => {
+  const handleNotificationPress = useCallback(() => {
     setNotificationReturnScreen(currentScreen);
     setCurrentScreen('notification');
-  };
+  }, [currentScreen]);
 
-  const handleNotificationBack = () => {
+  const handleNotificationBack = useCallback(() => {
     setCurrentScreen(notificationReturnScreen);
-  };
+  }, [notificationReturnScreen]);
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     try {
       const { clearAuthData } = await import('./src/utils/storage');
       await clearAuthData();
@@ -442,9 +441,9 @@ function App() {
       console.error('Error during logout:', error);
       setCurrentScreen('login');
     }
-  };
+  }, []);
 
-  const handleShowError = (fromScreen: Screen, message?: string) => {
+  const handleShowError = useCallback((fromScreen: Screen, message?: string) => {
     // Check if the error is a session expiration / 401
     if (message?.includes('Session expired') || message?.includes('Unauthorized')) {
       handleLogout();
@@ -456,17 +455,17 @@ function App() {
     setPreviousScreen(returnScreen);
     setErrorMessage(message || '');
     setCurrentScreen('error');
-  };
+  }, [handleLogout]);
 
-  const handleErrorRetry = () => {
+  const handleErrorRetry = useCallback(() => {
     // Go back to previous screen and let it retry
     setCurrentScreen(previousScreen);
-  };
+  }, [previousScreen]);
 
-  const handleErrorGoBack = () => {
+  const handleErrorGoBack = useCallback(() => {
     // Go back to previous screen
     setCurrentScreen(previousScreen);
-  };
+  }, [previousScreen]);
 
   return (
     <LanguageProvider>

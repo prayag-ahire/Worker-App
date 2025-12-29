@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -60,7 +60,7 @@ const MonthlyScheduleScreen: React.FC<MonthlyScheduleScreenProps> = ({ onBack, o
     }
   };
 
-  const formatMonth = () => {
+  const formatMonth = useMemo(() => {
     const months = [
       t('calendar.january'),
       t('calendar.february'),
@@ -78,21 +78,25 @@ const MonthlyScheduleScreen: React.FC<MonthlyScheduleScreenProps> = ({ onBack, o
     const monthName = months[selectedDate.getMonth()];
     const year = selectedDate.getFullYear();
     return `${monthName}, ${year}`;
-  };
+  }, [selectedDate, t]);
 
-  const handlePrevious = () => {
-    const newDate = new Date(selectedDate);
-    newDate.setMonth(newDate.getMonth() - 1);
-    setSelectedDate(newDate);
-  };
+  const handlePrevious = useCallback(() => {
+    setSelectedDate(prev => {
+      const newDate = new Date(prev);
+      newDate.setMonth(newDate.getMonth() - 1);
+      return newDate;
+    });
+  }, []);
 
-  const handleNext = () => {
-    const newDate = new Date(selectedDate);
-    newDate.setMonth(newDate.getMonth() + 1);
-    setSelectedDate(newDate);
-  };
+  const handleNext = useCallback(() => {
+    setSelectedDate(prev => {
+      const newDate = new Date(prev);
+      newDate.setMonth(newDate.getMonth() + 1);
+      return newDate;
+    });
+  }, []);
 
-  const generateMonthCalendar = () => {
+  const calendarGrid = useMemo(() => {
     const year = selectedDate.getFullYear();
     const month = selectedDate.getMonth();
 
@@ -124,9 +128,8 @@ const MonthlyScheduleScreen: React.FC<MonthlyScheduleScreenProps> = ({ onBack, o
       calendar.push(week);
     }
 
-    console.log('Generated calendar for', selectedDate.getMonth() + 1, selectedDate.getFullYear(), ':', calendar);
     return calendar;
-  };
+  }, [selectedDate]);
 
   const getDateKey = (day: number) => {
     const year = selectedDate.getFullYear();
@@ -285,7 +288,7 @@ const MonthlyScheduleScreen: React.FC<MonthlyScheduleScreenProps> = ({ onBack, o
           <TouchableOpacity style={styles.navButton} onPress={handlePrevious}>
             <Text style={styles.navButtonText}>‹</Text>
           </TouchableOpacity>
-          <Text style={styles.monthText}>{formatMonth()}</Text>
+          <Text style={styles.monthText}>{formatMonth}</Text>
           <TouchableOpacity style={styles.navButton} onPress={handleNext}>
             <Text style={styles.navButtonText}>›</Text>
           </TouchableOpacity>
@@ -304,7 +307,7 @@ const MonthlyScheduleScreen: React.FC<MonthlyScheduleScreenProps> = ({ onBack, o
           </View>
 
           {/* Calendar Grid */}
-          {generateMonthCalendar().map((week, weekIndex) => (
+          {calendarGrid.map((week, weekIndex) => (
             <View key={`week-${weekIndex}`} style={styles.week}>
               {week.map((day, dayIndex) => {
                 if (day === null) {
@@ -362,7 +365,7 @@ const MonthlyScheduleScreen: React.FC<MonthlyScheduleScreenProps> = ({ onBack, o
               {selectedDay && isHoliday(selectedDay) ? t('monthlySchedule.editLeave') : t('monthlySchedule.addLeave')}
             </Text>
             <Text style={styles.modalDate}>
-              {t('monthlySchedule.date')}: {selectedDay} {formatMonth()}
+              {t('monthlySchedule.date')}: {selectedDay} {formatMonth}
             </Text>
 
             <TextInput

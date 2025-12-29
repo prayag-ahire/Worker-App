@@ -26,6 +26,38 @@ export interface ApiErrorResponse {
 }
 
 /**
+ * Handle common API error patterns
+ */
+const handleApiResponse = async (response: Response, errorMessage: string) => {
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({})) as ApiErrorResponse;
+    if (response.status === 401) {
+      throw new Error('Session expired. Please login again.');
+    }
+    throw new Error(errorData.error || `${errorMessage}: ${response.status}`);
+  }
+  
+  const data = await response.json();
+  return data;
+};
+
+/**
+ * Handle common catch error patterns
+ */
+const handleApiError = (error: any, apiName: string) => {
+  console.error(`${apiName} Error:`, error);
+  
+  if (error.message?.includes('Network request failed')) {
+    throw new Error('Cannot connect to server. Please check your internet connection.');
+  }
+  if (error.message?.includes('timeout')) {
+    throw new Error('Server is taking too long to respond. Please try again.');
+  }
+  
+  throw error;
+};
+
+/**
  * Fetch with timeout
  */
 const fetchWithTimeout = async (url: string, options: RequestInit, timeout: number): Promise<Response> => {
@@ -75,12 +107,7 @@ export const sendChatMessage = async (
       REQUEST_TIMEOUT
     );
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({})) as ApiErrorResponse;
-      throw new Error(errorData.error || `API error: ${response.status}`);
-    }
-
-    const data = await response.json() as ChatResponse;
+    const data = await handleApiResponse(response, 'Chat failed');
 
     if (!data.success) {
       throw new Error(data.error || 'Failed to get response');
@@ -88,17 +115,7 @@ export const sendChatMessage = async (
 
     return data.response;
   } catch (error: any) {
-    console.error('Chat API Error:', error);
-    
-    // Provide user-friendly error messages
-    if (error.message?.includes('Network request failed')) {
-      throw new Error('Cannot connect to server. Please check if the server is running.');
-    }
-    if (error.message?.includes('timeout')) {
-      throw new Error('Server is taking too long to respond. Please try again.');
-    }
-    
-    throw error;
+    return handleApiError(error, 'Chat API');
   }
 };
 
@@ -148,7 +165,6 @@ export const loginWorker = async (
   password: string
 ): Promise<LoginResponse> => {
   try {
-    console.log(`Logging in to ${PRODUCTION_API_URL}/worker/login`);
     const response = await fetchWithTimeout(
       `${PRODUCTION_API_URL}/worker/login`,
       {
@@ -164,12 +180,7 @@ export const loginWorker = async (
       REQUEST_TIMEOUT
     );
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({})) as ApiErrorResponse;
-      throw new Error(errorData.error || `Login failed: ${response.status}`);
-    }
-
-    const data = await response.json() as LoginResponse;
+    const data = await handleApiResponse(response, 'Login failed') as LoginResponse;
 
     if (!data.token) {
       throw new Error('Invalid response: No token received');
@@ -177,17 +188,7 @@ export const loginWorker = async (
 
     return data;
   } catch (error: any) {
-    console.error('Login API Error:', error);
-    
-    // Provide user-friendly error messages
-    if (error.message?.includes('Network request failed')) {
-      throw new Error('Cannot connect to server. Please check your internet connection.');
-    }
-    if (error.message?.includes('timeout')) {
-      throw new Error('Server is taking too long to respond. Please try again.');
-    }
-    
-    throw error;
+    return handleApiError(error, 'Login API');
   }
 };
 
@@ -202,7 +203,6 @@ export const signupWorker = async (
   password: string
 ): Promise<LoginResponse> => {
   try {
-    console.log(`Signing up to ${PRODUCTION_API_URL}/worker/signup`);
     const response = await fetchWithTimeout(
       `${PRODUCTION_API_URL}/worker/signup`,
       {
@@ -218,12 +218,7 @@ export const signupWorker = async (
       REQUEST_TIMEOUT
     );
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({})) as ApiErrorResponse;
-      throw new Error(errorData.error || `Signup failed: ${response.status}`);
-    }
-
-    const data = await response.json() as LoginResponse;
+    const data = await handleApiResponse(response, 'Signup failed') as LoginResponse;
 
     if (!data.token) {
       throw new Error('Invalid response: No token received');
@@ -231,17 +226,7 @@ export const signupWorker = async (
 
     return data;
   } catch (error: any) {
-    console.error('Signup API Error:', error);
-    
-    // Provide user-friendly error messages
-    if (error.message?.includes('Network request failed')) {
-      throw new Error('Cannot connect to server. Please check your internet connection.');
-    }
-    if (error.message?.includes('timeout')) {
-      throw new Error('Server is taking too long to respond. Please try again.');
-    }
-    
-    throw error;
+    return handleApiError(error, 'Signup API');
   }
 };
 
@@ -294,7 +279,6 @@ export const createWorkerProfile = async (
   profileData: WorkerProfileRequest
 ): Promise<WorkerProfileResponse> => {
   try {
-    console.log(`Creating worker profile at ${PRODUCTION_API_URL}/worker/workerProfile`);
     const response = await fetchWithTimeout(
       `${PRODUCTION_API_URL}/worker/workerProfile`,
       {
@@ -308,29 +292,9 @@ export const createWorkerProfile = async (
       REQUEST_TIMEOUT
     );
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({})) as ApiErrorResponse;
-      throw new Error(errorData.error || `Profile creation failed: ${response.status}`);
-    }
-
-    const data = await response.json() as WorkerProfileResponse;
-
-    return data;
+    return await handleApiResponse(response, 'Profile creation failed') as WorkerProfileResponse;
   } catch (error: any) {
-    console.error('Worker Profile API Error:', error);
-    
-    // Provide user-friendly error messages
-    if (error.message?.includes('Network request failed')) {
-      throw new Error('Cannot connect to server. Please check your internet connection.');
-    }
-    if (error.message?.includes('timeout')) {
-      throw new Error('Server is taking too long to respond. Please try again.');
-    }
-    if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
-      throw new Error('Session expired. Please login again.');
-    }
-    
-    throw error;
+    return handleApiError(error, 'Worker Profile API');
   }
 };
 
@@ -348,7 +312,6 @@ export interface LanguageResponse {
  */
 export const getUserLanguage = async (token: string): Promise<LanguageResponse> => {
   try {
-    console.log(`Fetching user language from ${PRODUCTION_API_URL}/worker/settings/me/language`);
     const response = await fetchWithTimeout(
       `${PRODUCTION_API_URL}/worker/settings/me/language`,
       {
@@ -361,27 +324,9 @@ export const getUserLanguage = async (token: string): Promise<LanguageResponse> 
       REQUEST_TIMEOUT
     );
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({})) as ApiErrorResponse;
-      throw new Error(errorData.error || `Failed to fetch language: ${response.status}`);
-    }
-
-    const data = await response.json() as LanguageResponse;
-    return data;
+    return await handleApiResponse(response, 'Failed to fetch language') as LanguageResponse;
   } catch (error: any) {
-    console.error('Get Language API Error:', error);
-    
-    if (error.message?.includes('Network request failed')) {
-      throw new Error('Cannot connect to server. Please check your internet connection.');
-    }
-    if (error.message?.includes('timeout')) {
-      throw new Error('Server is taking too long to respond. Please try again.');
-    }
-    if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
-      throw new Error('Session expired. Please login again.');
-    }
-    
-    throw error;
+    return handleApiError(error, 'Get Language API');
   }
 };
 
@@ -396,7 +341,6 @@ export const updateUserLanguage = async (
   language: string
 ): Promise<LanguageResponse> => {
   try {
-    console.log(`Updating user language to ${language} at ${PRODUCTION_API_URL}/worker/settings/me/language`);
     const response = await fetchWithTimeout(
       `${PRODUCTION_API_URL}/worker/settings/me/language`,
       {
@@ -412,27 +356,9 @@ export const updateUserLanguage = async (
       REQUEST_TIMEOUT
     );
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({})) as ApiErrorResponse;
-      throw new Error(errorData.error || `Failed to update language: ${response.status}`);
-    }
-
-    const data = await response.json() as LanguageResponse;
-    return data;
+    return await handleApiResponse(response, 'Failed to update language') as LanguageResponse;
   } catch (error: any) {
-    console.error('Update Language API Error:', error);
-    
-    if (error.message?.includes('Network request failed')) {
-      throw new Error('Cannot connect to server. Please check your internet connection.');
-    }
-    if (error.message?.includes('timeout')) {
-      throw new Error('Server is taking too long to respond. Please try again.');
-    }
-    if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
-      throw new Error('Session expired. Please login again.');
-    }
-    
-    throw error;
+    return handleApiError(error, 'Update Language API');
   }
 };
 
@@ -558,7 +484,6 @@ export interface UserProfileResponse {
  */
 export const getUserProfile = async (token: string): Promise<UserProfileResponse> => {
   try {
-    console.log(`Fetching user profile from ${PRODUCTION_API_URL}/worker/Profile/me`);
     const response = await fetchWithTimeout(
       `${PRODUCTION_API_URL}/worker/Profile/me`,
       {
@@ -571,27 +496,9 @@ export const getUserProfile = async (token: string): Promise<UserProfileResponse
       REQUEST_TIMEOUT
     );
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({})) as ApiErrorResponse;
-      throw new Error(errorData.error || `Failed to fetch profile: ${response.status}`);
-    }
-
-    const data = await response.json() as UserProfileResponse;
-    return data;
+    return await handleApiResponse(response, 'Failed to fetch profile') as UserProfileResponse;
   } catch (error: any) {
-    console.error('Get User Profile API Error:', error);
-    
-    if (error.message?.includes('Network request failed')) {
-      throw new Error('Cannot connect to server. Please check your internet connection.');
-    }
-    if (error.message?.includes('timeout')) {
-      throw new Error('Server is taking too long to respond. Please try again.');
-    }
-    if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
-      throw new Error('Session expired. Please login again.');
-    }
-    
-    throw error;
+    return handleApiError(error, 'Get User Profile API');
   }
 };
 
@@ -637,7 +544,6 @@ export const updateUserProfile = async (
   profileData: UpdateProfileRequest
 ): Promise<UpdateProfileResponse> => {
   try {
-    console.log(`Updating user profile at ${PRODUCTION_API_URL}/worker/Profile/me`);
     const response = await fetchWithTimeout(
       `${PRODUCTION_API_URL}/worker/Profile/me`,
       {
@@ -651,27 +557,9 @@ export const updateUserProfile = async (
       REQUEST_TIMEOUT
     );
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({})) as ApiErrorResponse;
-      throw new Error(errorData.error || `Failed to update profile: ${response.status}`);
-    }
-
-    const data = await response.json() as UpdateProfileResponse;
-    return data;
+    return await handleApiResponse(response, 'Failed to update profile') as UpdateProfileResponse;
   } catch (error: any) {
-    console.error('Update User Profile API Error:', error);
-    
-    if (error.message?.includes('Network request failed')) {
-      throw new Error('Cannot connect to server. Please check your internet connection.');
-    }
-    if (error.message?.includes('timeout')) {
-      throw new Error('Server is taking too long to respond. Please try again.');
-    }
-    if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
-      throw new Error('Session expired. Please login again.');
-    }
-    
-    throw error;
+    return handleApiError(error, 'Update User Profile API');
   }
 };
 
@@ -700,7 +588,6 @@ export interface LocationUpdateRequest {
  */
 export const getUserLocation = async (token: string): Promise<LocationResponse> => {
   try {
-    console.log(`Fetching user location from ${PRODUCTION_API_URL}/worker/settings/me/location`);
     const response = await fetchWithTimeout(
       `${PRODUCTION_API_URL}/worker/settings/me/location`,
       {
@@ -713,27 +600,9 @@ export const getUserLocation = async (token: string): Promise<LocationResponse> 
       REQUEST_TIMEOUT
     );
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({})) as ApiErrorResponse;
-      throw new Error(errorData.error || `Failed to fetch location: ${response.status}`);
-    }
-
-    const data = await response.json() as LocationResponse;
-    return data;
+    return await handleApiResponse(response, 'Failed to fetch location') as LocationResponse;
   } catch (error: any) {
-    console.error('Get User Location API Error:', error);
-    
-    if (error.message?.includes('Network request failed')) {
-      throw new Error('Cannot connect to server. Please check your internet connection.');
-    }
-    if (error.message?.includes('timeout')) {
-      throw new Error('Server is taking too long to respond. Please try again.');
-    }
-    if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
-      throw new Error('Session expired. Please login again.');
-    }
-    
-    throw error;
+    return handleApiError(error, 'Get User Location API');
   }
 };
 
@@ -748,7 +617,6 @@ export const updateUserLocation = async (
   locationData: LocationUpdateRequest
 ): Promise<LocationResponse> => {
   try {
-    console.log(`Updating user location at ${PRODUCTION_API_URL}/worker/settings/me/location`);
     const response = await fetchWithTimeout(
       `${PRODUCTION_API_URL}/worker/settings/me/location`,
       {
@@ -762,27 +630,9 @@ export const updateUserLocation = async (
       REQUEST_TIMEOUT
     );
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({})) as ApiErrorResponse;
-      throw new Error(errorData.error || `Failed to update location: ${response.status}`);
-    }
-
-    const data = await response.json() as LocationResponse;
-    return data;
+    return await handleApiResponse(response, 'Failed to update location') as LocationResponse;
   } catch (error: any) {
-    console.error('Update User Location API Error:', error);
-    
-    if (error.message?.includes('Network request failed')) {
-      throw new Error('Cannot connect to server. Please check your internet connection.');
-    }
-    if (error.message?.includes('timeout')) {
-      throw new Error('Server is taking too long to respond. Please try again.');
-    }
-    if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
-      throw new Error('Session expired. Please login again.');
-    }
-    
-    throw error;
+    return handleApiError(error, 'Update User Location API');
   }
 };/**
  * Weekly schedule response interface
@@ -828,8 +678,6 @@ export interface WeeklyScheduleResponse {
  */
 export const getWeeklySchedule = async (token: string): Promise<WeeklyScheduleResponse> => {
   try {
-    console.log(`Fetching weekly schedule from ${PRODUCTION_API_URL}/worker/WorkerSchedule/weekly`);
-    
     const response = await fetchWithTimeout(
       `${PRODUCTION_API_URL}/worker/WorkerSchedule/weekly`,
       {
@@ -842,31 +690,9 @@ export const getWeeklySchedule = async (token: string): Promise<WeeklyScheduleRe
       REQUEST_TIMEOUT
     );
 
-    console.log('Weekly schedule response status:', response.status);
-    console.log('Weekly schedule response ok:', response.ok);
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({})) as ApiErrorResponse;
-      throw new Error(errorData.error || `Failed to fetch schedule: ${response.status}`);
-    }
-
-    const data = await response.json() as WeeklyScheduleResponse;
-    console.log('Weekly schedule raw response:', JSON.stringify(data, null, 2));
-    return data;
+    return await handleApiResponse(response, 'Failed to fetch schedule') as WeeklyScheduleResponse;
   } catch (error: any) {
-    console.error('Get Weekly Schedule API Error:', error);
-    
-    if (error.message?.includes('Network request failed')) {
-      throw new Error('Cannot connect to server. Please check your internet connection.');
-    }
-    if (error.message?.includes('timeout')) {
-      throw new Error('Server is taking too long to respond. Please try again.');
-    }
-    if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
-      throw new Error('Session expired. Please login again.');
-    }
-    
-    throw error;
+    return handleApiError(error, 'Get Weekly Schedule API');
   }
 };
 
@@ -924,9 +750,6 @@ export const updateWeeklySchedule = async (
   scheduleData: UpdateWeeklyScheduleRequest
 ): Promise<UpdateWeeklyScheduleResponse> => {
   try {
-    console.log(`Updating weekly schedule at ${PRODUCTION_API_URL}/worker/WorkerSchedule/weekly`);
-    console.log('Schedule data to update:', JSON.stringify(scheduleData, null, 2));
-    
     const response = await fetchWithTimeout(
       `${PRODUCTION_API_URL}/worker/WorkerSchedule/weekly`,
       {
@@ -940,30 +763,9 @@ export const updateWeeklySchedule = async (
       REQUEST_TIMEOUT
     );
 
-    console.log('Update schedule response status:', response.status);
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({})) as ApiErrorResponse;
-      throw new Error(errorData.error || `Failed to update schedule: ${response.status}`);
-    }
-
-    const data = await response.json() as UpdateWeeklyScheduleResponse;
-    console.log('Update schedule response:', JSON.stringify(data, null, 2));
-    return data;
+    return await handleApiResponse(response, 'Failed to update schedule') as UpdateWeeklyScheduleResponse;
   } catch (error: any) {
-    console.error('Update Weekly Schedule API Error:', error);
-    
-    if (error.message?.includes('Network request failed')) {
-      throw new Error('Cannot connect to server. Please check your internet connection.');
-    }
-    if (error.message?.includes('timeout')) {
-      throw new Error('Server is taking too long to respond. Please try again.');
-    }
-    if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
-      throw new Error('Session expired. Please login again.');
-    }
-    
-    throw error;
+    return handleApiError(error, 'Update Weekly Schedule API');
   }
 };
 
@@ -1014,8 +816,6 @@ export const getMonthlySchedule = async (
   month: string
 ): Promise<MonthlyScheduleResponse> => {
   try {
-    console.log(`Fetching monthly schedule from ${PRODUCTION_API_URL}/worker/WorkerSchedule/month?month=${month}`);
-    
     const response = await fetchWithTimeout(
       `${PRODUCTION_API_URL}/worker/WorkerSchedule/month?month=${month}`,
       {
@@ -1028,30 +828,9 @@ export const getMonthlySchedule = async (
       REQUEST_TIMEOUT
     );
 
-    console.log('Monthly schedule response status:', response.status);
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({})) as ApiErrorResponse;
-      throw new Error(errorData.error || `Failed to fetch monthly schedule: ${response.status}`);
-    }
-
-    const data = await response.json() as MonthlyScheduleResponse;
-    console.log('Monthly schedule response:', JSON.stringify(data, null, 2));
-    return data;
+    return await handleApiResponse(response, 'Failed to fetch monthly schedule') as MonthlyScheduleResponse;
   } catch (error: any) {
-    console.error('Get Monthly Schedule API Error:', error);
-    
-    if (error.message?.includes('Network request failed')) {
-      throw new Error('Cannot connect to server. Please check your internet connection.');
-    }
-    if (error.message?.includes('timeout')) {
-      throw new Error('Server is taking too long to respond. Please try again.');
-    }
-    if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
-      throw new Error('Session expired. Please login again.');
-    }
-    
-    throw error;
+    return handleApiError(error, 'Get Monthly Schedule API');
   }
 };
 
@@ -1066,9 +845,6 @@ export const addHoliday = async (
   holidayData: AddHolidayRequest
 ): Promise<AddHolidayResponse> => {
   try {
-    console.log(`Adding holiday at ${PRODUCTION_API_URL}/worker/WorkerSchedule/month`);
-    console.log('Holiday data:', JSON.stringify(holidayData, null, 2));
-    
     const response = await fetchWithTimeout(
       `${PRODUCTION_API_URL}/worker/WorkerSchedule/month`,
       {
@@ -1082,30 +858,9 @@ export const addHoliday = async (
       REQUEST_TIMEOUT
     );
 
-    console.log('Add holiday response status:', response.status);
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({})) as ApiErrorResponse;
-      throw new Error(errorData.error || `Failed to add holiday: ${response.status}`);
-    }
-
-    const data = await response.json() as AddHolidayResponse;
-    console.log('Add holiday response:', JSON.stringify(data, null, 2));
-    return data;
+    return await handleApiResponse(response, 'Failed to add holiday') as AddHolidayResponse;
   } catch (error: any) {
-    console.error('Add Holiday API Error:', error);
-    
-    if (error.message?.includes('Network request failed')) {
-      throw new Error('Cannot connect to server. Please check your internet connection.');
-    }
-    if (error.message?.includes('timeout')) {
-      throw new Error('Server is taking too long to respond. Please try again.');
-    }
-    if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
-      throw new Error('Session expired. Please login again.');
-    }
-    
-    throw error;
+    return handleApiError(error, 'Add Holiday API');
   }
 };
 
@@ -1128,8 +883,6 @@ export const deleteHoliday = async (
   date: string
 ): Promise<DeleteHolidayResponse> => {
   try {
-    console.log(`Deleting holiday at ${PRODUCTION_API_URL}/worker/WorkerSchedule/month?date=${date}`);
-    
     const response = await fetchWithTimeout(
       `${PRODUCTION_API_URL}/worker/WorkerSchedule/month?date=${date}`,
       {
@@ -1142,29 +895,8 @@ export const deleteHoliday = async (
       REQUEST_TIMEOUT
     );
 
-    console.log('Delete holiday response status:', response.status);
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({})) as ApiErrorResponse;
-      throw new Error(errorData.error || `Failed to delete holiday: ${response.status}`);
-    }
-
-    const data = await response.json() as DeleteHolidayResponse;
-    console.log('Delete holiday response:', JSON.stringify(data, null, 2));
-    return data;
+    return await handleApiResponse(response, 'Failed to delete holiday') as DeleteHolidayResponse;
   } catch (error: any) {
-    console.error('Delete Holiday API Error:', error);
-    
-    if (error.message?.includes('Network request failed')) {
-      throw new Error('Cannot connect to server. Please check your internet connection.');
-    }
-    if (error.message?.includes('timeout')) {
-      throw new Error('Server is taking too long to respond. Please try again.');
-    }
-    if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
-      throw new Error('Session expired. Please login again.');
-    }
-    
-    throw error;
+    return handleApiError(error, 'Delete Holiday API');
   }
 };

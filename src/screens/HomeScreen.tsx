@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -58,13 +58,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
   const viewMode = externalViewMode !== undefined ? externalViewMode : internalViewMode;
   
   // Function to update view mode
-  const updateViewMode = (mode: ViewMode) => {
+  const updateViewMode = useCallback((mode: ViewMode) => {
     if (onViewModeChange) {
       onViewModeChange(mode);
     } else {
       setInternalViewMode(mode);
     }
-  };
+  }, [onViewModeChange]);
 
   // Load cached user profile on mount and when shouldRefresh changes
   useEffect(() => {
@@ -73,7 +73,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
         const cachedProfile = await getUserProfile();
         if (cachedProfile && cachedProfile.username) {
           setUserName(cachedProfile.username);
-          console.log('Loaded username from cache:', cachedProfile.username);
         }
       } catch (error: any) {
         console.error('Error loading cached profile:', error);
@@ -89,12 +88,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
   }, [shouldRefresh]); // Re-run when shouldRefresh changes
 
   // Sample data - Day view
-  const todayWork: WorkItem[] = [
+  const todayWork: WorkItem[] = useMemo(() => [
     { id: '1', clientName: 'Prayag', time: '2:00-3:00', status: 'Pending' },
-  ];
+  ], []);
 
   // Sample data - Week view
-  const weekWork = [
+  const weekWork = useMemo(() => [
     { day: t('calendar.sunday'), count: '0' },
     { day: t('calendar.monday'), count: '7' },
     { day: t('calendar.tuesday'), count: '2' },
@@ -102,53 +101,57 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
     { day: t('calendar.thursday'), count: '8' },
     { day: t('calendar.friday'), count: '5' },
     { day: t('calendar.saturday'), count: '0' },
-  ];
+  ], [t]);
 
   // Sample data - Month view (calendar grid)
-  const monthWork = [
+  const monthWork = useMemo(() => [
     [null, null, null, null, 1, 2, 3],
     [4, 5, 6, 7, 8, 9, 10],
     [11, 12, 13, 14, 15, 16, 17],
     [18, 19, 20, 21, 22, 23, 24],
     [25, 26, 27, 28, 29, 30, null],
-  ];
+  ], []);
 
   // Work count per day for month view
-  const monthWorkCount: { [key: number]: number } = {
+  const monthWorkCount: { [key: number]: number } = useMemo(() => ({
     1: 3, 5: 2, 8: 5, 12: 1, 15: 4, 18: 6, 22: 3, 25: 2, 28: 7,
-  };
+  }), []);
 
-  const handleSettingsPress = () => {
+  const handleSettingsPress = useCallback(() => {
     if (onSettingsPress) {
       onSettingsPress();
     }
-  };
+  }, [onSettingsPress]);
 
-  const handlePrevious = () => {
-    const newDate = new Date(selectedDate);
-    if (viewMode === 'day') {
-      newDate.setDate(newDate.getDate() - 1);
-    } else if (viewMode === 'week') {
-      newDate.setDate(newDate.getDate() - 7);
-    } else if (viewMode === 'month') {
-      newDate.setMonth(newDate.getMonth() - 1);
-    }
-    setSelectedDate(newDate);
-  };
+  const handlePrevious = useCallback(() => {
+    setSelectedDate(prev => {
+      const newDate = new Date(prev);
+      if (viewMode === 'day') {
+        newDate.setDate(newDate.getDate() - 1);
+      } else if (viewMode === 'week') {
+        newDate.setDate(newDate.getDate() - 7);
+      } else if (viewMode === 'month') {
+        newDate.setMonth(newDate.getMonth() - 1);
+      }
+      return newDate;
+    });
+  }, [viewMode]);
 
-  const handleNext = () => {
-    const newDate = new Date(selectedDate);
-    if (viewMode === 'day') {
-      newDate.setDate(newDate.getDate() + 1);
-    } else if (viewMode === 'week') {
-      newDate.setDate(newDate.getDate() + 7);
-    } else if (viewMode === 'month') {
-      newDate.setMonth(newDate.getMonth() + 1);
-    }
-    setSelectedDate(newDate);
-  };
+  const handleNext = useCallback(() => {
+    setSelectedDate(prev => {
+      const newDate = new Date(prev);
+      if (viewMode === 'day') {
+        newDate.setDate(newDate.getDate() + 1);
+      } else if (viewMode === 'week') {
+        newDate.setDate(newDate.getDate() + 7);
+      } else if (viewMode === 'month') {
+        newDate.setMonth(newDate.getMonth() + 1);
+      }
+      return newDate;
+    });
+  }, [viewMode]);
 
-  const formatDate = () => {
+  const formatDate = useMemo(() => {
     const day = selectedDate.getDate();
     const days = [
       t('calendar.sunday'),
@@ -161,7 +164,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
     ];
     const dayName = days[selectedDate.getDay()];
     return `${day}, ${dayName}`;
-  };
+  }, [selectedDate, t]);
 
   const getWeekNumber = (date: Date) => {
     const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -170,7 +173,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
     return Math.ceil((dayOfMonth + dayOfWeek) / 7);
   };
 
-  const formatWeek = () => {
+  const formatWeek = useMemo(() => {
     const weekNum = getWeekNumber(selectedDate);
     const months = [
       t('calendar.january'),
@@ -188,9 +191,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
     ];
     const monthName = months[selectedDate.getMonth()];
     return `${t('calendar.week')} ${weekNum}, ${monthName}`;
-  };
+  }, [selectedDate, t]);
 
-  const formatMonth = () => {
+  const formatMonth = useMemo(() => {
     const months = [
       t('calendar.january'),
       t('calendar.february'),
@@ -208,7 +211,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
     const monthName = months[selectedDate.getMonth()];
     const year = selectedDate.getFullYear();
     return `${monthName} ${year}`;
-  };
+  }, [selectedDate, t]);
 
   const generateMonthCalendar = () => {
     const year = selectedDate.getFullYear();
@@ -345,9 +348,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
             <Text style={styles.navButtonText}>‹</Text>
           </TouchableOpacity>
           <Text style={styles.dateText}>
-            {viewMode === 'day' && formatDate()}
-            {viewMode === 'week' && formatWeek()}
-            {viewMode === 'month' && formatMonth()}
+            {viewMode === 'day' && formatDate}
+            {viewMode === 'week' && formatWeek}
+            {viewMode === 'month' && formatMonth}
           </Text>
           <TouchableOpacity 
             style={styles.navButton} 

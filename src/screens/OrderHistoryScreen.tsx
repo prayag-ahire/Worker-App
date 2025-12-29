@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -30,14 +30,14 @@ interface Order {
 const OrderHistoryScreen: React.FC<OrderHistoryScreenProps> = ({ onBack, onOrderPress, onHomePress, onSchedulePress, onSettingsPress, onNotificationPress, onShowError }) => {
   const { t } = useLanguage();
   
-  const orders: Order[] = [
+  const orders: Order[] = useMemo(() => [
     { id: '1245', clientName: 'Prayag Ahire', status: t('home.completed') },
     { id: '1246', clientName: 'Ganesh Ahire', status: t('home.completed') },
     { id: '1247', clientName: 'Ram Shirsagar', status: t('home.completed') },
     { id: '1248', clientName: 'Prayag Ahire', status: t('home.completed') },
     { id: '1249', clientName: 'Prayag Ahire', status: t('home.completed') },
     { id: '1250', clientName: 'Prayag Ahire', status: t('home.completed') },
-  ];
+  ], [t]);
 
   return (
     <View style={styles.container}>

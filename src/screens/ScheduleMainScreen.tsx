@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -21,13 +21,18 @@ interface ScheduleMainScreenProps {
   onShowError?: (fromScreen: 'scheduleMain', message?: string) => void;
 }
 
+const SCHEDULE_OPTIONS = [
+  { id: 1, title: 'schedule.weeklySchedule', key: 'weekly' as const },
+  { id: 2, title: 'schedule.monthlySchedule', key: 'monthly' as const },
+];
+
 const ScheduleMainScreen: React.FC<ScheduleMainScreenProps> = ({ onBack, onNavigate, onHomePress, onOrdersPress, onSettingsPress, onNotificationPress, onShowError }) => {
   const { t } = useLanguage();
   
-  const scheduleOptions = [
-    { id: 1, title: t('schedule.weeklySchedule'), key: 'weekly' as const },
-    { id: 2, title: t('schedule.monthlySchedule'), key: 'monthly' as const },
-  ];
+  const scheduleOptions = useMemo(() => SCHEDULE_OPTIONS.map(opt => ({
+    ...opt,
+    title: t(opt.title as any)
+  })), [t]);
 
   return (
     <View style={styles.container}>
