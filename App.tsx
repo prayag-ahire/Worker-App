@@ -247,12 +247,13 @@ function App() {
       setCurrentScreen('help');
     }
     if (screen === 'Login') {
-      setCurrentScreen('login');
+      handleLogout();
     }
   };
 
   const handleUserProfileBack = () => {
     setShouldRefreshProfile(false); // Reset refresh flag
+    setShouldRefreshHome(true); // Trigger refresh for home screen to pick up any changes
     setCurrentScreen('settings');
   };
 
@@ -420,7 +421,35 @@ function App() {
     setCurrentScreen('home');
   };
 
+  const handleNotificationPress = () => {
+    setNotificationReturnScreen(currentScreen);
+    setCurrentScreen('notification');
+  };
+
+  const handleNotificationBack = () => {
+    setCurrentScreen(notificationReturnScreen);
+  };
+
+  const handleLogout = async () => {
+    try {
+      const { clearAuthData } = await import('./src/utils/storage');
+      await clearAuthData();
+      setCurrentScreen('login');
+      setShouldRefreshHome(false);
+      setShouldRefreshProfile(false);
+    } catch (error) {
+      console.error('Error during logout:', error);
+      setCurrentScreen('login');
+    }
+  };
+
   const handleShowError = (fromScreen: Screen, message?: string) => {
+    // Check if the error is a session expiration / 401
+    if (message?.includes('Session expired') || message?.includes('Unauthorized')) {
+      handleLogout();
+      return;
+    }
+
     // If error is from userProfile, go back to settings instead
     const returnScreen = fromScreen === 'userProfile' ? 'settings' : fromScreen;
     setPreviousScreen(returnScreen);
@@ -436,15 +465,6 @@ function App() {
   const handleErrorGoBack = () => {
     // Go back to previous screen
     setCurrentScreen(previousScreen);
-  };
-
-  const handleNotificationPress = () => {
-    setNotificationReturnScreen(currentScreen);
-    setCurrentScreen('notification');
-  };
-
-  const handleNotificationBack = () => {
-    setCurrentScreen(notificationReturnScreen);
   };
 
   return (

@@ -14,7 +14,7 @@ import {
 import Toast from 'react-native-toast-message';
 import { Colors } from '../styles/colors';
 import { signupWorker } from '../services/apiClient';
-import { saveAuthToken, saveProfileCompleted } from '../utils/storage';
+import { saveAuthToken, saveProfileCompleted, clearAuthData } from '../utils/storage';
 
 interface SignUpScreenProps {
   onSignUpComplete?: (referralCode?: string) => void;
@@ -117,6 +117,9 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUpComplete, onLoginPr
     setIsLoading(true);
 
     try {
+      // Clear any existing auth data before signing up
+      await clearAuthData();
+
       // Call the signup API
       const response = await signupWorker(phoneNo, password);
 

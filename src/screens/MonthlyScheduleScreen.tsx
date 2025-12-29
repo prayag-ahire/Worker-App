@@ -79,7 +79,7 @@ const MonthlyScheduleScreen: React.FC<MonthlyScheduleScreenProps> = ({ onBack })
     ];
     const monthName = months[selectedDate.getMonth()];
     const year = selectedDate.getFullYear();
-    return `${monthName.slice(0, 3)}, ${year}`;
+    return `${monthName}, ${year}`;
   };
 
   const handlePrevious = () => {

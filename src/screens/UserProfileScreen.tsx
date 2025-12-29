@@ -14,7 +14,7 @@ import { Colors } from '../styles/colors';
 import { useLanguage } from '../contexts/LanguageContext';
 import { ScreenHeader } from '../components';
 import { getUserProfile, UserProfileResponse } from '../services/apiClient';
-import { getAuthToken } from '../utils/storage';
+import { getUserProfile as getCachedProfile, saveUserProfile, getAuthToken } from '../utils/storage';
 
 interface UserProfileScreenProps {
   onBack?: () => void;
@@ -49,6 +49,12 @@ const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit, o
 
         console.log('Fetching fresh profile data...');
         const data = await getUserProfile(token);
+        
+        // Save the fresh profile data to storage if successful
+        if (data) {
+          await saveUserProfile(data);
+        }
+
         setProfileData(data);
         setHasLoadedOnce(true);
         console.log('Fetched user profile:', data);
@@ -57,11 +63,7 @@ const UserProfileScreen: React.FC<UserProfileScreenProps> = ({ onBack, onEdit, o
         
         // Show error screen
         if (onShowError) {
-          const errorMessage = error.message === 'No authentication token found. Please login again.'
-            ? 'Your session has expired. Please login again.'
-            : 'Unable to load your profile. Please check your internet connection and try again.';
-          
-          onShowError('userProfile', errorMessage);
+          onShowError('userProfile', error.message);
         }
       } finally {
         setIsLoading(false);

@@ -12,7 +12,7 @@ import {
 import Toast from 'react-native-toast-message';
 import { Colors } from '../styles/colors';
 import { loginWorker, getUserProfile as fetchUserProfile } from '../services/apiClient';
-import { saveAuthToken, saveProfileCompleted, saveUserProfile } from '../utils/storage';
+import { saveAuthToken, saveProfileCompleted, saveUserProfile, clearAuthData } from '../utils/storage';
 
 interface LoginScreenProps {
   onLoginSuccess?: () => void;
@@ -70,6 +70,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
     setIsLoading(true);
 
     try {
+      // Clear any existing auth data before logging in
+      await clearAuthData();
+
       // Call the login API
       const response = await loginWorker(phoneNo, password);
 
