@@ -5,6 +5,7 @@ import {
   StyleSheet,
   StatusBar,
   ScrollView,
+  TouchableOpacity,
 } from 'react-native';
 import { Colors } from '../styles/colors';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -17,9 +18,10 @@ interface SettingsScreenProps {
   onHomePress?: () => void;
   onOrdersPress?: () => void;
   onSchedulePress?: () => void;
+  onNotificationPress?: () => void;
 }
 
-const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onNavigate, onHomePress, onOrdersPress, onSchedulePress }) => {
+const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onNavigate, onHomePress, onOrdersPress, onSchedulePress, onNotificationPress }) => {
   const { t } = useLanguage();
   
   const settingsOptions = [
@@ -53,6 +55,17 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack, onNavigate, onH
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>{t('settings.settings')}</Text>
+        <TouchableOpacity 
+          onPress={onNotificationPress}
+          style={styles.notificationButton}
+          activeOpacity={0.7}
+        >
+          <View style={styles.bellIcon}>
+            <View style={styles.bellTop} />
+            <View style={styles.bellBody} />
+            <View style={styles.bellClapper} />
+          </View>
+        </TouchableOpacity>
       </View>
 
       <ScrollView
@@ -98,6 +111,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 24,
     paddingTop: 60,
     paddingBottom: 20,
@@ -115,6 +131,49 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: Colors.white,
     letterSpacing: -0.3,
+    flex: 1,
+  },
+  notificationButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  bellIcon: {
+    width: 20,
+    height: 22,
+    position: 'relative',
+  },
+  bellTop: {
+    width: 4,
+    height: 2,
+    backgroundColor: Colors.white,
+    borderRadius: 2,
+    position: 'absolute',
+    top: 0,
+    left: 8,
+  },
+  bellBody: {
+    width: 16,
+    height: 16,
+    borderWidth: 2,
+    borderColor: Colors.white,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+    borderBottomLeftRadius: 4,
+    borderBottomRightRadius: 4,
+    position: 'absolute',
+    top: 2,
+    left: 2,
+  },
+  bellClapper: {
+    width: 4,
+    height: 4,
+    backgroundColor: Colors.white,
+    borderRadius: 2,
+    position: 'absolute',
+    bottom: 0,
+    left: 8,
   },
   scrollContent: {
     flexGrow: 1,

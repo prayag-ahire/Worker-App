@@ -26,10 +26,11 @@ import CommentScreen from './src/screens/CommentScreen';
 import RescheduleCalendarScreen from './src/screens/RescheduleCalendarScreen';
 import TimeSlotsScreen from './src/screens/TimeSlotsScreen';
 import ErrorScreen from './src/screens/ErrorScreen';
+import NotificationScreen from './src/screens/NotificationScreen';
 import { Colors } from './src/styles/colors';
 import { LanguageProvider } from './src/contexts/LanguageContext';
 
-type Screen = 'splash' | 'login' | 'signup' | 'onboarding' | 'personalDetails' | 'home' | 'settings' | 'userProfile' | 'editProfile' | 'location' | 'appLanguage' | 'inviteFriend' | 'tutorialVideos' | 'help' | 'aiChat' | 'scheduleMain' | 'weeklySchedule' | 'monthlySchedule' | 'orderHistory' | 'orderDetails' | 'activeOrder' | 'comment' | 'rescheduleCalendar' | 'timeSlots' | 'error';
+type Screen = 'splash' | 'login' | 'signup' | 'onboarding' | 'personalDetails' | 'home' | 'settings' | 'userProfile' | 'editProfile' | 'location' | 'appLanguage' | 'inviteFriend' | 'tutorialVideos' | 'help' | 'aiChat' | 'scheduleMain' | 'weeklySchedule' | 'monthlySchedule' | 'orderHistory' | 'orderDetails' | 'activeOrder' | 'comment' | 'rescheduleCalendar' | 'timeSlots' | 'error' | 'notification';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('splash');
@@ -47,6 +48,7 @@ function App() {
   const [previousScreen, setPreviousScreen] = useState<Screen>('home');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [homeViewMode, setHomeViewMode] = useState<'day' | 'week' | 'month'>('day');
+  const [notificationReturnScreen, setNotificationReturnScreen] = useState<Screen>('home');
 
   // Handle hardware back button
   useEffect(() => {
@@ -155,6 +157,12 @@ function App() {
       // Error screen - go back to previous screen
       if (currentScreen === 'error') {
         setCurrentScreen(previousScreen);
+        return true;
+      }
+
+      // Notification screen - go back to screen that opened it
+      if (currentScreen === 'notification') {
+        setCurrentScreen(notificationReturnScreen);
         return true;
       }
 
@@ -428,6 +436,15 @@ function App() {
     setCurrentScreen(previousScreen);
   };
 
+  const handleNotificationPress = () => {
+    setNotificationReturnScreen(currentScreen);
+    setCurrentScreen('notification');
+  };
+
+  const handleNotificationBack = () => {
+    setCurrentScreen(notificationReturnScreen);
+  };
+
   return (
     <LanguageProvider>
       <SafeAreaProvider>
@@ -469,6 +486,7 @@ function App() {
             shouldRefresh={shouldRefreshHome}
             viewMode={homeViewMode}
             onViewModeChange={setHomeViewMode}
+            onNotificationPress={handleNotificationPress}
           />
         )}
         {currentScreen === 'settings' && (
@@ -478,6 +496,7 @@ function App() {
             onHomePress={handleHomePress}
             onOrdersPress={handleOrdersPress}
             onSchedulePress={handleSchedulePress}
+            onNotificationPress={handleNotificationPress}
           />
         )}
         {currentScreen === 'userProfile' && (
@@ -525,6 +544,7 @@ function App() {
             onHomePress={handleHomePress}
             onOrdersPress={handleOrdersPress}
             onSettingsPress={handleSettingsPress}
+            onNotificationPress={handleNotificationPress}
           />
         )}
         {currentScreen === 'weeklySchedule' && (
@@ -540,6 +560,7 @@ function App() {
             onHomePress={handleHomePress}
             onSchedulePress={handleSchedulePress}
             onSettingsPress={handleSettingsPress}
+            onNotificationPress={handleNotificationPress}
           />
         )}
         {currentScreen === 'orderDetails' && (
@@ -583,6 +604,9 @@ function App() {
             onGoBack={handleErrorGoBack}
             errorMessage={errorMessage}
           />
+        )}
+        {currentScreen === 'notification' && (
+          <NotificationScreen onBack={handleNotificationBack} />
         )}
 
         {/* Confirmation Modal */}
